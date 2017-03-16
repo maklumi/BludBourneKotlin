@@ -2,7 +2,9 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 
@@ -14,7 +16,7 @@ object Utility {
         if (assetManager.isLoaded(assetFilenamePath)) {
             assetManager.unload(assetFilenamePath)
         } else {
-            Gdx.app.debug(TAG, "Asset is not loaded; Nothing to unload: " + assetFilenamePath );
+            Gdx.app.debug(TAG, "Asset is not loaded; Nothing to unload: " + assetFilenamePath);
         }
     }
 
@@ -48,4 +50,22 @@ object Utility {
             return TiledMap()
         }
     }
+
+
+    fun loadTextureAsset(textureFilenamePath: String) {
+        val filePathResolver = InternalFileHandleResolver()
+        if (filePathResolver.resolve(textureFilenamePath).exists()) {
+            assetManager.setLoader(Texture::class.java, TextureLoader(filePathResolver))
+            assetManager.load(textureFilenamePath, Texture::class.java)
+            assetManager.finishLoadingAsset(textureFilenamePath)
+        } else {
+            Gdx.app.debug(TAG, "Texture doesn't exist!: " + textureFilenamePath)
+        }
+    }
+
+    fun getTextureAsset(textureFilenamePath: String): Texture {
+        return assetManager.get(textureFilenamePath, Texture::class.java)
+    }
+
+
 }
