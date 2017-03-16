@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Array
 
 import java.util.UUID
 
-open class Entity {
+class Entity {
 
     var velocity: Vector2 = Vector2(100f, 100f)
     var boundingBox: Rectangle = Rectangle()
@@ -82,14 +82,7 @@ open class Entity {
     }
 
 
-    constructor(entityType: String) {
-        /*
-		entityScript = ScriptManager.getInstance().scriptFactory(entityType);
-		if( entityScript != null ){
-			entityScript.create(this);
-		}
-		*/
-    }
+
 
 
     fun reset() {

@@ -11,5 +11,8 @@ class BludBourne : Game() {
         setScreen(mainGameScreen)
     }
 
+    companion object {
+        val player = Entity()
+    }
 
 }
