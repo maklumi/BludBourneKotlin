@@ -6,13 +6,15 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import com.packtpub.libgdx.bludbourne.BludBourne
+import com.packtpub.libgdx.bludbourne.PlayerController
 import com.packtpub.libgdx.bludbourne.Utility
 
 
 class MainGameScreen : Screen {
 
     private val unitScale = 1 / 16f
-    private val overviewMap = "maps/tmx/Town.tmx"
+    private val overviewMap = "sprites/tmx/Town.tmx"
 
     internal var viewportWidth: Float = 0f
     internal var viewportHeight: Float = 0f
@@ -26,6 +28,7 @@ class MainGameScreen : Screen {
     private lateinit var currentMap: TiledMap
     private lateinit var mapRenderer: OrthogonalTiledMapRenderer
     private lateinit var camera: OrthographicCamera
+    private lateinit var controller: PlayerController
 
     override fun show() {
         setupViewport(Gdx.graphics.width, Gdx.graphics.height)
@@ -44,6 +47,9 @@ class MainGameScreen : Screen {
 
         mapRenderer = OrthogonalTiledMapRenderer(currentMap, unitScale)
         mapRenderer.setView(camera)
+        controller = PlayerController()
+        Gdx.input.setInputProcessor(controller)
+
     }
 
     override fun hide() {}
@@ -51,6 +57,9 @@ class MainGameScreen : Screen {
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+        controller.update(delta)
+        BludBourne.player.update(delta)
 
         mapRenderer.setView(camera)
 
@@ -63,7 +72,10 @@ class MainGameScreen : Screen {
 
     override fun resume() {}
 
-    override fun dispose() {}
+    override fun dispose() {
+        controller.dispose()
+        Gdx.input.inputProcessor = null
+    }
 
     private fun setupViewport(width: Int, height: Int) {
         //Make the viewport a percentage of the total display area
