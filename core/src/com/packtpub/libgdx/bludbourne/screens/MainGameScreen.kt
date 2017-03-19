@@ -12,14 +12,13 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.Rectangle
 import com.packtpub.libgdx.bludbourne.BludBourne
+import com.packtpub.libgdx.bludbourne.MapManager
 import com.packtpub.libgdx.bludbourne.PlayerController
 import com.packtpub.libgdx.bludbourne.Utility
 
 
 class MainGameScreen : Screen {
 
-    private val unitScale = 1 / 16f
-    private val overviewMap = "maps/town.tmx"
 
     internal var viewportWidth: Float = 0f
     internal var viewportHeight: Float = 0f
@@ -29,10 +28,7 @@ class MainGameScreen : Screen {
     internal var physicalHeight: Float = 0f
     internal var aspectRatio: Float = 0f
 
-
-    private lateinit var currentMap: TiledMap
-    private val MAP_COLLISION_LAYER = "MAP_COLLISION_LAYER"
-
+    private val mapMgr = MapManager()
     private lateinit var mapRenderer: OrthogonalTiledMapRenderer
     private lateinit var camera: OrthographicCamera
     private lateinit var controller: PlayerController
@@ -44,18 +40,14 @@ class MainGameScreen : Screen {
     override fun show() {
         setupViewport(Gdx.graphics.width, Gdx.graphics.height)
 
-        Utility.loadMapAsset(overviewMap)
-        if (Utility.isAssetLoaded(overviewMap)) {
-            currentMap = Utility.getMapAsset(overviewMap)
-        } else {
-            Gdx.app.debug(TAG, "Map not loaded")
-        }
+        // player
+        BludBourne.player.init(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
 
         //get the current size
         camera = OrthographicCamera(viewportWidth, viewportHeight)
         camera.setToOrtho(false, 10 * aspectRatio, 10f)
 
-        mapRenderer = OrthogonalTiledMapRenderer(currentMap, unitScale)
+        mapRenderer = OrthogonalTiledMapRenderer(mapMgr.currentMap, MapManager.UNIT_SCALE)
         mapRenderer.setView(camera)
 
         // textures
@@ -66,16 +58,7 @@ class MainGameScreen : Screen {
 
     }
 
-    fun isCollisionWithMap(boundingBox: Rectangle): Boolean {
-        val mapCollisionLayer = currentMap.layers.get(MAP_COLLISION_LAYER)
 
-        if (mapCollisionLayer != null) {
-            return isCollisionWithMapLayer(boundingBox, mapCollisionLayer)
-        } else {
-            return false
-        }
-
-    }
 
     override fun hide() {}
 
@@ -90,7 +73,10 @@ class MainGameScreen : Screen {
         camera.update()
 
         BludBourne.player.update(delta)
-        if (!isCollisionWithMap(BludBourne.player.boundingBox)) {
+
+        updatePortalLayerActivation(BludBourne.player.boundingBox)
+
+        if (!isCollisionWithMapLayer(BludBourne.player.boundingBox)) {
             BludBourne.player.setNextPositionToCurrent()
         }
         controller.update(delta)
@@ -148,33 +134,36 @@ class MainGameScreen : Screen {
         Gdx.app.debug(TAG, "WorldRenderer: physical: ($physicalWidth,$physicalHeight)")
     }
 
-    private fun isCollisionWithMapLayer(boundingBox: Rectangle, collisionLayer: MapLayer): Boolean {
+    private fun isCollisionWithMapLayer(boundingBox: Rectangle): Boolean {
+        val collisionLayer = mapMgr.collisionLayer
 
-        //Gdx.app.debug(TAG, "Checking collision layer...");
-        //Need to account for the unit-scale, since the map coordinates will be in pixels
-        // x = 10 unit, new box x = 10 * 16 = 160 pixel
-        boundingBox.setPosition(boundingBox.x / unitScale, boundingBox.y / unitScale)
-
-//        var rectangle: Rectangle
-//
-//        for (`object` in collisionLayer.objects) {
-//            if (`object` is RectangleMapObject) {
-//                rectangle = `object`.rectangle
-//                if (boundingBox.overlaps(rectangle!!)) {
-//                    Gdx.app.debug(TAG, "Collision Rect (" + rectangle.x + "," + rectangle.y + ")");
-//                    Gdx.app.debug(TAG, "Player Rect (" + boundingBox.x + "," + boundingBox.y + ")");
-//                    return true
-//                }
-//            }
-//        }
-        collisionLayer.objects.forEach {
+          collisionLayer.objects.forEach {
             if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle))
                 return true
+        }
+        return false
+    }
+
+
+    private fun updatePortalLayerActivation(boundingBox: Rectangle): Boolean {
+        // portal layer specifies its name as the layer to go
+        val portalLayer = mapMgr.portalLayer
+
+        portalLayer.objects.forEach {
+            if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle)) {
+                val mapName = it.getName() ?: return false
+                // cache position in pixels just in case we need to return later
+                mapMgr.setClosestStartPositionFromScaledUnits(BludBourne.player.currentPlayerPosition)
+                mapMgr.loadMap(mapName)
+                BludBourne.player.init(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
+                mapRenderer.map = mapMgr.currentMap
+                Gdx.app.debug(TAG, "Portal to $mapName Activated")
+                return true
+            }
         }
 
         return false
     }
-
 
     private val TAG = MainGameScreen::class.java.simpleName
 

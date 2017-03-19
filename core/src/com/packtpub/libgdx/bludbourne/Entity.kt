@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
@@ -47,21 +46,6 @@ class Entity {
 
     enum class Direction {
         UP, RIGHT, DOWN, LEFT;
-
-        val next: Direction
-            get() = Direction.values()[(ordinal + 1) % Direction.values().size]
-
-        val randomNext: Direction
-            get() = Direction.values()[MathUtils.random(Direction.values().size - 1)]
-
-        val opposite: Direction
-            get() {
-                if (this == LEFT) return RIGHT
-                else if (this == RIGHT) return LEFT
-                else if (this == UP) return DOWN
-                else return UP
-            }
-
     }
 
     init {
@@ -110,8 +94,9 @@ class Entity {
             Gdx.app.debug(TAG, "Width and Height are 0!! $width:$height")
         }
 
-        val minX = nextPlayerPosition.x
-        val minY = nextPlayerPosition.y
+        // convert from unit coordinates to pixel coordinates
+        val minX = nextPlayerPosition.x / MapManager.UNIT_SCALE
+        val minY = nextPlayerPosition.y / MapManager.UNIT_SCALE
 
         boundingBox.set(minX, minY, width, height)
         //Gdx.app.debug(TAG, "SETTING Bounding Box: (" + minX + "," + minY + ")  width: " + width + " height: " + height);

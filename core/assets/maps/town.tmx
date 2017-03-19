@@ -1,40 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE map SYSTEM "http://mapeditor.org/dtd/1.0/map.dtd">
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="40" height="30" tilewidth="16" tileheight="16" nextobjectid="88">
- <tileset firstgid="1" name="Decor0" tilewidth="16" tileheight="16">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="40" height="30" tilewidth="16" tileheight="16" nextobjectid="96">
+ <tileset firstgid="1" name="Decor0" tilewidth="16" tileheight="16" tilecount="176" columns="8">
   <image source="../sprites/Objects/Decor0.png" width="128" height="352"/>
  </tileset>
- <tileset firstgid="177" name="Wall" tilewidth="16" tileheight="16">
+ <tileset firstgid="177" name="Wall" tilewidth="16" tileheight="16" tilecount="1020" columns="20">
   <image source="../sprites/Objects/Wall.png" width="320" height="816"/>
  </tileset>
- <tileset firstgid="1197" name="Floor" tilewidth="16" tileheight="16">
+ <tileset firstgid="1197" name="Floor" tilewidth="16" tileheight="16" tilecount="819" columns="21">
   <image source="../sprites/Objects/Floor.png" width="336" height="624"/>
  </tileset>
- <tileset firstgid="2016" name="Pit0" tilewidth="16" tileheight="16">
+ <tileset firstgid="2016" name="Pit0" tilewidth="16" tileheight="16" tilecount="256" columns="8">
   <image source="../sprites/Objects/Pit0.png" width="128" height="512"/>
  </tileset>
- <tileset firstgid="2272" name="Door0" tilewidth="16" tileheight="16">
+ <tileset firstgid="2272" name="Door0" tilewidth="16" tileheight="16" tilecount="40" columns="8">
   <image source="../sprites/Objects/Door0.png" width="128" height="80"/>
  </tileset>
- <tileset firstgid="2312" name="Ground0" tilewidth="16" tileheight="16">
+ <tileset firstgid="2312" name="Ground0" tilewidth="16" tileheight="16" tilecount="56" columns="8">
   <image source="../sprites/Objects/Ground0.png" width="128" height="112"/>
  </tileset>
- <tileset firstgid="2368" name="Player0" tilewidth="16" tileheight="16">
+ <tileset firstgid="2368" name="Player0" tilewidth="16" tileheight="16" tilecount="120" columns="8">
   <image source="../sprites/Characters/Player0.png" width="128" height="240"/>
  </tileset>
- <tileset firstgid="2488" name="Tree0" tilewidth="16" tileheight="16">
+ <tileset firstgid="2488" name="Tree0" tilewidth="16" tileheight="16" tilecount="264" columns="8">
   <image source="../sprites/Objects/Tree0.png" width="128" height="528"/>
  </tileset>
- <tileset firstgid="2752" name="Humanoid0" tilewidth="16" tileheight="16">
+ <tileset firstgid="2752" name="Humanoid0" tilewidth="16" tileheight="16" tilecount="216" columns="8">
   <image source="../sprites/Characters/Humanoid0.png" width="128" height="432"/>
  </tileset>
- <tileset firstgid="2968" name="Cat0" tilewidth="16" tileheight="16">
+ <tileset firstgid="2968" name="Cat0" tilewidth="16" tileheight="16" tilecount="40" columns="8">
   <image source="../sprites/Characters/Cat0.png" width="128" height="80"/>
  </tileset>
- <tileset firstgid="3008" name="Quadraped0" tilewidth="16" tileheight="16">
+ <tileset firstgid="3008" name="Quadraped0" tilewidth="16" tileheight="16" tilecount="96" columns="8">
   <image source="../sprites/Characters/Quadraped0.png" width="128" height="192"/>
  </tileset>
- <tileset firstgid="3104" name="Container0" tilewidth="16" tileheight="16">
+ <tileset firstgid="3104" name="Container0" tilewidth="16" tileheight="16" tilecount="24" columns="8">
   <image source="../sprites/Items/Chest0.png" width="128" height="48"/>
  </tileset>
  <layer name="Background_Layer" width="40" height="30">
@@ -224,5 +223,15 @@
   <object id="85" x="306" y="82" width="28" height="12"/>
   <object id="86" x="316" y="17" width="40" height="12"/>
   <object id="87" x="60" y="17" width="40" height="12"/>
+ </objectgroup>
+ <objectgroup name="MAP_SPAWNS_LAYER">
+  <object id="88" name="PLAYER_START" x="208" y="448" width="16" height="16"/>
+  <object id="95" name="PLAYER_START" x="145" y="51" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="MAP_PORTAL_LAYER">
+  <object id="89" name="TOP_WORLD" x="0" y="478" width="640" height="12"/>
+  <object id="90" name="TOP_WORLD" x="0" y="-14" width="640" height="12"/>
+  <object id="91" name="TOP_WORLD" x="640" y="-13" width="12" height="500"/>
+  <object id="93" name="TOP_WORLD" x="-16" y="-12" width="12" height="500"/>
  </objectgroup>
 </map>
