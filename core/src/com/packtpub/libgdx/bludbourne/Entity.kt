@@ -40,6 +40,8 @@ class Entity {
     private lateinit var walkUpFrames: Array<TextureRegion>
     private lateinit var walkDownFrames: Array<TextureRegion>
 
+    private val inputComponent = InputComponent()
+
     enum class State {
         IDLE, WALKING, ANIMATED, ANIMATE_ONCE, ANIMATE_ONCE_REVERSE, PAUSE
     }
@@ -55,6 +57,9 @@ class Entity {
     }
 
     fun update(delta: Float) {
+
+        inputComponent.update(this, delta)
+
         frameTime = (frameTime + delta) % 5
         setBoundingBoxSize(0f, 0.5f) // set bound to lower half of body for better feel
 
@@ -67,6 +72,10 @@ class Entity {
         this.nextPlayerPosition.x = startX
         this.nextPlayerPosition.y = startY
 
+    }
+
+    fun dispose() {
+        Utility.unloadAsset(defaultSpritePath)
     }
 
 

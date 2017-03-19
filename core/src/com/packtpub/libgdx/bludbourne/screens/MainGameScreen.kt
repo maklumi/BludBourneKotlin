@@ -6,15 +6,11 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.objects.RectangleMapObject
-import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.Rectangle
-import com.packtpub.libgdx.bludbourne.BludBourne
+import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.MapManager
-import com.packtpub.libgdx.bludbourne.PlayerController
-import com.packtpub.libgdx.bludbourne.Utility
 
 
 class MainGameScreen : Screen {
@@ -28,36 +24,33 @@ class MainGameScreen : Screen {
     internal var physicalHeight: Float = 0f
     internal var aspectRatio: Float = 0f
 
+    private val player = Entity()
     private val mapMgr = MapManager()
     private lateinit var mapRenderer: OrthogonalTiledMapRenderer
     private lateinit var camera: OrthographicCamera
-    private lateinit var controller: PlayerController
 
     // textures
     lateinit var currentPlayerSprite: Sprite
     lateinit var currentPlayerFrame: TextureRegion
 
     override fun show() {
-        setupViewport(Gdx.graphics.width, Gdx.graphics.height)
+        setupViewport(10, 10)
 
         // player
-        BludBourne.player.init(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
+        player.init(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
 
         //get the current size
-        camera = OrthographicCamera(viewportWidth, viewportHeight)
-        camera.setToOrtho(false, 10 * aspectRatio, 10f)
+        camera = OrthographicCamera()
+        camera.setToOrtho(false, viewportWidth, viewportHeight)
 
         mapRenderer = OrthogonalTiledMapRenderer(mapMgr.currentMap, MapManager.UNIT_SCALE)
         mapRenderer.setView(camera)
 
         // textures
-        currentPlayerSprite = BludBourne.player.frameSprite
+        currentPlayerSprite = player.frameSprite
 
-        controller = PlayerController()
-        Gdx.input.inputProcessor = controller
 
     }
-
 
 
     override fun hide() {}
@@ -66,20 +59,19 @@ class MainGameScreen : Screen {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        currentPlayerFrame = BludBourne.player.currentFrame
+        currentPlayerFrame = player.currentFrame
 
         // lock and center the camera to player's position
         camera.position.set(currentPlayerSprite.x, currentPlayerSprite.y, 0f)
         camera.update()
 
-        BludBourne.player.update(delta)
+        player.update(delta)
 
-        updatePortalLayerActivation(BludBourne.player.boundingBox)
+        updatePortalLayerActivation(player.boundingBox)
 
-        if (!isCollisionWithMapLayer(BludBourne.player.boundingBox)) {
-            BludBourne.player.setNextPositionToCurrent()
+        if (!isCollisionWithMapLayer(player.boundingBox)) {
+            player.setNextPositionToCurrent()
         }
-        controller.update(delta)
 
 
         mapRenderer.setView(camera)
@@ -98,7 +90,7 @@ class MainGameScreen : Screen {
     override fun resume() {}
 
     override fun dispose() {
-        controller.dispose()
+        player.dispose()
         Gdx.input.inputProcessor = null
     }
 
@@ -137,7 +129,7 @@ class MainGameScreen : Screen {
     private fun isCollisionWithMapLayer(boundingBox: Rectangle): Boolean {
         val collisionLayer = mapMgr.collisionLayer
 
-          collisionLayer.objects.forEach {
+        collisionLayer.objects.forEach {
             if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle))
                 return true
         }
@@ -153,9 +145,9 @@ class MainGameScreen : Screen {
             if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle)) {
                 val mapName = it.getName() ?: return false
                 // cache position in pixels just in case we need to return later
-                mapMgr.setClosestStartPositionFromScaledUnits(BludBourne.player.currentPlayerPosition)
+                mapMgr.setClosestStartPositionFromScaledUnits(player.currentPlayerPosition)
                 mapMgr.loadMap(mapName)
-                BludBourne.player.init(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
+                player.init(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
                 mapRenderer.map = mapMgr.currentMap
                 Gdx.app.debug(TAG, "Portal to $mapName Activated")
                 return true

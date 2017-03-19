@@ -5,12 +5,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.math.Vector3
+import java.util.*
 
-import java.util.HashMap
 
-
-class PlayerController : InputProcessor {
-    private val TAG = PlayerController::class.java.simpleName
+class InputComponent : InputProcessor {
+    private val TAG = InputComponent::class.java.simpleName
 
     internal enum class Keys { LEFT, RIGHT, UP, DOWN, QUIT }
     internal enum class Mouse { SELECT, DOACTION }
@@ -26,6 +25,8 @@ class PlayerController : InputProcessor {
 
         mouseButtons.put(Mouse.SELECT, false)
         mouseButtons.put(Mouse.DOACTION, false)
+
+        Gdx.input.inputProcessor = this
     }
 
     override fun keyDown(keycode: Int): Boolean {
@@ -118,7 +119,7 @@ class PlayerController : InputProcessor {
     fun quitPressed() = keys.put(Keys.QUIT, true)
 
 
-    fun setClickedMouseCoordinates(x: Int, y: Int): Vector3=
+    fun setClickedMouseCoordinates(x: Int, y: Int): Vector3 =
             lastMouseCoordinates.set(x.toFloat(), y.toFloat(), 0f)
 
     fun selectMouseButtonPressed(x: Int, y: Int) =
@@ -140,35 +141,30 @@ class PlayerController : InputProcessor {
             mouseButtons.put(Mouse.DOACTION, false)
 
 
-    fun update(delta: Float) {
-        if (delta == 0f || BludBourne.player.state === Entity.State.PAUSE) return
+    fun update(player: Entity, delta: Float) {
+        if (delta == 0f || player.state === Entity.State.PAUSE) return
 
-        processInput(delta)
-
-    }
-
-    private fun processInput(delta: Float) {
         //Keyboard input
         if (keys[Keys.LEFT]!!) {
-            BludBourne.player.calculateNextPosition(Entity.Direction.LEFT, delta)
-            BludBourne.player.state = Entity.State.WALKING
-            BludBourne.player.setDirection(Entity.Direction.LEFT, delta)
+            player.calculateNextPosition(Entity.Direction.LEFT, delta)
+            player.state = Entity.State.WALKING
+            player.setDirection(Entity.Direction.LEFT, delta)
         } else if (keys[Keys.RIGHT]!!) {
-            BludBourne.player.calculateNextPosition(Entity.Direction.RIGHT, delta)
-            BludBourne.player.state = Entity.State.WALKING
-            BludBourne.player.setDirection(Entity.Direction.RIGHT, delta)
+            player.calculateNextPosition(Entity.Direction.RIGHT, delta)
+            player.state = Entity.State.WALKING
+            player.setDirection(Entity.Direction.RIGHT, delta)
         } else if (keys[Keys.UP]!!) {
-            BludBourne.player.calculateNextPosition(Entity.Direction.UP, delta)
-            BludBourne.player.state = Entity.State.WALKING
-            BludBourne.player.setDirection(Entity.Direction.UP, delta)
+            player.calculateNextPosition(Entity.Direction.UP, delta)
+            player.state = Entity.State.WALKING
+            player.setDirection(Entity.Direction.UP, delta)
         } else if (keys[Keys.DOWN]!!) {
-            BludBourne.player.calculateNextPosition(Entity.Direction.DOWN, delta)
-            BludBourne.player.state = Entity.State.WALKING
-            BludBourne.player.setDirection(Entity.Direction.DOWN, delta)
+            player.calculateNextPosition(Entity.Direction.DOWN, delta)
+            player.state = Entity.State.WALKING
+            player.setDirection(Entity.Direction.DOWN, delta)
         } else if (keys[Keys.QUIT]!!) {
             Gdx.app.exit()
         } else {
-            BludBourne.player.state = Entity.State.IDLE
+            player.state = Entity.State.IDLE
         }
 
         //Mouse input

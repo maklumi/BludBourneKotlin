@@ -6,14 +6,16 @@ import com.packtpub.libgdx.bludbourne.screens.MainGameScreen
 class BludBourne : Game() {
 
     override fun create() {
-        player = Entity()
         mainGameScreen = MainGameScreen()
         setScreen(mainGameScreen)
     }
 
+    override fun dispose() {
+        mainGameScreen.dispose()
+    }
+
     companion object {
         lateinit var mainGameScreen : MainGameScreen
-        lateinit var player : Entity
     }
 
 }
