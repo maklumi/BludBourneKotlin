@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.Vector2
@@ -34,6 +35,7 @@ class MainGameScreen : Screen {
 
     // textures
     lateinit var currentPlayerSprite: Sprite
+    lateinit var currentPlayerFrame: TextureRegion
 
     override fun show() {
         setupViewport(Gdx.graphics.width, Gdx.graphics.height)
@@ -66,6 +68,8 @@ class MainGameScreen : Screen {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
+        currentPlayerFrame = BludBourne.player.currentFrame
+
         // lock and center the camera to player's position
         camera.position.set(currentPlayerSprite.x, currentPlayerSprite.y, 0f)
         camera.update()
@@ -77,7 +81,7 @@ class MainGameScreen : Screen {
         mapRenderer.render()
 
         mapRenderer.batch.begin()
-        mapRenderer.batch.draw(currentPlayerSprite,
+        mapRenderer.batch.draw(currentPlayerFrame,
                 currentPlayerSprite.x, currentPlayerSprite.y, 1f, 1f)
         mapRenderer.batch.end()
     }

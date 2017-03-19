@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3
 import java.util.HashMap
 
 
-class PlayerController : InputProcessor{
+class PlayerController : InputProcessor {
     private val TAG = PlayerController::class.java.simpleName
 
     internal enum class Keys { LEFT, RIGHT, UP, DOWN, QUIT }
@@ -120,7 +120,7 @@ class PlayerController : InputProcessor{
     fun quitPressed() = keys.put(Keys.QUIT, true)
 
 
-    fun setClickedMouseCoordinates(x: Int, y: Int) =
+    fun setClickedMouseCoordinates(x: Int, y: Int): Vector3=
             lastMouseCoordinates.set(x.toFloat(), y.toFloat(), 0f)
 
     fun selectMouseButtonPressed(x: Int, y: Int) =
@@ -156,22 +156,22 @@ class PlayerController : InputProcessor{
             Gdx.app.debug(TAG, "LEFT key")
             BludBourne.player.calculateNextPosition(Entity.Direction.LEFT, delta)
             BludBourne.player.state = Entity.State.WALKING
-            BludBourne.player.setDirection(Entity.Direction.LEFT)
+            BludBourne.player.setDirection(Entity.Direction.LEFT, delta)
         } else if (keys[Keys.RIGHT]!!) {
             Gdx.app.debug(TAG, "RIGHT key")
             BludBourne.player.calculateNextPosition(Entity.Direction.RIGHT, delta)
             BludBourne.player.state = Entity.State.WALKING
-            BludBourne.player.setDirection(Entity.Direction.RIGHT)
+            BludBourne.player.setDirection(Entity.Direction.RIGHT, delta)
         } else if (keys[Keys.UP]!!) {
             Gdx.app.debug(TAG, "UP key")
             BludBourne.player.calculateNextPosition(Entity.Direction.UP, delta)
             BludBourne.player.state = Entity.State.WALKING
-            BludBourne.player.setDirection(Entity.Direction.UP)
+            BludBourne.player.setDirection(Entity.Direction.UP, delta)
         } else if (keys[Keys.DOWN]!!) {
             Gdx.app.debug(TAG, "DOWN key")
             BludBourne.player.calculateNextPosition(Entity.Direction.DOWN, delta)
             BludBourne.player.state = Entity.State.WALKING
-            BludBourne.player.setDirection(Entity.Direction.DOWN)
+            BludBourne.player.setDirection(Entity.Direction.DOWN, delta)
         } else if (keys[Keys.QUIT]!!) {
             Gdx.app.exit()
         } else {

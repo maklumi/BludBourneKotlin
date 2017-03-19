@@ -1,14 +1,16 @@
 package com.packtpub.libgdx.bludbourne
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.Array
 
 class Entity {
 
-    var velocity: Vector2 = Vector2(10f, 10f)
-    var rotationDegrees = 0f
+    var velocity: Vector2 = Vector2(2f, 2f)
     var state = State.IDLE
     var currentPlayerPosition: Vector2 = Vector2()
     var nextPlayerPosition: Vector2 = Vector2()
@@ -25,7 +27,16 @@ class Entity {
 
     var frameSprite: Sprite = Sprite()
         private set
+    lateinit var currentFrame: TextureRegion
+    private lateinit var walkLeftAnimation: Animation<TextureRegion>
+    private lateinit var walkRightAnimation: Animation<TextureRegion>
+    private lateinit var walkUpAnimation: Animation<TextureRegion>
+    private lateinit var walkDownAnimation: Animation<TextureRegion>
 
+    private lateinit var walkLeftFrames: Array<TextureRegion>
+    private lateinit var walkRightFrames: Array<TextureRegion>
+    private lateinit var walkUpFrames: Array<TextureRegion>
+    private lateinit var walkDownFrames: Array<TextureRegion>
 
     enum class State {
         IDLE, WALKING, ANIMATED, ANIMATE_ONCE, ANIMATE_ONCE_REVERSE, PAUSE
@@ -34,9 +45,6 @@ class Entity {
     enum class Direction {
         UP, RIGHT, DOWN, LEFT;
 
-        //Gdx.app.debug(TAG, "Current Direction: " + Direction.values()[(ordinal()) % Direction.values().length] );
-        //Gdx.app.debug(TAG, "Current Direction: " + ordinal() );
-        //Gdx.app.debug(TAG, "Next Direction: " + Direction.values()[(ordinal()+1) % Direction.values().length] );
         val next: Direction
             get() = Direction.values()[(ordinal + 1) % Direction.values().size]
 
@@ -45,15 +53,10 @@ class Entity {
 
         val opposite: Direction
             get() {
-                if (this == LEFT) {
-                    return RIGHT
-                } else if (this == RIGHT) {
-                    return LEFT
-                } else if (this == UP) {
-                    return DOWN
-                } else {
-                    return UP
-                }
+                if (this == LEFT) return RIGHT
+                else if (this == RIGHT) return LEFT
+                else if (this == UP) return DOWN
+                else return UP
             }
 
     }
@@ -61,10 +64,11 @@ class Entity {
     init {
         Utility.loadTextureAsset(defaultSpritePath)
         loadDefaultSprite()
+        loadAllAnimations()
     }
 
     fun update(delta: Float) {
-        frameTime += delta
+        frameTime = (frameTime + delta) % 5
 
     }
 
@@ -78,19 +82,15 @@ class Entity {
     }
 
 
-    fun setDirection(direction: Direction) {
+    fun setDirection(direction: Direction, delta: Float) {
         this.previousDirection = this.currentDirection
         this.currentDirection = direction
 
-        //Look into the appropriate variable when changing position
-
         when (currentDirection) {
-            Entity.Direction.DOWN -> rotationDegrees = 0f
-            Entity.Direction.LEFT -> rotationDegrees = 270f
-            Entity.Direction.UP -> rotationDegrees = 180f
-            Entity.Direction.RIGHT -> rotationDegrees = 90f
-            else -> {
-            }
+            Entity.Direction.DOWN -> currentFrame = walkDownAnimation.getKeyFrame(frameTime)
+            Entity.Direction.LEFT -> currentFrame = walkLeftAnimation.getKeyFrame(frameTime)
+            Entity.Direction.UP -> currentFrame = walkUpAnimation.getKeyFrame(frameTime)
+            Entity.Direction.RIGHT -> currentFrame = walkRightAnimation.getKeyFrame(frameTime)
         }
 
     }
@@ -109,10 +109,6 @@ class Entity {
 
         var testX = currentPlayerPosition.x
         var testY = currentPlayerPosition.y
-
-
-        //Gdx.app.debug(TAG, "calculateNextPosition:: Current Position: (" + currentPlayerPosition.x + "," + currentPlayerPosition.y + ")"  );
-        //Gdx.app.debug(TAG, "calculateNextPosition:: Current Direction: " + currentDirection  );
 
         velocity.scl(deltaTime)
 
@@ -135,6 +131,36 @@ class Entity {
         val texture = Utility.getTextureAsset(defaultSpritePath)
         val textureFrames = TextureRegion.split(texture, FRAME_WIDTH, FRAME_HEIGHT)
         frameSprite = Sprite(textureFrames[0][0], 0, 0, FRAME_WIDTH, FRAME_HEIGHT)
+        // default first frame
+        currentFrame = textureFrames[0][0]
+    }
+
+    private fun loadAllAnimations() {
+        val texture = Utility.getTextureAsset(defaultSpritePath)
+        val textureFrames = TextureRegion.split(texture, FRAME_WIDTH, FRAME_HEIGHT)
+
+        walkDownFrames = Array<TextureRegion>(4)
+        walkLeftFrames = Array<TextureRegion>(4)
+        walkRightFrames = Array<TextureRegion>(4)
+        walkUpFrames = Array<TextureRegion>(4)
+
+        for (i in 0..3) {
+            for (j in 0..3) {
+                val region = textureFrames[i][j]
+                when (i) {
+                    0 -> walkDownFrames.insert(j, region)
+                    1 -> walkLeftFrames.insert(j, region)
+                    2 -> walkRightFrames.insert(j, region)
+                    3 -> walkUpFrames.insert(j, region)
+                }
+            }
+        }
+
+        walkDownAnimation = Animation(0.25f, walkDownFrames, Animation.PlayMode.LOOP)
+        walkLeftAnimation = Animation(0.25f, walkLeftFrames, Animation.PlayMode.LOOP)
+        walkRightAnimation = Animation(0.25f, walkRightFrames, Animation.PlayMode.LOOP)
+        walkUpAnimation = Animation(0.25f, walkUpFrames, Animation.PlayMode.LOOP)
+
     }
 
     private val TAG = Entity::class.java.simpleName
