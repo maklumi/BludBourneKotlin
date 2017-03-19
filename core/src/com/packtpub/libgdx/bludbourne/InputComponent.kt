@@ -148,19 +148,19 @@ class InputComponent : InputProcessor {
         if (keys[Keys.LEFT]!!) {
             player.calculateNextPosition(Entity.Direction.LEFT, delta)
             player.state = Entity.State.WALKING
-            player.setDirection(Entity.Direction.LEFT, delta)
+            player.direction = Entity.Direction.LEFT
         } else if (keys[Keys.RIGHT]!!) {
             player.calculateNextPosition(Entity.Direction.RIGHT, delta)
             player.state = Entity.State.WALKING
-            player.setDirection(Entity.Direction.RIGHT, delta)
+            player.direction = Entity.Direction.RIGHT
         } else if (keys[Keys.UP]!!) {
             player.calculateNextPosition(Entity.Direction.UP, delta)
             player.state = Entity.State.WALKING
-            player.setDirection(Entity.Direction.UP, delta)
+            player.direction = Entity.Direction.UP
         } else if (keys[Keys.DOWN]!!) {
             player.calculateNextPosition(Entity.Direction.DOWN, delta)
             player.state = Entity.State.WALKING
-            player.setDirection(Entity.Direction.DOWN, delta)
+            player.direction = Entity.Direction.DOWN
         } else if (keys[Keys.QUIT]!!) {
             Gdx.app.exit()
         } else {

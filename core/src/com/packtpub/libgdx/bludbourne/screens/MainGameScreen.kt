@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.Rectangle
@@ -14,7 +12,7 @@ import com.packtpub.libgdx.bludbourne.MapManager
 
 
 class MainGameScreen : Screen {
-
+    private val TAG = MainGameScreen::class.java.simpleName
 
     internal var viewportWidth: Float = 0f
     internal var viewportHeight: Float = 0f
@@ -29,10 +27,6 @@ class MainGameScreen : Screen {
     private lateinit var mapRenderer: OrthogonalTiledMapRenderer
     private lateinit var camera: OrthographicCamera
 
-    // textures
-    lateinit var currentPlayerSprite: Sprite
-    lateinit var currentPlayerFrame: TextureRegion
-
     override fun show() {
         setupViewport(10, 10)
 
@@ -46,9 +40,6 @@ class MainGameScreen : Screen {
         mapRenderer = OrthogonalTiledMapRenderer(mapMgr.currentMap, MapManager.UNIT_SCALE)
         mapRenderer.setView(camera)
 
-        // textures
-        currentPlayerSprite = player.frameSprite
-
 
     }
 
@@ -59,13 +50,11 @@ class MainGameScreen : Screen {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        currentPlayerFrame = player.currentFrame
 
         // lock and center the camera to player's position
-        camera.position.set(currentPlayerSprite.x, currentPlayerSprite.y, 0f)
+        camera.position.set(player.currentPlayerPosition.x, player.currentPlayerPosition.y, 0f)
         camera.update()
 
-        player.update(delta)
 
         updatePortalLayerActivation(player.boundingBox)
 
@@ -73,14 +62,10 @@ class MainGameScreen : Screen {
             player.setNextPositionToCurrent()
         }
 
-
         mapRenderer.setView(camera)
         mapRenderer.render()
+        player.update(mapRenderer.batch, delta)
 
-        mapRenderer.batch.begin()
-        mapRenderer.batch.draw(currentPlayerFrame,
-                currentPlayerSprite.x, currentPlayerSprite.y, 1f, 1f)
-        mapRenderer.batch.end()
     }
 
     override fun resize(width: Int, height: Int) {}
@@ -91,7 +76,7 @@ class MainGameScreen : Screen {
 
     override fun dispose() {
         player.dispose()
-        Gdx.input.inputProcessor = null
+        mapRenderer.dispose()
     }
 
     private fun setupViewport(width: Int, height: Int) {
@@ -156,7 +141,5 @@ class MainGameScreen : Screen {
 
         return false
     }
-
-    private val TAG = MainGameScreen::class.java.simpleName
 
 }

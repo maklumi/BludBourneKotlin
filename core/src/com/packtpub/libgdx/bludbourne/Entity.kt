@@ -1,46 +1,28 @@
 package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.g2d.Animation
-import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.utils.Array
 
 class Entity {
+    private val TAG = Entity::class.java.simpleName
 
     var velocity: Vector2 = Vector2(2f, 2f)
     var state = State.IDLE
     var currentPlayerPosition: Vector2 = Vector2()
     var nextPlayerPosition: Vector2 = Vector2()
-    var currentDirection: Direction = Direction.LEFT
-        private set
-    var previousDirection: Direction = Direction.UP
-        private set
+    var direction = Direction.DOWN
 
     var boundingBox: Rectangle = Rectangle()
 
-    private val defaultSpritePath = "sprites/characters/Warrior.png"
-    var FRAME_WIDTH = 16
-    var FRAME_HEIGHT = 16
-
-    var frameTime = 0f
-
-    var frameSprite: Sprite = Sprite()
-        private set
-    lateinit var currentFrame: TextureRegion
-    private lateinit var walkLeftAnimation: Animation<TextureRegion>
-    private lateinit var walkRightAnimation: Animation<TextureRegion>
-    private lateinit var walkUpAnimation: Animation<TextureRegion>
-    private lateinit var walkDownAnimation: Animation<TextureRegion>
-
-    private lateinit var walkLeftFrames: Array<TextureRegion>
-    private lateinit var walkRightFrames: Array<TextureRegion>
-    private lateinit var walkUpFrames: Array<TextureRegion>
-    private lateinit var walkDownFrames: Array<TextureRegion>
+    companion object {
+        var FRAME_WIDTH = 16
+        var FRAME_HEIGHT = 16
+    }
 
     private val inputComponent = InputComponent()
+    private val graphicsComponent = GraphicsComponent()
 
     enum class State {
         IDLE, WALKING, ANIMATED, ANIMATE_ONCE, ANIMATE_ONCE_REVERSE, PAUSE
@@ -50,32 +32,23 @@ class Entity {
         UP, RIGHT, DOWN, LEFT;
     }
 
-    init {
-        Utility.loadTextureAsset(defaultSpritePath)
-        loadDefaultSprite()
-        loadAllAnimations()
-    }
 
-    fun update(delta: Float) {
+    fun update(batch: Batch, delta: Float) {
 
         inputComponent.update(this, delta)
+        graphicsComponent.update(batch, this, delta)
 
-        frameTime = (frameTime + delta) % 5
-        setBoundingBoxSize(0f, 0.5f) // set bound to lower half of body for better feel
-
+        setBoundingBoxSize(0f, 0.5f)
     }
 
 
     fun init(startX: Float, startY: Float) {
-        this.currentPlayerPosition.x = startX
-        this.currentPlayerPosition.y = startY
-        this.nextPlayerPosition.x = startX
-        this.nextPlayerPosition.y = startY
-
+        currentPlayerPosition.set(startX, startY)
+        nextPlayerPosition.set(startX, startY)
     }
 
     fun dispose() {
-        Utility.unloadAsset(defaultSpritePath)
+        inputComponent.dispose()
     }
 
 
@@ -112,24 +85,7 @@ class Entity {
     }
 
 
-    fun setDirection(direction: Direction, delta: Float) {
-        this.previousDirection = this.currentDirection
-        this.currentDirection = direction
-
-        when (currentDirection) {
-            Entity.Direction.DOWN -> currentFrame = walkDownAnimation.getKeyFrame(frameTime)
-            Entity.Direction.LEFT -> currentFrame = walkLeftAnimation.getKeyFrame(frameTime)
-            Entity.Direction.UP -> currentFrame = walkUpAnimation.getKeyFrame(frameTime)
-            Entity.Direction.RIGHT -> currentFrame = walkRightAnimation.getKeyFrame(frameTime)
-        }
-
-    }
-
-
     fun setNextPositionToCurrent() {
-
-        frameSprite.x = nextPlayerPosition.x
-        frameSprite.y = nextPlayerPosition.y
         currentPlayerPosition.set(nextPlayerPosition.x, nextPlayerPosition.y)
     }
 
@@ -154,45 +110,6 @@ class Entity {
         //velocity
         velocity.scl(1 / deltaTime)
     }
-
-    // private functions
-    private fun loadDefaultSprite() {
-        val texture = Utility.getTextureAsset(defaultSpritePath)
-        val textureFrames = TextureRegion.split(texture, FRAME_WIDTH, FRAME_HEIGHT)
-        frameSprite = Sprite(textureFrames[0][0], 0, 0, FRAME_WIDTH, FRAME_HEIGHT)
-        // default first frame
-        currentFrame = textureFrames[0][0]
-    }
-
-    private fun loadAllAnimations() {
-        val texture = Utility.getTextureAsset(defaultSpritePath)
-        val textureFrames = TextureRegion.split(texture, FRAME_WIDTH, FRAME_HEIGHT)
-
-        walkDownFrames = Array<TextureRegion>(4)
-        walkLeftFrames = Array<TextureRegion>(4)
-        walkRightFrames = Array<TextureRegion>(4)
-        walkUpFrames = Array<TextureRegion>(4)
-
-        for (i in 0..3) {
-            for (j in 0..3) {
-                val region = textureFrames[i][j]
-                when (i) {
-                    0 -> walkDownFrames.insert(j, region)
-                    1 -> walkLeftFrames.insert(j, region)
-                    2 -> walkRightFrames.insert(j, region)
-                    3 -> walkUpFrames.insert(j, region)
-                }
-            }
-        }
-
-        walkDownAnimation = Animation(0.25f, walkDownFrames, Animation.PlayMode.LOOP)
-        walkLeftAnimation = Animation(0.25f, walkLeftFrames, Animation.PlayMode.LOOP)
-        walkRightAnimation = Animation(0.25f, walkRightFrames, Animation.PlayMode.LOOP)
-        walkUpAnimation = Animation(0.25f, walkUpFrames, Animation.PlayMode.LOOP)
-
-    }
-
-    private val TAG = Entity::class.java.simpleName
 
 
 }
