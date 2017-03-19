@@ -1,26 +1,25 @@
 package com.packtpub.libgdx.bludbourne
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
-import java.util.*
 
 class Entity {
 
-    var velocity: Vector2 = Vector2(100f, 100f)
+    var velocity: Vector2 = Vector2(10f, 10f)
     var rotationDegrees = 0f
     var state = State.IDLE
     var currentPlayerPosition: Vector2 = Vector2()
     var nextPlayerPosition: Vector2 = Vector2()
-    var currentDirection = Direction.LEFT
+    var currentDirection: Direction = Direction.LEFT
         private set
-    var previousDirection = Direction.UP
+    var previousDirection: Direction = Direction.UP
         private set
+
+    private val defaultSpritePath = "sprites/characters/Warrior.png"
+    var FRAME_WIDTH = 16
+    var FRAME_HEIGHT = 16
 
     var frameTime = 0f
 
@@ -59,6 +58,10 @@ class Entity {
 
     }
 
+    init {
+        Utility.loadTextureAsset(defaultSpritePath)
+        loadDefaultSprite()
+    }
 
     fun update(delta: Float) {
         frameTime += delta
@@ -98,7 +101,7 @@ class Entity {
         frameSprite.x = nextPlayerPosition.x
         frameSprite.y = nextPlayerPosition.y
         currentPlayerPosition.set(nextPlayerPosition.x, nextPlayerPosition.y)
-        Gdx.app.debug(TAG, "NOT BLOCKED: Setting nextPlayerPosition as Current: (" + nextPlayerPosition.x + "," + nextPlayerPosition.y + ")");
+//        Gdx.app.debug(TAG, "NOT BLOCKED: Setting nextPlayerPosition as Current: (" + nextPlayerPosition.x + "," + nextPlayerPosition.y + ")");
     }
 
 
@@ -127,6 +130,12 @@ class Entity {
         velocity.scl(1 / deltaTime)
     }
 
+    // private functions
+    private fun loadDefaultSprite() {
+        val texture = Utility.getTextureAsset(defaultSpritePath)
+        val textureFrames = TextureRegion.split(texture, FRAME_WIDTH, FRAME_HEIGHT)
+        frameSprite = Sprite(textureFrames[0][0], 0, 0, FRAME_WIDTH, FRAME_HEIGHT)
+    }
 
     private val TAG = Entity::class.java.simpleName
 

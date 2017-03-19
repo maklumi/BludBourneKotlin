@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import com.badlogic.gdx.math.Vector2
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.PlayerController
 import com.packtpub.libgdx.bludbourne.Utility
@@ -30,6 +32,9 @@ class MainGameScreen : Screen {
     private lateinit var camera: OrthographicCamera
     private lateinit var controller: PlayerController
 
+    // textures
+    lateinit var currentPlayerSprite: Sprite
+
     override fun show() {
         setupViewport(Gdx.graphics.width, Gdx.graphics.height)
 
@@ -43,12 +48,15 @@ class MainGameScreen : Screen {
         //get the current size
         camera = OrthographicCamera(viewportWidth, viewportHeight)
         camera.setToOrtho(false, 10 * aspectRatio, 10f)
-        camera.update()
 
         mapRenderer = OrthogonalTiledMapRenderer(currentMap, unitScale)
         mapRenderer.setView(camera)
+
+        // textures
+        currentPlayerSprite = BludBourne.player.frameSprite
+
         controller = PlayerController()
-        Gdx.input.setInputProcessor(controller)
+        Gdx.input.inputProcessor = controller
 
     }
 
@@ -58,12 +66,20 @@ class MainGameScreen : Screen {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
+        // lock and center the camera to player's position
+        camera.position.set(currentPlayerSprite.x, currentPlayerSprite.y, 0f)
+        camera.update()
+
         controller.update(delta)
         BludBourne.player.update(delta)
 
         mapRenderer.setView(camera)
-
         mapRenderer.render()
+
+        mapRenderer.batch.begin()
+        mapRenderer.batch.draw(currentPlayerSprite,
+                currentPlayerSprite.x, currentPlayerSprite.y, 1f, 1f)
+        mapRenderer.batch.end()
     }
 
     override fun resize(width: Int, height: Int) {}
