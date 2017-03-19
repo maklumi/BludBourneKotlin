@@ -72,13 +72,11 @@ class PlayerController : InputProcessor {
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        //Gdx.app.debug(TAG, "GameScreen: MOUSE DOWN........: (" + screenX + "," + screenY + ")" );
 
         if (button == Input.Buttons.LEFT || button == Input.Buttons.RIGHT) {
             this.setClickedMouseCoordinates(screenX, screenY)
         }
 
-        //left is selection, right is context menu
         if (button == Input.Buttons.LEFT) {
             this.selectMouseButtonPressed(screenX, screenY)
         }
@@ -147,28 +145,23 @@ class PlayerController : InputProcessor {
 
         processInput(delta)
 
-        BludBourne.player.setNextPositionToCurrent()
     }
 
     private fun processInput(delta: Float) {
         //Keyboard input
         if (keys[Keys.LEFT]!!) {
-            Gdx.app.debug(TAG, "LEFT key")
             BludBourne.player.calculateNextPosition(Entity.Direction.LEFT, delta)
             BludBourne.player.state = Entity.State.WALKING
             BludBourne.player.setDirection(Entity.Direction.LEFT, delta)
         } else if (keys[Keys.RIGHT]!!) {
-            Gdx.app.debug(TAG, "RIGHT key")
             BludBourne.player.calculateNextPosition(Entity.Direction.RIGHT, delta)
             BludBourne.player.state = Entity.State.WALKING
             BludBourne.player.setDirection(Entity.Direction.RIGHT, delta)
         } else if (keys[Keys.UP]!!) {
-            Gdx.app.debug(TAG, "UP key")
             BludBourne.player.calculateNextPosition(Entity.Direction.UP, delta)
             BludBourne.player.state = Entity.State.WALKING
             BludBourne.player.setDirection(Entity.Direction.UP, delta)
         } else if (keys[Keys.DOWN]!!) {
-            Gdx.app.debug(TAG, "DOWN key")
             BludBourne.player.calculateNextPosition(Entity.Direction.DOWN, delta)
             BludBourne.player.state = Entity.State.WALKING
             BludBourne.player.setDirection(Entity.Direction.DOWN, delta)

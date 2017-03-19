@@ -6,9 +6,11 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.maps.MapLayer
+import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Rectangle
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.PlayerController
 import com.packtpub.libgdx.bludbourne.Utility
@@ -17,7 +19,7 @@ import com.packtpub.libgdx.bludbourne.Utility
 class MainGameScreen : Screen {
 
     private val unitScale = 1 / 16f
-    private val overviewMap = "sprites/tmx/Town.tmx"
+    private val overviewMap = "maps/town.tmx"
 
     internal var viewportWidth: Float = 0f
     internal var viewportHeight: Float = 0f
@@ -29,6 +31,8 @@ class MainGameScreen : Screen {
 
 
     private lateinit var currentMap: TiledMap
+    private val MAP_COLLISION_LAYER = "MAP_COLLISION_LAYER"
+
     private lateinit var mapRenderer: OrthogonalTiledMapRenderer
     private lateinit var camera: OrthographicCamera
     private lateinit var controller: PlayerController
@@ -62,6 +66,17 @@ class MainGameScreen : Screen {
 
     }
 
+    fun isCollisionWithMap(boundingBox: Rectangle): Boolean {
+        val mapCollisionLayer = currentMap.layers.get(MAP_COLLISION_LAYER)
+
+        if (mapCollisionLayer != null) {
+            return isCollisionWithMapLayer(boundingBox, mapCollisionLayer)
+        } else {
+            return false
+        }
+
+    }
+
     override fun hide() {}
 
     override fun render(delta: Float) {
@@ -74,8 +89,12 @@ class MainGameScreen : Screen {
         camera.position.set(currentPlayerSprite.x, currentPlayerSprite.y, 0f)
         camera.update()
 
-        controller.update(delta)
         BludBourne.player.update(delta)
+        if (!isCollisionWithMap(BludBourne.player.boundingBox)) {
+            BludBourne.player.setNextPositionToCurrent()
+        }
+        controller.update(delta)
+
 
         mapRenderer.setView(camera)
         mapRenderer.render()
@@ -127,6 +146,33 @@ class MainGameScreen : Screen {
         Gdx.app.debug(TAG, "WorldRenderer: virtual: ($virtualWidth,$virtualHeight)")
         Gdx.app.debug(TAG, "WorldRenderer: viewport: ($viewportWidth,$viewportHeight)")
         Gdx.app.debug(TAG, "WorldRenderer: physical: ($physicalWidth,$physicalHeight)")
+    }
+
+    private fun isCollisionWithMapLayer(boundingBox: Rectangle, collisionLayer: MapLayer): Boolean {
+
+        //Gdx.app.debug(TAG, "Checking collision layer...");
+        //Need to account for the unit-scale, since the map coordinates will be in pixels
+        // x = 10 unit, new box x = 10 * 16 = 160 pixel
+        boundingBox.setPosition(boundingBox.x / unitScale, boundingBox.y / unitScale)
+
+//        var rectangle: Rectangle
+//
+//        for (`object` in collisionLayer.objects) {
+//            if (`object` is RectangleMapObject) {
+//                rectangle = `object`.rectangle
+//                if (boundingBox.overlaps(rectangle!!)) {
+//                    Gdx.app.debug(TAG, "Collision Rect (" + rectangle.x + "," + rectangle.y + ")");
+//                    Gdx.app.debug(TAG, "Player Rect (" + boundingBox.x + "," + boundingBox.y + ")");
+//                    return true
+//                }
+//            }
+//        }
+        collisionLayer.objects.forEach {
+            if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle))
+                return true
+        }
+
+        return false
     }
 
 

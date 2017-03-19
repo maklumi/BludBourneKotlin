@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 
@@ -18,6 +19,8 @@ class Entity {
         private set
     var previousDirection: Direction = Direction.UP
         private set
+
+    var boundingBox: Rectangle = Rectangle()
 
     private val defaultSpritePath = "sprites/characters/Warrior.png"
     var FRAME_WIDTH = 16
@@ -69,6 +72,7 @@ class Entity {
 
     fun update(delta: Float) {
         frameTime = (frameTime + delta) % 5
+        setBoundingBoxSize(0f, 0.5f) // set bound to lower half of body for better feel
 
     }
 
@@ -79,6 +83,38 @@ class Entity {
         this.nextPlayerPosition.x = startX
         this.nextPlayerPosition.y = startY
 
+    }
+
+
+    fun setBoundingBoxSize(percentageWidthReduced: Float, percentageHeightReduced: Float) {
+        val width: Float
+        val height: Float
+
+        val widthReductionAmount = 1.0f - percentageWidthReduced //.8f for 20% (1 - .20)
+        val heightReductionAmount = 1.0f - percentageHeightReduced //.8f for 20% (1 - .20)
+
+        if (widthReductionAmount > 0 && widthReductionAmount < 1) {
+            width = FRAME_WIDTH * widthReductionAmount
+        } else {
+            width = FRAME_WIDTH.toFloat()
+        }
+
+        if (heightReductionAmount > 0 && heightReductionAmount < 1) {
+            height = FRAME_HEIGHT * heightReductionAmount
+        } else {
+            height = FRAME_HEIGHT.toFloat()
+        }
+
+
+        if (width == 0f || height == 0f) {
+            Gdx.app.debug(TAG, "Width and Height are 0!! $width:$height")
+        }
+
+        val minX = nextPlayerPosition.x
+        val minY = nextPlayerPosition.y
+
+        boundingBox.set(minX, minY, width, height)
+        //Gdx.app.debug(TAG, "SETTING Bounding Box: (" + minX + "," + minY + ")  width: " + width + " height: " + height);
     }
 
 
@@ -101,7 +137,6 @@ class Entity {
         frameSprite.x = nextPlayerPosition.x
         frameSprite.y = nextPlayerPosition.y
         currentPlayerPosition.set(nextPlayerPosition.x, nextPlayerPosition.y)
-//        Gdx.app.debug(TAG, "NOT BLOCKED: Setting nextPlayerPosition as Current: (" + nextPlayerPosition.x + "," + nextPlayerPosition.y + ")");
     }
 
 

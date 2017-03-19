@@ -9,7 +9,7 @@ class BludBourne : Game() {
 
     override fun create() {
         player = Entity()
-        player.init(0f,0f)
+        player.init(20f,20f)
         setScreen(mainGameScreen)
     }
 
