@@ -11,9 +11,11 @@ import java.util.*
 class InputComponent : InputProcessor {
     private val TAG = InputComponent::class.java.simpleName
 
-    internal enum class Keys { LEFT, RIGHT, UP, DOWN, QUIT }
-    internal enum class Mouse { SELECT, DOACTION }
+    private enum class Keys { LEFT, RIGHT, UP, DOWN, QUIT }
+    private enum class Mouse { SELECT, DOACTION }
 
+    private var keys: MutableMap<Keys, Boolean> = HashMap()
+    private var mouseButtons: MutableMap<Mouse, Boolean> = HashMap()
     private val lastMouseCoordinates = Vector3()
 
     init {
@@ -28,6 +30,39 @@ class InputComponent : InputProcessor {
 
         Gdx.input.inputProcessor = this
     }
+
+    fun update(player: Entity, delta: Float) {
+        //Keyboard input
+        if (keys[Keys.LEFT]!!) {
+//            player.calculateNextPosition(Entity.Direction.LEFT, delta)
+            player.state = Entity.State.WALKING
+            player.direction = Entity.Direction.LEFT
+        } else if (keys[Keys.RIGHT]!!) {
+//            player.calculateNextPosition(Entity.Direction.RIGHT, delta)
+            player.state = Entity.State.WALKING
+            player.direction = Entity.Direction.RIGHT
+        } else if (keys[Keys.UP]!!) {
+//            player.calculateNextPosition(Entity.Direction.UP, delta)
+            player.state = Entity.State.WALKING
+            player.direction = Entity.Direction.UP
+        } else if (keys[Keys.DOWN]!!) {
+//            player.calculateNextPosition(Entity.Direction.DOWN, delta)
+            player.state = Entity.State.WALKING
+            player.direction = Entity.Direction.DOWN
+        } else if (keys[Keys.QUIT]!!) {
+            Gdx.app.exit()
+        } else {
+            player.state = Entity.State.IDLE
+        }
+
+        //Mouse input
+        if (mouseButtons[Mouse.SELECT]!!) {
+            //Gdx.app.debug(TAG, "Mouse LEFT click at : (" + lastMouseCoordinates.x + "," + lastMouseCoordinates.y + ")" );
+            mouseButtons.put(Mouse.SELECT, false)
+        }
+
+    }
+
 
     override fun keyDown(keycode: Int): Boolean {
         if (keycode == Input.Keys.LEFT || keycode == Input.Keys.A) {
@@ -110,7 +145,9 @@ class InputComponent : InputProcessor {
         return false
     }
 
-    fun dispose() {}
+    fun dispose() {
+        Gdx.input.inputProcessor = null
+    }
 
     fun leftPressed() = keys.put(Keys.LEFT, true)
     fun rightPressed() = keys.put(Keys.RIGHT, true)
@@ -141,51 +178,13 @@ class InputComponent : InputProcessor {
             mouseButtons.put(Mouse.DOACTION, false)
 
 
-    fun update(player: Entity, delta: Float) {
-        if (delta == 0f || player.state === Entity.State.PAUSE) return
-
-        //Keyboard input
-        if (keys[Keys.LEFT]!!) {
-            player.calculateNextPosition(Entity.Direction.LEFT, delta)
-            player.state = Entity.State.WALKING
-            player.direction = Entity.Direction.LEFT
-        } else if (keys[Keys.RIGHT]!!) {
-            player.calculateNextPosition(Entity.Direction.RIGHT, delta)
-            player.state = Entity.State.WALKING
-            player.direction = Entity.Direction.RIGHT
-        } else if (keys[Keys.UP]!!) {
-            player.calculateNextPosition(Entity.Direction.UP, delta)
-            player.state = Entity.State.WALKING
-            player.direction = Entity.Direction.UP
-        } else if (keys[Keys.DOWN]!!) {
-            player.calculateNextPosition(Entity.Direction.DOWN, delta)
-            player.state = Entity.State.WALKING
-            player.direction = Entity.Direction.DOWN
-        } else if (keys[Keys.QUIT]!!) {
-            Gdx.app.exit()
-        } else {
-            player.state = Entity.State.IDLE
-        }
-
-        //Mouse input
-        if (mouseButtons[Mouse.SELECT]!!) {
-            //Gdx.app.debug(TAG, "Mouse LEFT click at : (" + lastMouseCoordinates.x + "," + lastMouseCoordinates.y + ")" );
-            mouseButtons.put(Mouse.SELECT, false)
-        }
-
+    fun hide() {
+        keys.put(Keys.LEFT, false)
+        keys.put(Keys.RIGHT, false)
+        keys.put(Keys.UP, false)
+        keys.put(Keys.DOWN, false)
+        keys.put(Keys.QUIT, false)
     }
 
-    companion object {
-        internal var keys: MutableMap<Keys, Boolean> = HashMap()
-        internal var mouseButtons: MutableMap<Mouse, Boolean> = HashMap()
-
-        fun hide() {
-            keys.put(Keys.LEFT, false)
-            keys.put(Keys.RIGHT, false)
-            keys.put(Keys.UP, false)
-            keys.put(Keys.DOWN, false)
-            keys.put(Keys.QUIT, false)
-        }
-    }
 
 }

@@ -30,17 +30,12 @@ class MainGameScreen : Screen {
     override fun show() {
         setupViewport(10, 10)
 
-        // player
-        player.init(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
-
         //get the current size
         camera = OrthographicCamera()
         camera.setToOrtho(false, viewportWidth, viewportHeight)
 
         mapRenderer = OrthogonalTiledMapRenderer(mapMgr.currentMap, MapManager.UNIT_SCALE)
         mapRenderer.setView(camera)
-
-
     }
 
 
@@ -50,22 +45,39 @@ class MainGameScreen : Screen {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
+        mapRenderer.setView(camera)
+        mapRenderer.render()
+
+        player.update(mapMgr, mapRenderer.batch, delta)
+
+        updatePortalLayerActivation(player.boundingBox)
 
         // lock and center the camera to player's position
         camera.position.set(player.currentPlayerPosition.x, player.currentPlayerPosition.y, 0f)
         camera.update()
 
+    }
 
-        updatePortalLayerActivation(player.boundingBox)
+    private fun updatePortalLayerActivation(boundingBox: Rectangle): Boolean {
+        // portal layer specifies its name as the layer to go
+        val portalLayer = mapMgr.portalLayer
 
-        if (!isCollisionWithMapLayer(player.boundingBox)) {
-            player.setNextPositionToCurrent()
+        portalLayer.objects.forEach {
+            if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle)) {
+                val mapName = it.getName() ?: return false
+                // cache position in pixels just in case we need to return later
+                mapMgr.setClosestStartPositionFromScaledUnits(player.currentPlayerPosition)
+                mapMgr.loadMap(mapName)
+
+                player.currentPlayerPosition.set(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
+                player.nextPlayerPosition.set(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
+
+                mapRenderer.map = mapMgr.currentMap
+                Gdx.app.debug(TAG, "Portal to $mapName Activated")
+                return true
+            }
         }
-
-        mapRenderer.setView(camera)
-        mapRenderer.render()
-        player.update(mapRenderer.batch, delta)
-
+        return false
     }
 
     override fun resize(width: Int, height: Int) {}
@@ -109,37 +121,6 @@ class MainGameScreen : Screen {
         Gdx.app.debug(TAG, "WorldRenderer: virtual: ($virtualWidth,$virtualHeight)")
         Gdx.app.debug(TAG, "WorldRenderer: viewport: ($viewportWidth,$viewportHeight)")
         Gdx.app.debug(TAG, "WorldRenderer: physical: ($physicalWidth,$physicalHeight)")
-    }
-
-    private fun isCollisionWithMapLayer(boundingBox: Rectangle): Boolean {
-        val collisionLayer = mapMgr.collisionLayer
-
-        collisionLayer.objects.forEach {
-            if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle))
-                return true
-        }
-        return false
-    }
-
-
-    private fun updatePortalLayerActivation(boundingBox: Rectangle): Boolean {
-        // portal layer specifies its name as the layer to go
-        val portalLayer = mapMgr.portalLayer
-
-        portalLayer.objects.forEach {
-            if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle)) {
-                val mapName = it.getName() ?: return false
-                // cache position in pixels just in case we need to return later
-                mapMgr.setClosestStartPositionFromScaledUnits(player.currentPlayerPosition)
-                mapMgr.loadMap(mapName)
-                player.init(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
-                mapRenderer.map = mapMgr.currentMap
-                Gdx.app.debug(TAG, "Portal to $mapName Activated")
-                return true
-            }
-        }
-
-        return false
     }
 
 }
