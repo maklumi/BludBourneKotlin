@@ -1,6 +1,8 @@
 package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
@@ -9,12 +11,14 @@ import java.util.*
 
 class MapManager {
 
-    //All maps for the game
     private val mapTable: Hashtable<String, String> = Hashtable()
     private val playerStartLocationTable: Hashtable<String, Vector2> = Hashtable()
     private val playerStart: Vector2 = Vector2(0f, 0f)
     private var currentMapName: String = TOWN
     var currentMap: TiledMap
+
+    var camera = OrthographicCamera()
+    var hasMapChanged = false
 
     lateinit var collisionLayer: MapLayer
         private set
@@ -35,11 +39,7 @@ class MapManager {
     }
 
     fun loadMap(mapName: String): TiledMap {
-//        playerStart.set(0f, 0f)
-
         val mapFullPath: String = mapTable[mapName]!!
-
-//        currentMap.dispose()
 
         Utility.loadMapAsset(mapFullPath)
         if (Utility.isAssetLoaded(mapFullPath)) {
@@ -58,6 +58,7 @@ class MapManager {
         }
         playerStart.set(start.x, start.y)
 
+        hasMapChanged = true
 
         Gdx.app.debug(TAG, "Player Start: (" + playerStart.x + "," + playerStart.y + ")")
         return currentMap

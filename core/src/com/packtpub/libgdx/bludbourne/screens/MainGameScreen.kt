@@ -4,9 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
-import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.utils.Json
+import com.packtpub.libgdx.bludbourne.Component
 import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.MapManager
 
@@ -26,6 +26,7 @@ class MainGameScreen : Screen {
     private val mapMgr = MapManager()
     private lateinit var mapRenderer: OrthogonalTiledMapRenderer
     private lateinit var camera: OrthographicCamera
+    private val json = Json()
 
     override fun show() {
         setupViewport(10, 10)
@@ -36,6 +37,7 @@ class MainGameScreen : Screen {
 
         mapRenderer = OrthogonalTiledMapRenderer(mapMgr.currentMap, MapManager.UNIT_SCALE)
         mapRenderer.setView(camera)
+        mapMgr.camera = camera
     }
 
 
@@ -46,38 +48,21 @@ class MainGameScreen : Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         mapRenderer.setView(camera)
-        mapRenderer.render()
+        if (mapMgr.hasMapChanged) {
+            mapRenderer.map = mapMgr.currentMap
+            player.sendMessage(Component.MESSAGE.INIT_START_POSITION +
+                    Component.MESSAGE.MESSAGE_TOKEN +
+                    json.toJson(mapMgr.playerStartUnitScaled))
 
-        player.update(mapMgr, mapRenderer.batch, delta)
+            camera.position.set(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y, 0f)
+            camera.update()
 
-        updatePortalLayerActivation(player.boundingBox)
+            mapMgr.hasMapChanged = false
 
-        // lock and center the camera to player's position
-        camera.position.set(player.currentPlayerPosition.x, player.currentPlayerPosition.y, 0f)
-        camera.update()
-
-    }
-
-    private fun updatePortalLayerActivation(boundingBox: Rectangle): Boolean {
-        // portal layer specifies its name as the layer to go
-        val portalLayer = mapMgr.portalLayer
-
-        portalLayer.objects.forEach {
-            if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle)) {
-                val mapName = it.getName() ?: return false
-                // cache position in pixels just in case we need to return later
-                mapMgr.setClosestStartPositionFromScaledUnits(player.currentPlayerPosition)
-                mapMgr.loadMap(mapName)
-
-                player.currentPlayerPosition.set(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
-                player.nextPlayerPosition.set(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y)
-
-                mapRenderer.map = mapMgr.currentMap
-                Gdx.app.debug(TAG, "Portal to $mapName Activated")
-                return true
-            }
         }
-        return false
+
+        mapRenderer.render() // always render before passing it to player
+        player.update(mapMgr, mapRenderer.batch, delta)
     }
 
     override fun resize(width: Int, height: Int) {}

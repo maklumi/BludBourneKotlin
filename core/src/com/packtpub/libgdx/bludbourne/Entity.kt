@@ -1,17 +1,11 @@
 package com.packtpub.libgdx.bludbourne
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.math.Rectangle
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.Array
 
 class Entity {
     private val TAG = Entity::class.java.simpleName
-
-    var state = State.IDLE
-    var direction = Direction.DOWN
-    var boundingBox: Rectangle = Rectangle()
-    var nextPlayerPosition: Vector2 = Vector2()
-    var currentPlayerPosition: Vector2 = Vector2()
 
     private val inputComponent = InputComponent()
     private val graphicsComponent = GraphicsComponent()
@@ -25,25 +19,34 @@ class Entity {
         UP, RIGHT, DOWN, LEFT;
     }
 
+    private val components = Array<Component>(MAX_COMPONENTS)
+
+    init {
+        components.add(inputComponent)
+        components.add(graphicsComponent)
+        components.add(physicsComponent)
+    }
+
     fun update(mapMgr: MapManager, batch: Batch, delta: Float) {
         inputComponent.update(this, delta)
-        physicsComponent.update(mapMgr, this, delta)
-        graphicsComponent.update(batch, this, delta)
-
-        currentPlayerPosition = physicsComponent.currentPlayerPosition
-        nextPlayerPosition = physicsComponent.nextPlayerPosition
-        boundingBox = physicsComponent.boundingBox
+        physicsComponent.update(this, mapMgr, delta)
+        graphicsComponent.update(this, batch, delta)
     }
 
-    fun dispose() {
-        inputComponent.dispose()
-        physicsComponent.dispose()
-        graphicsComponent.dispose()
+    fun sendMessage(message: String, vararg args: String) {
+        var fullMessage = message
+
+        args.forEach { fullMessage += Component.MESSAGE.MESSAGE_TOKEN + it }
+
+        components.forEach { it.receiveMessage(fullMessage) }
     }
+
+    fun dispose() = components.forEach { it.dispose() }
 
     companion object {
         var FRAME_WIDTH = 16
         var FRAME_HEIGHT = 16
+        val MAX_COMPONENTS = 5
     }
 
 

@@ -5,10 +5,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.Json
+import com.packtpub.libgdx.bludbourne.Component.MESSAGE.MESSAGE_TOKEN
 import java.util.*
 
 
-class InputComponent : InputProcessor {
+class InputComponent : InputProcessor, Component {
     private val TAG = InputComponent::class.java.simpleName
 
     private enum class Keys { LEFT, RIGHT, UP, DOWN, QUIT }
@@ -17,6 +19,8 @@ class InputComponent : InputProcessor {
     private var keys: MutableMap<Keys, Boolean> = HashMap()
     private var mouseButtons: MutableMap<Mouse, Boolean> = HashMap()
     private val lastMouseCoordinates = Vector3()
+    private val json = Json()
+    private var currentDirection = Entity.Direction.DOWN
 
     init {
         keys.put(Keys.LEFT, false)
@@ -31,28 +35,25 @@ class InputComponent : InputProcessor {
         Gdx.input.inputProcessor = this
     }
 
-    fun update(player: Entity, delta: Float) {
+    fun update(entity: Entity, delta: Float) {
         //Keyboard input
         if (keys[Keys.LEFT]!!) {
-//            player.calculateNextPosition(Entity.Direction.LEFT, delta)
-            player.state = Entity.State.WALKING
-            player.direction = Entity.Direction.LEFT
+            entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.WALKING))
+            entity.sendMessage(Component.MESSAGE.CURRENT_DIRECTION, json.toJson(Entity.Direction.LEFT))
         } else if (keys[Keys.RIGHT]!!) {
-//            player.calculateNextPosition(Entity.Direction.RIGHT, delta)
-            player.state = Entity.State.WALKING
-            player.direction = Entity.Direction.RIGHT
+            entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.WALKING))
+            entity.sendMessage(Component.MESSAGE.CURRENT_DIRECTION, json.toJson(Entity.Direction.RIGHT))
         } else if (keys[Keys.UP]!!) {
-//            player.calculateNextPosition(Entity.Direction.UP, delta)
-            player.state = Entity.State.WALKING
-            player.direction = Entity.Direction.UP
+            entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.WALKING))
+            entity.sendMessage(Component.MESSAGE.CURRENT_DIRECTION, json.toJson(Entity.Direction.UP))
         } else if (keys[Keys.DOWN]!!) {
-//            player.calculateNextPosition(Entity.Direction.DOWN, delta)
-            player.state = Entity.State.WALKING
-            player.direction = Entity.Direction.DOWN
+            entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.WALKING))
+            entity.sendMessage(Component.MESSAGE.CURRENT_DIRECTION, json.toJson(Entity.Direction.DOWN))
         } else if (keys[Keys.QUIT]!!) {
             Gdx.app.exit()
         } else {
-            player.state = Entity.State.IDLE
+            entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.IDLE))
+
         }
 
         //Mouse input
@@ -63,6 +64,18 @@ class InputComponent : InputProcessor {
 
     }
 
+    override fun receiveMessage(message: String) {
+        val string = message.split(MESSAGE_TOKEN.toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
+
+        if (string.isEmpty()) return
+
+        //Specifically for messages with 1 object payload
+        if (string.size == 2) {
+            if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION, ignoreCase = true)) {
+                currentDirection = json.fromJson(Entity.Direction::class.java, string[1])
+            }
+        }
+    }
 
     override fun keyDown(keycode: Int): Boolean {
         if (keycode == Input.Keys.LEFT || keycode == Input.Keys.A) {
@@ -145,7 +158,7 @@ class InputComponent : InputProcessor {
         return false
     }
 
-    fun dispose() {
+    override fun dispose() {
         Gdx.input.inputProcessor = null
     }
 

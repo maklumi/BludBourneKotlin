@@ -3,13 +3,14 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.Entity.Companion.FRAME_HEIGHT
 import com.packtpub.libgdx.bludbourne.Entity.Companion.FRAME_WIDTH
 
-class GraphicsComponent {
+class GraphicsComponent : Component {
     private val TAG = GraphicsComponent::class.java.simpleName
     private val defaultSpritePath = "sprites/characters/Warrior.png"
 
@@ -25,63 +26,73 @@ class GraphicsComponent {
 
 
     private var frameTime = 0f
-    private var frameSprite: Sprite = Sprite()
+    //   private var frameSprite: Sprite = Sprite()
     private lateinit var currentFrame: TextureRegion
+    private val json = Json()
+    private var currentPosition = Vector2()
+    private var currentState = Entity.State.IDLE
+    private var currentDirection = Entity.Direction.DOWN
 
     init {
         Utility.loadTextureAsset(defaultSpritePath)
-        loadDefaultSprite()
         loadAllAnimations()
     }
 
-    fun update(batch: Batch, entity: Entity, delta: Float) {
+    fun update(entity: Entity, batch: Batch, delta: Float) {
         frameTime = (frameTime + delta) % 5
 
-        when (entity.direction) {
+        when (currentDirection) {
             Entity.Direction.DOWN ->
-                if (entity.state === Entity.State.WALKING) {
+                if (currentState === Entity.State.WALKING) {
                     currentFrame = walkDownAnimation.getKeyFrame(frameTime)
                 } else {
-//                currentFrame = walkDownAnimation.keyFrames[0] as TextureRegion
                     currentFrame = walkDownFrames[0]
                 }
             Entity.Direction.LEFT ->
-                if (entity.state === Entity.State.WALKING) {
+                if (currentState === Entity.State.WALKING) {
                     currentFrame = walkLeftAnimation.getKeyFrame(frameTime)
                 } else {
-//                currentFrame = walkLeftAnimation.keyFrames[0] as TextureRegion
                     currentFrame = walkLeftFrames[0]
                 }
             Entity.Direction.UP ->
-                if (entity.state === Entity.State.WALKING) {
+                if (currentState === Entity.State.WALKING) {
                     currentFrame = walkUpAnimation.getKeyFrame(frameTime)
                 } else {
-//                currentFrame = walkUpAnimation.keyFrames[0] as TextureRegion
                     currentFrame = walkUpFrames[0]
                 }
             Entity.Direction.RIGHT ->
-                if (entity.state === Entity.State.WALKING) {
+                if (currentState === Entity.State.WALKING) {
                     currentFrame = walkRightAnimation.getKeyFrame(frameTime)
                 } else {
-//                currentFrame = walkRightAnimation.keyFrames[0] as TextureRegion
                     currentFrame = walkRightFrames[0]
                 }
         }
 
         batch.begin()
-        batch.draw(currentFrame, entity.currentPlayerPosition.x, entity.currentPlayerPosition.y, 1f, 1f)
+        batch.draw(currentFrame, currentPosition.x, currentPosition.y, 1f, 1f)
         batch.end()
     }
 
+    override fun receiveMessage(message: String) {
+        val string = message.split(Component.MESSAGE.MESSAGE_TOKEN.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
-    fun dispose() = Utility.unloadAsset(defaultSpritePath)
+        if (string.isEmpty()) return
 
-    private fun loadDefaultSprite() {
-        val texture = Utility.getTextureAsset(defaultSpritePath)
-        val textureFrames = TextureRegion.split(texture, FRAME_WIDTH, FRAME_HEIGHT)
-        frameSprite = Sprite(textureFrames[0][0], 0, 0, FRAME_WIDTH, FRAME_HEIGHT)
-        currentFrame = textureFrames[0][0]
+        //Specifically for messages with 1 object payload
+        if (string.size == 2) {
+            if (string[0].equals(Component.MESSAGE.CURRENT_POSITION, ignoreCase = true)) {
+                currentPosition = json.fromJson(Vector2::class.java, string[1])
+            } else if (string[0].equals(Component.MESSAGE.INIT_START_POSITION, ignoreCase = true)) {
+                currentPosition = json.fromJson(Vector2::class.java, string[1])
+            } else if (string[0].equals(Component.MESSAGE.CURRENT_STATE, ignoreCase = true)) {
+                currentState = json.fromJson(Entity.State::class.java, string[1])
+            } else if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION, ignoreCase = true)) {
+                currentDirection = json.fromJson(Entity.Direction::class.java, string[1])
+            }
+        }
     }
+
+    override fun dispose() = Utility.unloadAsset(defaultSpritePath)
 
     private fun loadAllAnimations() {
         val texture = Utility.getTextureAsset(defaultSpritePath)
