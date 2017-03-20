@@ -10,8 +10,8 @@ object EntityFactory {
     fun getEntity(entityType: EntityType): Entity? {
         when (entityType) {
             EntityFactory.EntityType.PLAYER -> return Entity(PlayerInputComponent(), PlayerPhysicsComponent(), PlayerGraphicsComponent())
-            EntityType.DEMO_PLAYER -> return Entity(DemoInputComponent(),
-                    PlayerPhysicsComponent(), PlayerGraphicsComponent())
+            EntityType.DEMO_PLAYER -> return Entity(NPCInputComponent(),
+                    NPCPhysicsComponent(), NPCGraphicsComponent())
             else -> return null
         }
     }

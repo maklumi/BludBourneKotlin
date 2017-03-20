@@ -13,23 +13,9 @@ class PlayerInputComponent : InputComponent(), InputProcessor {
 
     private val TAG = InputComponent::class.java.simpleName
 
-    private enum class Keys { LEFT, RIGHT, UP, DOWN, QUIT }
-    private enum class Mouse { SELECT, DOACTION }
-
-    private var keys: MutableMap<Keys, Boolean> = HashMap()
-    private var mouseButtons: MutableMap<Mouse, Boolean> = HashMap()
     private val lastMouseCoordinates = Vector3()
 
     init {
-        keys.put(Keys.LEFT, false)
-        keys.put(Keys.RIGHT, false)
-        keys.put(Keys.UP, false)
-        keys.put(Keys.DOWN, false)
-        keys.put(Keys.QUIT, false)
-
-        mouseButtons.put(Mouse.SELECT, false)
-        mouseButtons.put(Mouse.DOACTION, false)
-
         Gdx.input.inputProcessor = this
     }
 

@@ -11,7 +11,14 @@ class Entity(val inputComponent: InputComponent,
     private val TAG = Entity::class.java.simpleName
 
     enum class State {
-        IDLE, WALKING, ANIMATED, ANIMATE_ONCE, ANIMATE_ONCE_REVERSE, PAUSE
+        IDLE, WALKING,
+        IMMOBILE;
+
+        companion object {
+            fun getRandomNext(): State {
+                return State.values()[MathUtils.random(State.values().size - 2)]
+            }
+        }
     }
 
     enum class Direction {
