@@ -19,8 +19,6 @@ class PlayerInputComponent : InputComponent(), InputProcessor {
     private var keys: MutableMap<Keys, Boolean> = HashMap()
     private var mouseButtons: MutableMap<Mouse, Boolean> = HashMap()
     private val lastMouseCoordinates = Vector3()
-    private val json = Json()
-    private var currentDirection = Entity.Direction.DOWN
 
     init {
         keys.put(Keys.LEFT, false)

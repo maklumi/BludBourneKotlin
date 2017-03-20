@@ -18,12 +18,14 @@ abstract class PhysicsComponent : Component {
 
     abstract fun update(entity: Entity, mapMgr: MapManager, delta: Float)
 
-    fun isCollisionWithMapLayer(mapMgr: MapManager, boundingBox: Rectangle): Boolean {
+    fun isCollisionWithMapLayer(entity: Entity, mapMgr: MapManager, boundingBox: Rectangle): Boolean {
         val collisionLayer = mapMgr.collisionLayer
 
         collisionLayer.objects.forEach {
-            if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle))
+            if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle)) {
+                entity.sendMessage(Component.MESSAGE.COLLISION_WITH_MAP)
                 return true
+            }
         }
         return false
     }

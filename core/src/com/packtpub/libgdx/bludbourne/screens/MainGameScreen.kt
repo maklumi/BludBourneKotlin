@@ -40,7 +40,8 @@ class MainGameScreen : Screen {
         mapRenderer.setView(camera)
         mapMgr.camera = camera
 
-        player = EntityFactory.getEntity(EntityFactory.EntityType.PLAYER)!!
+//        player = EntityFactory.getEntity(EntityFactory.EntityType.PLAYER)!!
+        player = EntityFactory.getEntity(EntityFactory.EntityType.DEMO_PLAYER)!!
     }
 
 

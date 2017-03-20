@@ -1,6 +1,7 @@
 package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Array
 
 class Entity(val inputComponent: InputComponent,
@@ -15,6 +16,13 @@ class Entity(val inputComponent: InputComponent,
 
     enum class Direction {
         UP, RIGHT, DOWN, LEFT;
+
+        companion object {
+
+            fun getRandomNext(): Direction {
+                return Direction.values()[MathUtils.random(Direction.values().size - 1)]
+            }
+        }
     }
 
     private val components = Array<Component>(MAX_COMPONENTS)

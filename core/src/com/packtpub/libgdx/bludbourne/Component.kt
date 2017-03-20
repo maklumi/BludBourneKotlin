@@ -9,6 +9,7 @@ interface Component {
         val INIT_START_POSITION = "initStartPosition"
         val CURRENT_DIRECTION = "currentDirection"
         val CURRENT_STATE = "currentState"
+        val COLLISION_WITH_MAP = "COLLISION_WITH_MAP"
     }
 
 
