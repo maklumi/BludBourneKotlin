@@ -1,15 +1,13 @@
 package com.packtpub.libgdx.bludbourne
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.utils.Array
 
-class Entity {
-    private val TAG = Entity::class.java.simpleName
+class Entity(val inputComponent: InputComponent,
+             val physicsComponent: PhysicsComponent,
+             val graphicsComponent: GraphicsComponent) {
 
-    private val inputComponent = InputComponent()
-    private val graphicsComponent = GraphicsComponent()
-    private val physicsComponent = PhysicsComponent()
+    private val TAG = Entity::class.java.simpleName
 
     enum class State {
         IDLE, WALKING, ANIMATED, ANIMATE_ONCE, ANIMATE_ONCE_REVERSE, PAUSE

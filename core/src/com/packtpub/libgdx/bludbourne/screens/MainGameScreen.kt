@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.Component
 import com.packtpub.libgdx.bludbourne.Entity
+import com.packtpub.libgdx.bludbourne.EntityFactory
 import com.packtpub.libgdx.bludbourne.MapManager
 
 
@@ -22,7 +23,7 @@ class MainGameScreen : Screen {
     internal var physicalHeight: Float = 0f
     internal var aspectRatio: Float = 0f
 
-    private val player = Entity()
+    private lateinit var player: Entity
     private val mapMgr = MapManager()
     private lateinit var mapRenderer: OrthogonalTiledMapRenderer
     private lateinit var camera: OrthographicCamera
@@ -38,6 +39,8 @@ class MainGameScreen : Screen {
         mapRenderer = OrthogonalTiledMapRenderer(mapMgr.currentMap, MapManager.UNIT_SCALE)
         mapRenderer.setView(camera)
         mapMgr.camera = camera
+
+        player = EntityFactory.getEntity(EntityFactory.EntityType.PLAYER)!!
     }
 
 
