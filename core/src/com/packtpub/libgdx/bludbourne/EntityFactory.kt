@@ -16,7 +16,7 @@ object EntityFactory {
         when (entityType) {
             EntityType.PLAYER -> {
                 val player = Entity(PlayerInputComponent(), PlayerPhysicsComponent(), PlayerGraphicsComponent())
-                player.loadConfig(PLAYER_CONFIG)
+                player.entityConfig = Entity.getEntityConfig(PLAYER_CONFIG)
                 player.sendMessage(Component.MESSAGE.LOAD_ANIMATIONS, json.toJson(player.entityConfig))
                 return player
             }

@@ -11,23 +11,28 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
 
     init {
         npcStartPositions.forEach { position ->
-            mapEntities.add(initEntity(position, townGuardWalking))
+            mapEntities.add(initEntity(Entity.getEntityConfig(townGuardWalking), position))
         }
 
         // Special cases
-        mapEntities.add(initSpecialEntity(TOWNBLACKSMITH, townBlacksmith))
-        mapEntities.add(initSpecialEntity(TOWNMAGE, townMage))
-        mapEntities.add(initSpecialEntity(TOWNINNKEEPER, townInnKeeper))
+        mapEntities.add(initSpecialEntity(Entity.getEntityConfig(townBlacksmith)))
+        mapEntities.add(initSpecialEntity(Entity.getEntityConfig(townMage)))
+        mapEntities.add(initSpecialEntity(Entity.getEntityConfig(townInnKeeper)))
+
+        // When we have multiple configs in one file
+        val configs = Entity.getEntityConfigs(townFolk)
+        configs.forEach { mapEntities.add(initSpecialEntity(it)) }
+
     }
 
     override fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
         mapEntities.forEach { it.update(mapMgr, batch, delta) }
     }
 
-    private fun initEntity(position: Vector2, configFile: String): Entity {
+    private fun initEntity(config: EntityConfig, position: Vector2): Entity {
         val entity = EntityFactory.getEntity(EntityFactory.EntityType.NPC)
         entity.apply {
-            loadConfig(configFile)
+            entityConfig = config
             sendMessage(Component.MESSAGE.LOAD_ANIMATIONS, json.toJson(entity.entityConfig))
             sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(position))
             sendMessage(Component.MESSAGE.INIT_STATE, json.toJson(entity.entityConfig.state))
@@ -36,26 +41,21 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
         return entity
     }
 
-    private fun initSpecialEntity(positionName: String, configFile: String): Entity {
+    private fun initSpecialEntity(entityConfig: EntityConfig): Entity {
         var position = Vector2(0f, 0f)
 
-        if (specialNPCStartPositions.containsKey(positionName)) {
-            position = specialNPCStartPositions[positionName]!!
+        if (specialNPCStartPositions.containsKey(entityConfig.entityID)) {
+            position = specialNPCStartPositions[entityConfig.entityID]!!
         }
-        return initEntity(position, configFile)
+        return initEntity(entityConfig, position)
     }
 
     companion object {
         private val mapPath = "maps/town.tmx"
         private val townGuardWalking = "scripts/town_guard_walking.json"
-
         private val townBlacksmith = "scripts/town_blacksmith.json"
-        private val TOWNBLACKSMITH = "TOWN_BLACKSMITH"
-
         private val townMage = "scripts/town_mage.json"
-        private val TOWNMAGE = "TOWN_MAGE"
-
         private val townInnKeeper = "scripts/town_innkeeper.json"
-        private val TOWNINNKEEPER = "TOWN_INNKEEPER"
+        private val townFolk = "scripts/town_folk.json"
     }
 }

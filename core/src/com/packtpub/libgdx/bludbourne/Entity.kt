@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonValue
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
 class Entity(val inputComponent: InputComponent,
@@ -68,16 +69,28 @@ class Entity(val inputComponent: InputComponent,
         components.forEach { it.receiveMessage(fullMessage) }
     }
 
-    fun loadConfig(configFilePath: String) {
-        entityConfig = json.fromJson(EntityConfig::class.java, Gdx.files.internal(configFilePath))
-    }
-
     fun dispose() = components.forEach { it.dispose() }
 
     companion object {
         var FRAME_WIDTH = 16
         var FRAME_HEIGHT = 16
         val MAX_COMPONENTS = 5
+
+        fun getEntityConfig(configFilePath: String): EntityConfig {
+            val json = Json()
+            return json.fromJson(EntityConfig::class.java, Gdx.files.internal(configFilePath))
+        }
+
+        fun getEntityConfigs(configFilePath: String): Array<EntityConfig> {
+            val json = Json()
+            val configs = Array<EntityConfig>()
+
+            val jsonValues = json.fromJson(ArrayList::class.java, Gdx.files.internal(configFilePath)) as ArrayList<JsonValue>
+
+            jsonValues.forEach { configs.add(json.readValue(EntityConfig::class.java, it)) }
+
+            return configs
+        }
     }
 
 
