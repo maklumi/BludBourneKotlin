@@ -75,25 +75,25 @@ class PlayerGraphicsComponent : GraphicsComponent() {
                 if (currentState === Entity.State.WALKING) {
                     currentFrame = walkDownAnimation.getKeyFrame(frameTime)
                 } else {
-                    currentFrame = walkDownAnimation.keyFrames[0]
+                    currentFrame = walkDownAnimation.getKeyFrame(0f)
                 }
             Entity.Direction.LEFT ->
                 if (currentState === Entity.State.WALKING) {
                     currentFrame = walkLeftAnimation.getKeyFrame(frameTime)
                 } else {
-                    currentFrame = walkLeftAnimation.keyFrames[0]
+                    currentFrame = walkLeftAnimation.getKeyFrame(0f)
                 }
             Entity.Direction.UP ->
                 if (currentState === Entity.State.WALKING) {
                     currentFrame = walkUpAnimation.getKeyFrame(frameTime)
                 } else {
-                    currentFrame = walkUpAnimation.keyFrames[0]
+                    currentFrame = walkUpAnimation.getKeyFrame(0f)
                 }
             Entity.Direction.RIGHT ->
                 if (currentState === Entity.State.WALKING) {
                     currentFrame = walkRightAnimation.getKeyFrame(frameTime)
                 } else {
-                    currentFrame = walkRightAnimation.keyFrames[0]
+                    currentFrame = walkRightAnimation.getKeyFrame(0f)
                 }
         }
 

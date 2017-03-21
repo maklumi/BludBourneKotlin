@@ -19,7 +19,7 @@ abstract class PhysicsComponent : Component {
     abstract fun update(entity: Entity, mapMgr: MapManager, delta: Float)
 
     fun isCollisionWithMapLayer(entity: Entity, mapMgr: MapManager, boundingBox: Rectangle): Boolean {
-        val collisionLayer = mapMgr.collisionLayer
+        val collisionLayer = mapMgr.getCollisionLayer()
 
         collisionLayer.objects.forEach {
             if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle)) {
@@ -86,9 +86,9 @@ abstract class PhysicsComponent : Component {
         //Need to account for the unitscale, since the map coordinates will be in pixels
         val minX: Float
         val minY: Float
-        if (MapManager.UNIT_SCALE > 0) {
-            minX = nextEntityPosition.x / MapManager.UNIT_SCALE
-            minY = nextEntityPosition.y / MapManager.UNIT_SCALE
+        if (Map.UNIT_SCALE > 0) {
+            minX = nextEntityPosition.x / Map.UNIT_SCALE
+            minY = nextEntityPosition.y / Map.UNIT_SCALE
         } else {
             minX = nextEntityPosition.x
             minY = nextEntityPosition.y

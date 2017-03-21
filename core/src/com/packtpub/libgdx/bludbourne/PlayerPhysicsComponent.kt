@@ -56,18 +56,18 @@ class PlayerPhysicsComponent : PhysicsComponent() {
 
     private fun updatePortalLayerActivation(mapMgr: MapManager, boundingBox: Rectangle): Boolean {
         // portal layer specifies its name as the layer to go
-        val portalLayer = mapMgr.portalLayer
+        val portalLayer = mapMgr.getPortalLayer()
 
         portalLayer.objects.forEach {
             if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle)) {
                 val mapName = it.getName() ?: return false
                 // cache position in pixels just in case we need to return later
                 mapMgr.setClosestStartPositionFromScaledUnits(currentEntityPosition)
-                mapMgr.loadMap(mapName)
-                currentEntityPosition.x = mapMgr.playerStartUnitScaled.x
-                currentEntityPosition.y = mapMgr.playerStartUnitScaled.y
-                nextEntityPosition.x = mapMgr.playerStartUnitScaled.x
-                nextEntityPosition.y = mapMgr.playerStartUnitScaled.y
+                mapMgr.loadMap(MapFactory.MapType.valueOf(mapName))
+                currentEntityPosition.x = mapMgr.getPlayerStartUnitScaled().x
+                currentEntityPosition.y = mapMgr.getPlayerStartUnitScaled().y
+                nextEntityPosition.x = mapMgr.getPlayerStartUnitScaled().x
+                nextEntityPosition.y = mapMgr.getPlayerStartUnitScaled().y
 
                 Gdx.app.debug(TAG, "Portal to $mapName Activated")
                 return true

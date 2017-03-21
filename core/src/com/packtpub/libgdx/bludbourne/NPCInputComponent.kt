@@ -37,6 +37,12 @@ class NPCInputComponent : InputComponent(), InputProcessor {
             Gdx.app.exit()
         }
 
+        // if IMMOBILE, don't update anything
+        if (currentState == Entity.State.IMMOBILE) {
+            entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.IMMOBILE))
+            return
+        }
+
         frameTime += delta
 
         //Change direction after so many seconds
@@ -46,10 +52,7 @@ class NPCInputComponent : InputComponent(), InputProcessor {
             frameTime = 0.0f
         }
 
-        if (currentState === Entity.State.IMMOBILE) {
-            entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.IMMOBILE))
-            return
-        } else if (currentState === Entity.State.IDLE) {
+        if (currentState === Entity.State.IDLE) {
             entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.IDLE))
             return
         }

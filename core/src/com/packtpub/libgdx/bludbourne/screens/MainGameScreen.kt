@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.Component
 import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.EntityFactory
+import com.packtpub.libgdx.bludbourne.Map.Companion.UNIT_SCALE
 import com.packtpub.libgdx.bludbourne.MapManager
 
 
@@ -36,12 +37,11 @@ class MainGameScreen : Screen {
         camera = OrthographicCamera()
         camera.setToOrtho(false, viewportWidth, viewportHeight)
 
-        mapRenderer = OrthogonalTiledMapRenderer(mapMgr.currentMap, MapManager.UNIT_SCALE)
+        mapRenderer = OrthogonalTiledMapRenderer(mapMgr.getCurrentTiledMap(), UNIT_SCALE)
         mapRenderer.setView(camera)
         mapMgr.camera = camera
 
-//        player = EntityFactory.getEntity(EntityFactory.EntityType.PLAYER)!!
-        player = EntityFactory.getEntity(EntityFactory.EntityType.DEMO_PLAYER)!!
+        player = EntityFactory.getEntity(EntityFactory.EntityType.PLAYER)!!
     }
 
 
@@ -53,11 +53,11 @@ class MainGameScreen : Screen {
 
         mapRenderer.setView(camera)
         if (mapMgr.hasMapChanged) {
-            mapRenderer.map = mapMgr.currentMap
+            mapRenderer.map = mapMgr.getCurrentTiledMap()
             player.sendMessage(Component.MESSAGE.INIT_START_POSITION,
-                    json.toJson(mapMgr.playerStartUnitScaled))
+                    json.toJson(mapMgr.getPlayerStartUnitScaled()))
 
-            camera.position.set(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y, 0f)
+            camera.position.set(mapMgr.getPlayerStartUnitScaled().x, mapMgr.getPlayerStartUnitScaled().y, 0f)
             camera.update()
 
             mapMgr.hasMapChanged = false
