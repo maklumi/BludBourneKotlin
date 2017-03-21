@@ -18,16 +18,51 @@ abstract class PhysicsComponent : Component {
 
     abstract fun update(entity: Entity, mapMgr: MapManager, delta: Float)
 
-    fun isCollisionWithMapLayer(entity: Entity, mapMgr: MapManager, boundingBox: Rectangle): Boolean {
-        val collisionLayer = mapMgr.getCollisionLayer()
+    fun isCollisionWithMapLayer(entity: Entity, mapMgr: MapManager): Boolean {
+        val mapCollisionLayer = mapMgr.getCollisionLayer()
 
-        collisionLayer.objects.forEach {
-            if (it is RectangleMapObject && boundingBox.overlaps(it.rectangle)) {
-                entity.sendMessage(Component.MESSAGE.COLLISION_WITH_MAP)
-                return true
+        mapCollisionLayer.objects.forEach {
+            if (it is RectangleMapObject) {
+                if (boundingBox.overlaps(it.rectangle)) {
+                    entity.sendMessage(Component.MESSAGE.COLLISION_WITH_MAP)
+                    return true
+                }
             }
         }
+
         return false
+    }
+
+    protected open fun isCollisionWithMapEntities(entity: Entity, mapMgr: MapManager): Boolean {
+        val entities = mapMgr.getCurrentMapEntities()
+        var isCollisionWithMapEntities = false
+
+        for (mapEntity in entities) {
+            // check for testing against self
+            if (mapEntity == entity) continue
+
+            if (boundingBox.overlaps(mapEntity.getCurrentBoundingBox())) {
+                entity.sendMessage(Component.MESSAGE.COLLISION_WITH_ENTITY)
+                isCollisionWithMapEntities = true
+                break
+            }
+        }
+
+        return isCollisionWithMapEntities
+
+    }
+
+    fun isCollision(entitySource: Entity, entityTarget: Entity): Boolean {
+        var isCollisionWithMapEntities = false
+
+        if (entitySource == entityTarget) return false
+
+        if (entitySource.getCurrentBoundingBox().overlaps(entityTarget.getCurrentBoundingBox())) {
+            entitySource.sendMessage(Component.MESSAGE.COLLISION_WITH_ENTITY)
+            isCollisionWithMapEntities = true
+        }
+
+        return isCollisionWithMapEntities
     }
 
     fun setNextPositionToCurrent(entity: Entity) {

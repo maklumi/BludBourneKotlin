@@ -30,6 +30,7 @@ abstract class Map(var currentMapType: MapFactory.MapType,
     protected val npcStartPositions: Array<Vector2>
     protected val specialNPCStartPositions: Hashtable<String, Vector2>
     protected val json = Json()
+    var mapEntities: Array<Entity> = Array(10)
 
     init {
         Utility.loadMapAsset(fullMapPath)

@@ -23,6 +23,8 @@ class NPCInputComponent : InputComponent(), InputProcessor {
         if (string.size == 1) {
             if (string[0].equals(Component.MESSAGE.COLLISION_WITH_MAP.toString(), ignoreCase = true)) {
                 currentDirection = Entity.Direction.getRandomNext()
+            } else if (string[0].equals(Component.MESSAGE.COLLISION_WITH_ENTITY.toString(), ignoreCase = true)) {
+                currentDirection = Entity.Direction.getRandomNext()
             }
         }
 

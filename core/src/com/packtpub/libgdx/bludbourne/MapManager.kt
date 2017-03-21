@@ -6,9 +6,11 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.Array
 
 class MapManager {
 
+    lateinit var player: Entity //set from MainGameScreen
     var camera = OrthographicCamera()
     var hasMapChanged = false
     private var currentMap: Map = MapFactory.getMap(MapFactory.MapType.TOWN)
@@ -24,9 +26,11 @@ class MapManager {
         currentMap.setClosestStartPositionFromScaledUnits(position)
     }
 
-    fun updateCurrentMapEntities(mapMgr: MapManager, batch: Batch, delta: Float){
+    fun updateCurrentMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
         currentMap.updateMapEntities(mapMgr, batch, delta)
     }
+
+    fun getCurrentMapEntities(): Array<Entity> = currentMap.mapEntities
 
     fun getCollisionLayer(): MapLayer {
         return currentMap.collisionLayer

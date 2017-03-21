@@ -3,6 +3,7 @@ package com.packtpub.libgdx.bludbourne
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
@@ -13,7 +14,7 @@ class Entity(val inputComponent: InputComponent,
              val graphicsComponent: GraphicsComponent) {
 
     private val TAG = Entity::class.java.simpleName
-    private val json = Json()
+
     var entityConfig = EntityConfig()
 
     enum class State {
@@ -68,6 +69,8 @@ class Entity(val inputComponent: InputComponent,
 
         components.forEach { it.receiveMessage(fullMessage) }
     }
+
+    fun getCurrentBoundingBox() : Rectangle = physicsComponent.boundingBox
 
     fun dispose() = components.forEach { it.dispose() }
 

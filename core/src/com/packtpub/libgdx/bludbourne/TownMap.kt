@@ -2,12 +2,9 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.utils.Array
 
 
 class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
-
-    private val mapEntities = Array<Entity>(4)
 
     init {
         npcStartPositions.forEach { position ->
@@ -26,7 +23,9 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
     }
 
     override fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
-        mapEntities.forEach { it.update(mapMgr, batch, delta) }
+      for (i in 0..mapEntities.size-1) {
+          mapEntities[i].update(mapMgr, batch, delta)
+      }
     }
 
     private fun initEntity(config: EntityConfig, position: Vector2): Entity {

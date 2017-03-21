@@ -29,18 +29,27 @@ class NPCPhysicsComponent : PhysicsComponent() {
     }
 
     override fun update(entity: Entity, mapMgr: MapManager, delta: Float) {
-        //We want the hit box to be at the feet for a better feel
         setBoundingBoxSize(entity, 0f, 0f)
 
         if (state === Entity.State.IMMOBILE) return
 
-        if (!isCollisionWithMapLayer(entity, mapMgr, boundingBox) && state === Entity.State.WALKING) {
+        if (!isCollisionWithMapLayer(entity, mapMgr) &&
+                !isCollisionWithMapEntities(entity, mapMgr) &&
+                state === Entity.State.WALKING) {
             setNextPositionToCurrent(entity)
         }
 
         calculateNextPosition(delta)
     }
 
+    override fun isCollisionWithMapEntities(entity: Entity, mapMgr: MapManager): Boolean {
+        if (super.isCollisionWithMapEntities(entity, mapMgr)) return true
+
+        // test against player
+        if (isCollision(entity, mapMgr.player)) return true
+
+        return false
+    }
 
     private val TAG = NPCPhysicsComponent::class.java.simpleName
 
