@@ -1,11 +1,13 @@
 package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.maps.MapLayer
-import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Json
 
 abstract class Map(var currentMapType: MapFactory.MapType,
                    fullMapPath: String) {
@@ -24,6 +26,9 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected set
     protected var spawnsLayer: MapLayer
 
+    protected val npcStartPositions: Array<Vector2>
+    protected val json = Json()
+
     init {
         Utility.loadMapAsset(fullMapPath)
         if (Utility.isAssetLoaded(fullMapPath)) {
@@ -37,6 +42,7 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         spawnsLayer = currentTiledMap.layers.get(SPAWNS_LAYER)
         setClosestStartPosition(playerStart)
 
+        npcStartPositions = getNPCStartPositions()
     }
 
     val playerStartUnitScaled: Vector2
@@ -80,6 +86,32 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         setClosestStartPosition(convertedUnits)
     }
 
+    abstract fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float)
+
+    fun getNPCStartPositions(): Array<Vector2> {
+        val positions = Array<Vector2>()
+
+        spawnsLayer.objects.forEach {
+            val name = it.name
+
+            if (name == null || name.isEmpty()) return@forEach
+
+            if (name.equals(NPC_START, true)) {
+                // get center of rectangle
+                it as RectangleMapObject
+                var x = it.rectangle.x + it.rectangle.width / 2
+                var y = it.rectangle.y + it.rectangle.height / 2
+
+                // convert from map coordinates
+                x *= UNIT_SCALE
+                y *= UNIT_SCALE
+
+                positions.add(Vector2(x, y))
+            }
+        }
+        return positions
+    }
+
     companion object {
         private val TAG = Map::class.java.simpleName
 
@@ -89,6 +121,8 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected val COLLISION_LAYER = "MAP_COLLISION_LAYER"
         protected val SPAWNS_LAYER = "MAP_SPAWNS_LAYER"
         protected val PORTAL_LAYER = "MAP_PORTAL_LAYER"
+        protected val NPC_START = "NPC_START"
+
 
         //Starting locations
         protected val PLAYER_START = "PLAYER_START"

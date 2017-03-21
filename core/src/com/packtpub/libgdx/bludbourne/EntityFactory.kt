@@ -12,7 +12,7 @@ object EntityFactory {
     private val json = Json()
     private val PLAYER_CONFIG = "scripts/player.json"
 
-    fun getEntity(entityType: EntityType): Entity? {
+    fun getEntity(entityType: EntityType): Entity {
         when (entityType) {
             EntityType.PLAYER -> {
                 val player = Entity(PlayerInputComponent(), PlayerPhysicsComponent(), PlayerGraphicsComponent())
@@ -22,7 +22,6 @@ object EntityFactory {
             }
             EntityType.DEMO_PLAYER -> return Entity(NPCInputComponent(), PlayerPhysicsComponent(), PlayerGraphicsComponent())
             EntityType.NPC -> return Entity(NPCInputComponent(), NPCPhysicsComponent(), NPCGraphicsComponent())
-            else -> return null
         }
     }
 }

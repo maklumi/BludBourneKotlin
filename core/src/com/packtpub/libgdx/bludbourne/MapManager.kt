@@ -2,6 +2,7 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.Vector2
@@ -21,6 +22,10 @@ class MapManager {
 
     fun setClosestStartPositionFromScaledUnits(position: Vector2) {
         currentMap.setClosestStartPositionFromScaledUnits(position)
+    }
+
+    fun updateCurrentMapEntities(mapMgr: MapManager, batch: Batch, delta: Float){
+        currentMap.updateMapEntities(mapMgr, batch, delta)
     }
 
     fun getCollisionLayer(): MapLayer {

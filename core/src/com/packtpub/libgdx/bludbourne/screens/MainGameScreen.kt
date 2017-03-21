@@ -64,7 +64,10 @@ class MainGameScreen : Screen {
 
         }
 
-        mapRenderer.render() // always render before passing it to player
+        mapRenderer.render()
+
+        mapMgr.updateCurrentMapEntities(mapMgr, mapRenderer.batch, delta)
+
         player.update(mapMgr, mapRenderer.batch, delta)
     }
 
