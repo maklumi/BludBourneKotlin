@@ -29,6 +29,7 @@ object Utility {
     fun isAssetLoaded(fileName: String): Boolean = assetManager.isLoaded(fileName)
 
     fun loadMapAsset(mapFilenamePath: String) {
+        if (assetManager.isLoaded(mapFilenamePath)) return
         val filePathResolver = InternalFileHandleResolver()
         if (filePathResolver.resolve(mapFilenamePath).exists()) {
             assetManager.setLoader(TiledMap::class.java, TmxMapLoader(filePathResolver))
@@ -53,6 +54,7 @@ object Utility {
 
 
     fun loadTextureAsset(textureFilenamePath: String) {
+        if (assetManager.isLoaded(textureFilenamePath)) return
         val filePathResolver = InternalFileHandleResolver()
         if (filePathResolver.resolve(textureFilenamePath).exists()) {
             assetManager.setLoader(Texture::class.java, TextureLoader(filePathResolver))

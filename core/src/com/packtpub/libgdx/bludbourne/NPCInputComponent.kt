@@ -25,6 +25,14 @@ class NPCInputComponent : InputComponent(), InputProcessor {
                 currentDirection = Entity.Direction.getRandomNext()
             }
         }
+
+        if (string.size == 2) {
+            if (string[0].equals(Component.MESSAGE.INIT_STATE.toString(), ignoreCase = true)) {
+                currentState = json.fromJson(Entity.State::class.java, string[1])
+            } else if (string[0].equals(Component.MESSAGE.INIT_DIRECTION.toString(), true)) {
+                currentDirection = json.fromJson(Entity.Direction::class.java, string[1])
+            }
+        }
     }
 
     override fun dispose() {

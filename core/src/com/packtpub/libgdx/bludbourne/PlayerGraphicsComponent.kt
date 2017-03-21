@@ -97,9 +97,11 @@ class PlayerGraphicsComponent : GraphicsComponent() {
                     val textureNames: Array<String> = it.texturePaths
                     val points: Array<GridPoint2> = it.gridPoints
                     val animationType: Entity.AnimationType = it.animationType
+                    val frameDuration = it.frameDuration
+
                     var animation: Animation<TextureRegion>? = null
-                    if (textureNames.size == 1) animation = loadAnimation(textureNames[0], points)
-                    if (textureNames.size == 2) animation = loadAnimation(textureNames[0], textureNames[1], points)
+                    if (textureNames.size == 1) animation = loadAnimation(textureNames[0], points, frameDuration)
+                    if (textureNames.size == 2) animation = loadAnimation(textureNames[0], textureNames[1], points, frameDuration)
                     animations.put(animationType, animation)
                 }
             }

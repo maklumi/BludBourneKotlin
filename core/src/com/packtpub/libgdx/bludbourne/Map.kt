@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
+import java.util.*
 
 abstract class Map(var currentMapType: MapFactory.MapType,
                    fullMapPath: String) {
@@ -27,6 +28,7 @@ abstract class Map(var currentMapType: MapFactory.MapType,
     protected var spawnsLayer: MapLayer
 
     protected val npcStartPositions: Array<Vector2>
+    protected val specialNPCStartPositions: Hashtable<String, Vector2>
     protected val json = Json()
 
     init {
@@ -43,6 +45,7 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         setClosestStartPosition(playerStart)
 
         npcStartPositions = getNPCStartPositions()
+        specialNPCStartPositions = getExtraNPCStartPositions()
     }
 
     val playerStartUnitScaled: Vector2
@@ -110,6 +113,32 @@ abstract class Map(var currentMapType: MapFactory.MapType,
             }
         }
         return positions
+    }
+
+    private fun getExtraNPCStartPositions(): Hashtable<String, Vector2> {
+        val positionsTable = Hashtable<String, Vector2>()
+
+        spawnsLayer.objects.forEach {
+            val name = it.name
+
+            if (name == null || name.isEmpty()) return@forEach
+
+            // exclude non special characters
+            if (name.equals(NPC_START, true) || name.equals(PLAYER_START, true)) return@forEach
+
+            // get center of rectangle
+            it as RectangleMapObject
+            var x = it.rectangle.x + it.rectangle.width / 2
+            var y = it.rectangle.y + it.rectangle.height / 2
+
+            // convert from map coordinates
+            x *= UNIT_SCALE
+            y *= UNIT_SCALE
+
+            positionsTable.put(name, Vector2(x, y))
+
+        }
+        return positionsTable
     }
 
     companion object {
