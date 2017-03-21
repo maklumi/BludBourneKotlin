@@ -9,7 +9,7 @@ import java.util.*
 
 abstract class GraphicsComponent : Component {
 
-    abstract fun update(entity: Entity, batch: Batch, delta: Float)
+    abstract fun update(entity: Entity, mapManager: MapManager, batch: Batch, delta: Float)
 
     var animations: Hashtable<Entity.AnimationType, Animation<TextureRegion>> = Hashtable()
 

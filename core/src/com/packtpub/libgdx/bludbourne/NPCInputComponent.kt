@@ -24,7 +24,7 @@ class NPCInputComponent : InputComponent(), InputProcessor {
             if (string[0].equals(Component.MESSAGE.COLLISION_WITH_MAP.toString(), ignoreCase = true)) {
                 currentDirection = Entity.Direction.getRandomNext()
             } else if (string[0].equals(Component.MESSAGE.COLLISION_WITH_ENTITY.toString(), ignoreCase = true)) {
-                currentDirection = Entity.Direction.getRandomNext()
+                currentState = Entity.State.IDLE
             }
         }
 
@@ -55,7 +55,7 @@ class NPCInputComponent : InputComponent(), InputProcessor {
         frameTime += delta
 
         //Change direction after so many seconds
-        if (frameTime > 3) {
+        if (frameTime > 2) {
             currentState = Entity.State.getRandomNext()
             currentDirection = Entity.Direction.getRandomNext()
             frameTime = 0.0f

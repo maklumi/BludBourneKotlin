@@ -59,7 +59,7 @@ class Entity(val inputComponent: InputComponent,
     fun update(mapMgr: MapManager, batch: Batch, delta: Float) {
         inputComponent.update(this, delta)
         physicsComponent.update(this, mapMgr, delta)
-        graphicsComponent.update(this, batch, delta)
+        graphicsComponent.update(this, mapMgr, batch, delta)
     }
 
     fun sendMessage(message: Component.MESSAGE, vararg args: String) {
@@ -70,7 +70,7 @@ class Entity(val inputComponent: InputComponent,
         components.forEach { it.receiveMessage(fullMessage) }
     }
 
-    fun getCurrentBoundingBox() : Rectangle = physicsComponent.boundingBox
+    fun getCurrentBoundingBox(): Rectangle = physicsComponent.boundingBox
 
     fun dispose() = components.forEach { it.dispose() }
 
