@@ -3,6 +3,7 @@ package com.packtpub.libgdx.bludbourne
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Array
+import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
 class Entity(val inputComponent: InputComponent,
              val physicsComponent: PhysicsComponent,
@@ -46,10 +47,10 @@ class Entity(val inputComponent: InputComponent,
         graphicsComponent.update(this, batch, delta)
     }
 
-    fun sendMessage(message: String, vararg args: String) {
-        var fullMessage = message
+    fun sendMessage(message: Component.MESSAGE, vararg args: String) {
+        var fullMessage = message.toString()
 
-        args.forEach { fullMessage += Component.MESSAGE.MESSAGE_TOKEN + it }
+        args.forEach { fullMessage += MESSAGE_TOKEN + it }
 
         components.forEach { it.receiveMessage(fullMessage) }
     }

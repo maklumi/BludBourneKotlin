@@ -5,8 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.utils.Json
-import java.util.*
+import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
 
 class PlayerInputComponent : InputComponent(), InputProcessor {
@@ -49,13 +48,13 @@ class PlayerInputComponent : InputComponent(), InputProcessor {
     }
 
     override fun receiveMessage(message: String) {
-        val string = message.split(Component.MESSAGE.MESSAGE_TOKEN.toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
+        val string = message.split(MESSAGE_TOKEN)
 
         if (string.isEmpty()) return
 
         //Specifically for messages with 1 object payload
         if (string.size == 2) {
-            if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION, ignoreCase = true)) {
+            if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION.toString(), ignoreCase = true)) {
                 currentDirection = json.fromJson(Entity.Direction::class.java, string[1])
             }
         }
