@@ -81,6 +81,8 @@ class PlayerGraphicsComponent : GraphicsComponent() {
         batch.draw(currentFrame, currentPosition.x, currentPosition.y, 1f, 1f)
         batch.end()
 
+        // Used to graphically debug boundingBoxes
+        /*
         val rect = entity.getCurrentBoundingBox()
         shapeRenderer.apply {
             projectionMatrix = camera.combined
@@ -88,7 +90,7 @@ class PlayerGraphicsComponent : GraphicsComponent() {
             color = Color.RED
             rect(rect.x * Map.UNIT_SCALE, rect.y * Map.UNIT_SCALE, rect.width * Map.UNIT_SCALE, rect.height * Map.UNIT_SCALE)
             end()
-        }
+        }*/
 
     }
 

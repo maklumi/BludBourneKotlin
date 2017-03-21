@@ -31,6 +31,13 @@ class Entity(val inputComponent: InputComponent,
     enum class Direction {
         UP, RIGHT, DOWN, LEFT;
 
+        fun getOpposite(): Direction {
+            if (this == LEFT) return RIGHT
+            else if (this == RIGHT) return LEFT
+            else if (this == UP) return DOWN
+            else return UP
+        }
+
         companion object {
 
             fun getRandomNext(): Direction {

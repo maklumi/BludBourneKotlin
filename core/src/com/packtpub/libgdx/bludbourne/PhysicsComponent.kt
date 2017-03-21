@@ -5,16 +5,25 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Json
+import com.packtpub.libgdx.bludbourne.Entity.Companion.FRAME_HEIGHT
+import com.packtpub.libgdx.bludbourne.Entity.Companion.FRAME_WIDTH
 
 abstract class PhysicsComponent : Component {
     private val TAG = PhysicsComponent::class.java.simpleName
 
     val velocity = Vector2(2f, 2f)
     var boundingBox = Rectangle()
+    protected var boundingBoxLocation = BoundingBoxLocation.BOTTOM_LEFT
     var nextEntityPosition: Vector2 = Vector2(0f, 0f)
     var currentEntityPosition: Vector2 = Vector2(0f, 0f)
     var currentDirection = Entity.Direction.DOWN
     val json = Json()
+
+    enum class BoundingBoxLocation {
+        BOTTOM_LEFT,
+        BOTTOM_CENTER,
+        CENTER,
+    }
 
     abstract fun update(entity: Entity, mapMgr: MapManager, delta: Float)
 
@@ -94,24 +103,27 @@ abstract class PhysicsComponent : Component {
         velocity.scl(1 / deltaTime)
     }
 
-    fun setBoundingBoxSize(entity: Entity, percentageWidthReduced: Float, percentageHeightReduced: Float) {
+    fun initBoundingBox(percentageWidthReduced: Float, percentageHeightReduced: Float) {
         //Update the current bounding box
         val width: Float
         val height: Float
+
+        val origWidth = FRAME_WIDTH
+        val origHeight = FRAME_HEIGHT
 
         val widthReductionAmount = 1.0f - percentageWidthReduced //.8f for 20% (1 - .20)
         val heightReductionAmount = 1.0f - percentageHeightReduced //.8f for 20% (1 - .20)
 
         if (widthReductionAmount > 0 && widthReductionAmount < 1) {
-            width = Entity.FRAME_WIDTH * widthReductionAmount
+            width = FRAME_WIDTH * widthReductionAmount
         } else {
-            width = Entity.FRAME_WIDTH.toFloat()
+            width = FRAME_WIDTH.toFloat()
         }
 
         if (heightReductionAmount > 0 && heightReductionAmount < 1) {
-            height = Entity.FRAME_HEIGHT * heightReductionAmount
+            height = FRAME_HEIGHT * heightReductionAmount
         } else {
-            height = Entity.FRAME_HEIGHT.toFloat()
+            height = FRAME_HEIGHT.toFloat()
         }
 
         if (width == 0f || height == 0f) {
@@ -129,8 +141,36 @@ abstract class PhysicsComponent : Component {
             minY = nextEntityPosition.y
         }
 
-        boundingBox.set(minX, minY, width, height)
+        boundingBox.setWidth(width)
+        boundingBox.setHeight(height)
+
+        when (boundingBoxLocation) {
+            BoundingBoxLocation.BOTTOM_LEFT -> boundingBox.set(minX, minY, width, height)
+            BoundingBoxLocation.BOTTOM_CENTER -> boundingBox.setCenter(minX + origWidth / 2, minY + origHeight / 4)
+            BoundingBoxLocation.CENTER -> boundingBox.setCenter(minX + origWidth / 2, minY + origHeight / 2)
+        }
+
         //Gdx.app.debug(TAG, "SETTING Bounding Box: (" + minX + "," + minY + ")  width: " + width + " height: " + height);
+    }
+
+    protected fun updateBoundingBoxPosition(position: Vector2) {
+        //Need to account for the unitscale, since the map coordinates will be in pixels
+        val minX: Float
+        val minY: Float
+        if (Map.UNIT_SCALE > 0) {
+            minX = position.x / Map.UNIT_SCALE
+            minY = position.y / Map.UNIT_SCALE
+        } else {
+            minX = position.x
+            minY = position.y
+        }
+
+        when (boundingBoxLocation) {
+            BoundingBoxLocation.BOTTOM_LEFT -> boundingBox.set(minX, minY, boundingBox.width, boundingBox.height)
+            BoundingBoxLocation.BOTTOM_CENTER -> boundingBox.setCenter(minX + FRAME_WIDTH / 2, minY + FRAME_HEIGHT / 4)
+            BoundingBoxLocation.CENTER -> boundingBox.setCenter(minX + FRAME_WIDTH / 2, minY + FRAME_HEIGHT / 2)
+        }
+
     }
 
 }

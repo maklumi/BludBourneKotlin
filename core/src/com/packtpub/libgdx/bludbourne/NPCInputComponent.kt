@@ -3,6 +3,7 @@ package com.packtpub.libgdx.bludbourne
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.math.MathUtils
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
 class NPCInputComponent : InputComponent(), InputProcessor {
@@ -25,6 +26,7 @@ class NPCInputComponent : InputComponent(), InputProcessor {
                 currentDirection = Entity.Direction.getRandomNext()
             } else if (string[0].equals(Component.MESSAGE.COLLISION_WITH_ENTITY.toString(), ignoreCase = true)) {
                 currentState = Entity.State.IDLE
+//                currentDirection = currentDirection.getOpposite()
             }
         }
 
@@ -55,7 +57,7 @@ class NPCInputComponent : InputComponent(), InputProcessor {
         frameTime += delta
 
         //Change direction after so many seconds
-        if (frameTime > 2) {
+        if (frameTime > MathUtils.random(1, 5)) {
             currentState = Entity.State.getRandomNext()
             currentDirection = Entity.Direction.getRandomNext()
             frameTime = 0.0f

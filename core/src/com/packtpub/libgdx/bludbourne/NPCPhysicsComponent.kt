@@ -7,6 +7,11 @@ class NPCPhysicsComponent : PhysicsComponent() {
 
     private var state: Entity.State = Entity.State.IDLE
 
+    init {
+        boundingBoxLocation = BoundingBoxLocation.CENTER
+        initBoundingBox(0.4f, 0.15f)
+    }
+
     override fun dispose() {}
 
     override fun receiveMessage(message: String) {
@@ -29,7 +34,7 @@ class NPCPhysicsComponent : PhysicsComponent() {
     }
 
     override fun update(entity: Entity, mapMgr: MapManager, delta: Float) {
-        setBoundingBoxSize(entity, 0f, 0f)
+        updateBoundingBoxPosition(nextEntityPosition)
 
         if (state === Entity.State.IMMOBILE) return
 
@@ -37,6 +42,8 @@ class NPCPhysicsComponent : PhysicsComponent() {
                 !isCollisionWithMapEntities(entity, mapMgr) &&
                 state === Entity.State.WALKING) {
             setNextPositionToCurrent(entity)
+        } else {
+            updateBoundingBoxPosition(currentEntityPosition)
         }
 
         calculateNextPosition(delta)

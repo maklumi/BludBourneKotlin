@@ -110,15 +110,17 @@ class NPCGraphicsComponent : GraphicsComponent() {
         batch.draw(currentFrame, currentPosition.x, currentPosition.y, 1f, 1f)
         batch.end()
 
-        val rect = entity.getCurrentBoundingBox()
-        val camera = mapMgr.camera
-        shapeRenderer.apply {
-            projectionMatrix = camera.combined
-            begin(ShapeRenderer.ShapeType.Filled)
-            color = Color.BLACK
-            rect(rect.x * Map.UNIT_SCALE, rect.y * Map.UNIT_SCALE, rect.width * Map.UNIT_SCALE, rect.height * Map.UNIT_SCALE)
-            end()
-        }
+// Used to graphically debug boundingBoxes
+/*
+val rect = entity.getCurrentBoundingBox()
+val camera = mapMgr.camera
+shapeRenderer.apply {
+    projectionMatrix = camera.combined
+    begin(ShapeRenderer.ShapeType.Filled)
+    color = Color.BLACK
+    rect(rect.x * Map.UNIT_SCALE, rect.y * Map.UNIT_SCALE, rect.width * Map.UNIT_SCALE, rect.height * Map.UNIT_SCALE)
+    end()
+}*/
 
     }
 

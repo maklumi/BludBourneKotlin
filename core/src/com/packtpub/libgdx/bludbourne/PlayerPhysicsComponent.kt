@@ -12,6 +12,11 @@ class PlayerPhysicsComponent : PhysicsComponent() {
 
     private var state = Entity.State.IDLE
 
+    init {
+        boundingBoxLocation = BoundingBoxLocation.BOTTOM_CENTER
+        initBoundingBox(0.3f, 0.5f)
+    }
+
     override fun dispose() {
 
     }
@@ -36,12 +41,14 @@ class PlayerPhysicsComponent : PhysicsComponent() {
 
     override fun update(entity: Entity, mapMgr: MapManager, delta: Float) {
         //We want the hit box to be at the feet for a better feel
-        setBoundingBoxSize(entity, 0f, 0.5f)
+        updateBoundingBoxPosition(nextEntityPosition)
 
         if (!isCollisionWithMapLayer(entity, mapMgr) &&
                 !isCollisionWithMapEntities(entity, mapMgr) &&
                 state === Entity.State.WALKING) {
             setNextPositionToCurrent(entity)
+        } else {
+            updateBoundingBoxPosition(currentEntityPosition)
         }
 
         val camera = mapMgr.camera
