@@ -12,7 +12,6 @@ class NPCInputComponent : InputComponent(), InputProcessor {
     init {
         currentDirection = Entity.Direction.getRandomNext()
         currentState = Entity.State.WALKING
-        Gdx.input.inputProcessor = this
     }
 
     override fun receiveMessage(message: String) {

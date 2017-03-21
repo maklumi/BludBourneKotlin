@@ -1,5 +1,7 @@
 package com.packtpub.libgdx.bludbourne
 
+import com.badlogic.gdx.utils.Json
+
 
 object EntityFactory {
 
@@ -7,9 +9,17 @@ object EntityFactory {
         PLAYER, DEMO_PLAYER, NPC
     }
 
+    private val json = Json()
+    private val PLAYER_CONFIG = "scripts/player.json"
+
     fun getEntity(entityType: EntityType): Entity? {
         when (entityType) {
-            EntityType.PLAYER -> return Entity(PlayerInputComponent(), PlayerPhysicsComponent(), PlayerGraphicsComponent())
+            EntityType.PLAYER -> {
+                val player = Entity(PlayerInputComponent(), PlayerPhysicsComponent(), PlayerGraphicsComponent())
+                player.loadConfig(PLAYER_CONFIG)
+                player.sendMessage(Component.MESSAGE.LOAD_ANIMATIONS, json.toJson(player.entityConfig))
+                return player
+            }
             EntityType.DEMO_PLAYER -> return Entity(NPCInputComponent(), PlayerPhysicsComponent(), PlayerGraphicsComponent())
             EntityType.NPC -> return Entity(NPCInputComponent(), NPCPhysicsComponent(), NPCGraphicsComponent())
             else -> return null

@@ -15,64 +15,10 @@ class NPCGraphicsComponent : GraphicsComponent() {
     private var currentState: Entity.State = Entity.State.WALKING
     private var currentDirection: Entity.Direction = Entity.Direction.DOWN
 
-    private val walkLeftAnimation: Animation<TextureRegion>
-    private val walkRightAnimation: Animation<TextureRegion>
-    private val walkUpAnimation: Animation<TextureRegion>
-    private val walkDownAnimation: Animation<TextureRegion>
-    private val immobileAnimation: Animation<TextureRegion>
-
-    private val json: Json
+    private val json = Json()
 
     private var frameTime = 0f
     private var currentFrame: TextureRegion? = null
-
-    init {
-        Utility.loadTextureAsset(walkingAnimationSpriteSheetPath)
-        Utility.loadTextureAsset(immobileAnimation1)
-        Utility.loadTextureAsset(immobileAnimation2)
-
-        val texture = Utility.getTextureAsset(walkingAnimationSpriteSheetPath)
-        val texture1 = Utility.getTextureAsset(immobileAnimation1)
-        val texture2 = Utility.getTextureAsset(immobileAnimation2)
-
-        val downGridPoints: Array<GridPoint2> = Array()
-        val leftGridPoints: Array<GridPoint2> = Array()
-        val rightGridPoints: Array<GridPoint2> = Array()
-        val upGridPoints: Array<GridPoint2> = Array()
-
-        downGridPoints.add(GridPoint2(0, 0))
-        downGridPoints.add(GridPoint2(0, 1))
-        downGridPoints.add(GridPoint2(0, 2))
-        downGridPoints.add(GridPoint2(0, 3))
-
-        walkDownAnimation = loadAnimation(texture, downGridPoints)
-
-        leftGridPoints.add(GridPoint2(1, 0))
-        leftGridPoints.add(GridPoint2(1, 1))
-        leftGridPoints.add(GridPoint2(1, 2))
-        leftGridPoints.add(GridPoint2(1, 3))
-
-        walkLeftAnimation = loadAnimation(texture, leftGridPoints)
-
-        rightGridPoints.add(GridPoint2(2, 0))
-        rightGridPoints.add(GridPoint2(2, 1))
-        rightGridPoints.add(GridPoint2(2, 2))
-        rightGridPoints.add(GridPoint2(2, 3))
-
-        walkRightAnimation = loadAnimation(texture, rightGridPoints)
-
-        upGridPoints.add(GridPoint2(3, 0))
-        upGridPoints.add(GridPoint2(3, 1))
-        upGridPoints.add(GridPoint2(3, 2))
-        upGridPoints.add(GridPoint2(3, 3))
-
-        walkUpAnimation = loadAnimation(texture, upGridPoints)
-
-        val point = GridPoint2(0, 0)
-        immobileAnimation = loadAnimation(texture1, texture2, point)
-
-        json = Json()
-    }
 
     override fun receiveMessage(message: String) {
         //Gdx.app.debug(TAG, "Got message " + message);
@@ -90,6 +36,18 @@ class NPCGraphicsComponent : GraphicsComponent() {
                 currentState = json.fromJson<Entity.State>(Entity.State::class.java, string[1])
             } else if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION.toString(), ignoreCase = true)) {
                 currentDirection = json.fromJson<Entity.Direction>(Entity.Direction::class.java, string[1])
+            } else if (string[0].equals(Component.MESSAGE.LOAD_ANIMATIONS.toString(), true)) {
+                val entityConfig = json.fromJson(EntityConfig::class.java, string[1])
+                val animationConfigs = entityConfig.animationConfig
+                animationConfigs.forEach {
+                    val textureNames: Array<String> = it.texturePaths
+                    val points: Array<GridPoint2> = it.gridPoints
+                    val animationType: Entity.AnimationType = it.animationType
+                    var animation: Animation<TextureRegion>? = null
+                    if (textureNames.size == 1) animation = loadAnimation(textureNames[0], points)
+                    if (textureNames.size == 2) animation = loadAnimation(textureNames[0], textureNames[1], points)
+                    animations.put(animationType, animation)
+                }
             }
         }
     }
@@ -100,32 +58,44 @@ class NPCGraphicsComponent : GraphicsComponent() {
         //Look into the appropriate variable when changing position
         when (currentDirection) {
             Entity.Direction.DOWN -> if (currentState === Entity.State.WALKING) {
-                currentFrame = walkDownAnimation.getKeyFrame(frameTime)
+                val animation = animations[Entity.AnimationType.WALK_DOWN] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
             } else if (currentState === Entity.State.IDLE) {
-                currentFrame = walkDownAnimation.getKeyFrame(0f)
+                val animation = animations[Entity.AnimationType.WALK_DOWN] ?: return
+                currentFrame = animation.getKeyFrame(0f)
             } else if (currentState === Entity.State.IMMOBILE) {
-                currentFrame = immobileAnimation.getKeyFrame(frameTime)
+                val animation = animations[Entity.AnimationType.IMMOBILE] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
             }
             Entity.Direction.LEFT -> if (currentState === Entity.State.WALKING) {
-                currentFrame = walkLeftAnimation.getKeyFrame(frameTime)
+                val animation = animations[Entity.AnimationType.WALK_LEFT] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
             } else if (currentState === Entity.State.IDLE) {
-                currentFrame = walkLeftAnimation.getKeyFrame(0f)
+                val animation = animations[Entity.AnimationType.WALK_LEFT] ?: return
+                currentFrame = animation.getKeyFrame(0f)
             } else if (currentState === Entity.State.IMMOBILE) {
-                currentFrame = immobileAnimation.getKeyFrame(frameTime)
+                val animation = animations[Entity.AnimationType.IMMOBILE] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
             }
             Entity.Direction.UP -> if (currentState === Entity.State.WALKING) {
-                currentFrame = walkUpAnimation.getKeyFrame(frameTime)
+                val animation = animations[Entity.AnimationType.WALK_UP] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
             } else if (currentState === Entity.State.IDLE) {
-                currentFrame = walkUpAnimation.getKeyFrame(0f)
+                val animation = animations[Entity.AnimationType.WALK_UP] ?: return
+                currentFrame = animation.getKeyFrame(0f)
             } else if (currentState === Entity.State.IMMOBILE) {
-                currentFrame = immobileAnimation.getKeyFrame(frameTime)
+                val animation = animations[Entity.AnimationType.IMMOBILE] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
             }
             Entity.Direction.RIGHT -> if (currentState === Entity.State.WALKING) {
-                currentFrame = walkRightAnimation.getKeyFrame(frameTime)
+                val animation = animations[Entity.AnimationType.WALK_RIGHT] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
             } else if (currentState === Entity.State.IDLE) {
-                currentFrame = walkRightAnimation.getKeyFrame(0f)
+                val animation = animations[Entity.AnimationType.WALK_RIGHT] ?: return
+                currentFrame = animation.getKeyFrame(0f)
             } else if (currentState === Entity.State.IMMOBILE) {
-                currentFrame = immobileAnimation.getKeyFrame(frameTime)
+                val animation = animations[Entity.AnimationType.IMMOBILE] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
             }
             else -> {
             }
@@ -137,18 +107,11 @@ class NPCGraphicsComponent : GraphicsComponent() {
     }
 
     override fun dispose() {
-        Utility.unloadAsset(walkingAnimationSpriteSheetPath)
-        Utility.unloadAsset(immobileAnimation1)
-        Utility.unloadAsset(immobileAnimation2)
     }
 
     companion object {
 
         private val TAG = NPCGraphicsComponent::class.java.simpleName
-
-        private val walkingAnimationSpriteSheetPath = "sprites/characters/Engineer.png"
-        private val immobileAnimation1 = "sprites/characters/Player0.png"
-        private val immobileAnimation2 = "sprites/characters/Player1.png"
     }
 
 }

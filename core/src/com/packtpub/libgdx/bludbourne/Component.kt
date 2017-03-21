@@ -8,7 +8,8 @@ interface Component {
         INIT_START_POSITION,
         CURRENT_DIRECTION,
         CURRENT_STATE,
-        COLLISION_WITH_MAP
+        COLLISION_WITH_MAP,
+        LOAD_ANIMATIONS
     }
 
     fun dispose()

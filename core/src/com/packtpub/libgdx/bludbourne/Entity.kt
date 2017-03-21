@@ -1,8 +1,10 @@
 package com.packtpub.libgdx.bludbourne
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
 class Entity(val inputComponent: InputComponent,
@@ -10,6 +12,8 @@ class Entity(val inputComponent: InputComponent,
              val graphicsComponent: GraphicsComponent) {
 
     private val TAG = Entity::class.java.simpleName
+    private val json = Json()
+    var entityConfig = EntityConfig()
 
     enum class State {
         IDLE, WALKING,
@@ -33,6 +37,15 @@ class Entity(val inputComponent: InputComponent,
         }
     }
 
+    enum class AnimationType {
+        WALK_LEFT,
+        WALK_RIGHT,
+        WALK_UP,
+        WALK_DOWN,
+        IDLE,
+        IMMOBILE
+    }
+
     private val components = Array<Component>(MAX_COMPONENTS)
 
     init {
@@ -53,6 +66,10 @@ class Entity(val inputComponent: InputComponent,
         args.forEach { fullMessage += MESSAGE_TOKEN + it }
 
         components.forEach { it.receiveMessage(fullMessage) }
+    }
+
+    fun loadConfig(configFilePath: String) {
+        entityConfig = json.fromJson(EntityConfig::class.java, Gdx.files.internal(configFilePath))
     }
 
     fun dispose() = components.forEach { it.dispose() }
