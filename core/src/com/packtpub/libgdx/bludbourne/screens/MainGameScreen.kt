@@ -54,8 +54,7 @@ class MainGameScreen : Screen {
         mapRenderer.setView(camera)
         if (mapMgr.hasMapChanged) {
             mapRenderer.map = mapMgr.currentMap
-            player.sendMessage(Component.MESSAGE.INIT_START_POSITION +
-                    Component.MESSAGE.MESSAGE_TOKEN +
+            player.sendMessage(Component.MESSAGE.INIT_START_POSITION,
                     json.toJson(mapMgr.playerStartUnitScaled))
 
             camera.position.set(mapMgr.playerStartUnitScaled.x, mapMgr.playerStartUnitScaled.y, 0f)

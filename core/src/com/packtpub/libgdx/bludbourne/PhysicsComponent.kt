@@ -33,7 +33,7 @@ abstract class PhysicsComponent : Component {
     fun setNextPositionToCurrent(entity: Entity) {
         currentEntityPosition.set(nextEntityPosition.x, nextEntityPosition.y)
 
-        val text = Component.MESSAGE.CURRENT_POSITION + Component.MESSAGE.MESSAGE_TOKEN + json.toJson(currentEntityPosition)
+        //  val text = Component.MESSAGE.CURRENT_POSITION + Component.MESSAGE.MESSAGE_TOKEN + json.toJson(currentEntityPosition)
         entity.sendMessage(Component.MESSAGE.CURRENT_POSITION, json.toJson(currentEntityPosition))
     }
 

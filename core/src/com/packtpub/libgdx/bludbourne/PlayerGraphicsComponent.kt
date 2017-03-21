@@ -4,28 +4,25 @@ package com.packtpub.libgdx.bludbourne
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.GridPoint2
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
+import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
 class PlayerGraphicsComponent : GraphicsComponent() {
 
     private val TAG = GraphicsComponent::class.java.simpleName
     private val defaultSpritePath = "sprites/characters/Warrior.png"
 
-    private var currentPosition = Vector2()
-    private var currentState = Entity.State.IDLE
+    private var currentPosition = Vector2(0f, 0f)
+    private var currentState = Entity.State.WALKING
     private var currentDirection = Entity.Direction.DOWN
 
-    private lateinit var walkLeftFrames: Array<TextureRegion>
-    private lateinit var walkRightFrames: Array<TextureRegion>
-    private lateinit var walkUpFrames: Array<TextureRegion>
-    private lateinit var walkDownFrames: Array<TextureRegion>
-
-    private lateinit var walkLeftAnimation: Animation<TextureRegion>
-    private lateinit var walkRightAnimation: Animation<TextureRegion>
-    private lateinit var walkUpAnimation: Animation<TextureRegion>
-    private lateinit var walkDownAnimation: Animation<TextureRegion>
+    private var walkLeftAnimation: Animation<TextureRegion>
+    private var walkRightAnimation: Animation<TextureRegion>
+    private var walkUpAnimation: Animation<TextureRegion>
+    private var walkDownAnimation: Animation<TextureRegion>
 
     private val json = Json()
     private var frameTime = 0f
@@ -33,7 +30,40 @@ class PlayerGraphicsComponent : GraphicsComponent() {
 
     init {
         Utility.loadTextureAsset(defaultSpritePath)
-        loadAllAnimations()
+        val texture = Utility.getTextureAsset(defaultSpritePath)
+
+        val downGridPoints: Array<GridPoint2> = Array()
+        val leftGridPoints: Array<GridPoint2> = Array()
+        val rightGridPoints: Array<GridPoint2> = Array()
+        val upGridPoints: Array<GridPoint2> = Array()
+
+        downGridPoints.add(GridPoint2(0, 0))
+        downGridPoints.add(GridPoint2(0, 1))
+        downGridPoints.add(GridPoint2(0, 2))
+        downGridPoints.add(GridPoint2(0, 3))
+
+        walkDownAnimation = loadAnimation(texture, downGridPoints)
+
+        leftGridPoints.add(GridPoint2(1, 0))
+        leftGridPoints.add(GridPoint2(1, 1))
+        leftGridPoints.add(GridPoint2(1, 2))
+        leftGridPoints.add(GridPoint2(1, 3))
+
+        walkLeftAnimation = loadAnimation(texture, leftGridPoints)
+
+        rightGridPoints.add(GridPoint2(2, 0))
+        rightGridPoints.add(GridPoint2(2, 1))
+        rightGridPoints.add(GridPoint2(2, 2))
+        rightGridPoints.add(GridPoint2(2, 3))
+
+        walkRightAnimation = loadAnimation(texture, rightGridPoints)
+
+        upGridPoints.add(GridPoint2(3, 0))
+        upGridPoints.add(GridPoint2(3, 1))
+        upGridPoints.add(GridPoint2(3, 2))
+        upGridPoints.add(GridPoint2(3, 3))
+
+        walkUpAnimation = loadAnimation(texture, upGridPoints)
     }
 
 
@@ -45,25 +75,25 @@ class PlayerGraphicsComponent : GraphicsComponent() {
                 if (currentState === Entity.State.WALKING) {
                     currentFrame = walkDownAnimation.getKeyFrame(frameTime)
                 } else {
-                    currentFrame = walkDownFrames[0]
+                    currentFrame = walkDownAnimation.keyFrames[0]
                 }
             Entity.Direction.LEFT ->
                 if (currentState === Entity.State.WALKING) {
                     currentFrame = walkLeftAnimation.getKeyFrame(frameTime)
                 } else {
-                    currentFrame = walkLeftFrames[0]
+                    currentFrame = walkLeftAnimation.keyFrames[0]
                 }
             Entity.Direction.UP ->
                 if (currentState === Entity.State.WALKING) {
                     currentFrame = walkUpAnimation.getKeyFrame(frameTime)
                 } else {
-                    currentFrame = walkUpFrames[0]
+                    currentFrame = walkUpAnimation.keyFrames[0]
                 }
             Entity.Direction.RIGHT ->
                 if (currentState === Entity.State.WALKING) {
                     currentFrame = walkRightAnimation.getKeyFrame(frameTime)
                 } else {
-                    currentFrame = walkRightFrames[0]
+                    currentFrame = walkRightAnimation.keyFrames[0]
                 }
         }
 
@@ -73,52 +103,24 @@ class PlayerGraphicsComponent : GraphicsComponent() {
     }
 
     override fun receiveMessage(message: String) {
-        val string = message.split(Component.MESSAGE.MESSAGE_TOKEN.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val string = message.split(MESSAGE_TOKEN)
 
         if (string.isEmpty()) return
 
         //Specifically for messages with 1 object payload
         if (string.size == 2) {
-            if (string[0].equals(Component.MESSAGE.CURRENT_POSITION, ignoreCase = true)) {
+            if (string[0].equals(Component.MESSAGE.CURRENT_POSITION.toString(), ignoreCase = true)) {
                 currentPosition = json.fromJson(Vector2::class.java, string[1])
-            } else if (string[0].equals(Component.MESSAGE.INIT_START_POSITION, ignoreCase = true)) {
+            } else if (string[0].equals(Component.MESSAGE.INIT_START_POSITION.toString(), ignoreCase = true)) {
                 currentPosition = json.fromJson(Vector2::class.java, string[1])
-            } else if (string[0].equals(Component.MESSAGE.CURRENT_STATE, ignoreCase = true)) {
+            } else if (string[0].equals(Component.MESSAGE.CURRENT_STATE.toString(), ignoreCase = true)) {
                 currentState = json.fromJson(Entity.State::class.java, string[1])
-            } else if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION, ignoreCase = true)) {
+            } else if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION.toString(), ignoreCase = true)) {
                 currentDirection = json.fromJson(Entity.Direction::class.java, string[1])
             }
         }
     }
 
     override fun dispose() = Utility.unloadAsset(defaultSpritePath)
-
-    private fun loadAllAnimations() {
-        val texture = Utility.getTextureAsset(defaultSpritePath)
-        val textureFrames = TextureRegion.split(texture, Entity.FRAME_WIDTH, Entity.FRAME_HEIGHT)
-
-        walkDownFrames = Array<TextureRegion>(4)
-        walkLeftFrames = Array<TextureRegion>(4)
-        walkRightFrames = Array<TextureRegion>(4)
-        walkUpFrames = Array<TextureRegion>(4)
-
-        for (i in 0..3) {
-            for (j in 0..3) {
-                val region = textureFrames[i][j]
-                when (i) {
-                    0 -> walkDownFrames.insert(j, region)
-                    1 -> walkLeftFrames.insert(j, region)
-                    2 -> walkRightFrames.insert(j, region)
-                    3 -> walkUpFrames.insert(j, region)
-                }
-            }
-        }
-
-        walkDownAnimation = Animation(0.25f, walkDownFrames, Animation.PlayMode.LOOP)
-        walkLeftAnimation = Animation(0.25f, walkLeftFrames, Animation.PlayMode.LOOP)
-        walkRightAnimation = Animation(0.25f, walkRightFrames, Animation.PlayMode.LOOP)
-        walkUpAnimation = Animation(0.25f, walkUpFrames, Animation.PlayMode.LOOP)
-
-    }
 
 }

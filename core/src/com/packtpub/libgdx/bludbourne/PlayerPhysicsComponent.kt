@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
 class PlayerPhysicsComponent : PhysicsComponent() {
     private val TAG = PlayerPhysicsComponent::class.java.simpleName
@@ -16,18 +17,18 @@ class PlayerPhysicsComponent : PhysicsComponent() {
     }
 
     override fun receiveMessage(message: String) {
-        val string = message.split(Component.MESSAGE.MESSAGE_TOKEN.toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
+        val string = message.split(MESSAGE_TOKEN)
 
         if (string.isEmpty()) return
 
         //Specifically for messages with 1 object payload
         if (string.size == 2) {
-            if (string[0].equals(Component.MESSAGE.INIT_START_POSITION, ignoreCase = true)) {
+            if (string[0].equals(Component.MESSAGE.INIT_START_POSITION.toString(), ignoreCase = true)) {
                 currentEntityPosition = json.fromJson(Vector2::class.java, string[1])
                 nextEntityPosition.set(currentEntityPosition.x, currentEntityPosition.y)
-            } else if (string[0].equals(Component.MESSAGE.CURRENT_STATE, ignoreCase = true)) {
+            } else if (string[0].equals(Component.MESSAGE.CURRENT_STATE.toString(), ignoreCase = true)) {
                 state = json.fromJson(Entity.State::class.java, string[1])
-            } else if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION, ignoreCase = true)) {
+            } else if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION.toString(), ignoreCase = true)) {
                 currentDirection = json.fromJson(Entity.Direction::class.java, string[1])
             }
         }
