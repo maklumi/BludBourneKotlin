@@ -28,7 +28,7 @@ class MainGameScreen : Screen {
 
     private lateinit var player: Entity
     private lateinit var playerHUD: PlayerHUD
-    private val mapMgr = MapManager()
+    private lateinit var mapMgr: MapManager
     private lateinit var mapRenderer: OrthogonalTiledMapRenderer
     private val camera: OrthographicCamera = OrthographicCamera()
     private val hudCamera: OrthographicCamera = OrthographicCamera()
@@ -36,6 +36,7 @@ class MainGameScreen : Screen {
 
     override fun show() {
         setupViewport(10, 10)
+        mapMgr = MapManager()
 
         //get the current size
         camera.setToOrtho(false, viewportWidth, viewportHeight)
@@ -43,6 +44,8 @@ class MainGameScreen : Screen {
         mapRenderer = OrthogonalTiledMapRenderer(mapMgr.getCurrentTiledMap(), UNIT_SCALE)
         mapRenderer.setView(camera)
         mapMgr.camera = camera
+
+        Gdx.app.debug(TAG, "UnitScale value is: " + mapRenderer.unitScale)
 
         player = EntityFactory.getEntity(EntityFactory.EntityType.PLAYER)
         mapMgr.player = player
@@ -64,6 +67,10 @@ class MainGameScreen : Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         mapRenderer.setView(camera)
+
+//        mapRenderer.batch.enableBlending()
+//        mapRenderer.batch.setBlendFunction(GL20.GL_BLEND_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+
         if (mapMgr.hasMapChanged) {
             mapRenderer.map = mapMgr.getCurrentTiledMap()
             player.sendMessage(Component.MESSAGE.INIT_START_POSITION,
@@ -84,7 +91,11 @@ class MainGameScreen : Screen {
         playerHUD.render(delta)
     }
 
-    override fun resize(width: Int, height: Int) {}
+    override fun resize(width: Int, height: Int) {
+        setupViewport(10, 10)
+        camera.setToOrtho(false, viewportWidth, viewportHeight)
+        playerHUD.resize(physicalWidth.toInt(), physicalHeight.toInt())
+    }
 
     override fun pause() {}
 
