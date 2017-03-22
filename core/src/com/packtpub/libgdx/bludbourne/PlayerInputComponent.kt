@@ -3,20 +3,16 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.math.Vector3
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
 
-class PlayerInputComponent : InputComponent(), InputProcessor {
+class PlayerInputComponent : InputComponent() {
 
     private val TAG = PlayerInputComponent::class.java.simpleName
 
     private val lastMouseCoordinates = Vector3()
 
-    init {
-        Gdx.input.inputProcessor = this
-    }
 
     override fun update(entity: Entity, delta: Float) {
         //Keyboard input

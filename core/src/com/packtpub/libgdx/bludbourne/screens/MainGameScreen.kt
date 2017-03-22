@@ -1,6 +1,7 @@
 package com.packtpub.libgdx.bludbourne.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -48,6 +49,11 @@ class MainGameScreen : Screen {
 
         hudCamera.setToOrtho(false, physicalWidth, physicalHeight)
         playerHUD = PlayerHUD(hudCamera)
+
+        val multiplexer = InputMultiplexer()
+        multiplexer.addProcessor(playerHUD.stage)
+        multiplexer.addProcessor(player.inputComponent)
+        Gdx.input.inputProcessor = multiplexer
     }
 
 

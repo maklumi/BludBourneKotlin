@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 
 class PlayerHUD(camera: Camera) : Screen {
 
-    private val stage: Stage
+    val stage: Stage
     private val viewport: Viewport
     private val statusUI: StatusUI
 
@@ -16,7 +16,6 @@ class PlayerHUD(camera: Camera) : Screen {
         viewport = ScreenViewport(camera)
 
         stage = Stage(viewport)
-        //Gdx.input.setInputProcessor(stage)
 
         statusUI = StatusUI()
         statusUI.setPosition(0f, 0f)

@@ -25,13 +25,12 @@ class StatusUI : Group() {
     private val xp = 0
 
     init {
-        textureAtlas = TextureAtlas(textureAtlasPath)
+        textureAtlas = TextureAtlas(STATUSUI_TEXTURE_ATLAS_PATH)
         hudBackground = NinePatch(textureAtlas.findRegion("dialog"))
         hudBackgroundImage = Image(hudBackground)
-        hudBackgroundImage.setSize(265f, 135f)
+        hudBackgroundImage.setSize(270f, 135f)
 
-        skin = Skin()
-        skin.load(Gdx.files.internal("skins/uiskin.json"))
+        skin = Skin(Gdx.files.internal("skins/statusui.json"), textureAtlas)
 
         val table = Table()
 
@@ -111,7 +110,7 @@ class StatusUI : Group() {
     }
 
     companion object {
-        private val textureAtlasPath = "skins/statusui.pack"
+        val STATUSUI_TEXTURE_ATLAS_PATH = "skins/statusui.atlas"
     }
 
 

@@ -1,10 +1,11 @@
 package com.packtpub.libgdx.bludbourne
 
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.utils.Json
-import java.util.HashMap
+import java.util.*
 
 
-abstract class InputComponent : Component {
+abstract class InputComponent : Component, InputProcessor {
 
     var currentDirection: Entity.Direction = Entity.Direction.DOWN
     var currentState: Entity.State = Entity.State.IDLE

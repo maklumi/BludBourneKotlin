@@ -2,11 +2,10 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.math.MathUtils
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
-class NPCInputComponent : InputComponent(), InputProcessor {
+class NPCInputComponent : InputComponent() {
 
     private var frameTime = 0.0f
 
