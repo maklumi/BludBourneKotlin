@@ -1,6 +1,7 @@
 package com.packtpub.libgdx.bludbourne
 
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -18,6 +19,7 @@ class NPCGraphicsComponent : GraphicsComponent() {
     private var currentDirection: Entity.Direction = Entity.Direction.DOWN
     private val shapeRenderer = ShapeRenderer()
 
+    private var isSelected = false
     private val json = Json()
 
     private var frameTime = 0f
@@ -28,6 +30,14 @@ class NPCGraphicsComponent : GraphicsComponent() {
         val string = message.split(MESSAGE_TOKEN)
 
         if (string.isEmpty()) return
+
+        if (string.size == 1) {
+            if (string[0].equals(Component.MESSAGE.ENTITY_SELECTED.toString(), true)) {
+                isSelected = true
+            } else if (string[0].equals(Component.MESSAGE.ENTITY_DESELECTED.toString(), true)) {
+                isSelected = false
+            }
+        }
 
         //Specifically for messages with 1 object payload
         if (string.size == 2) {
@@ -106,6 +116,8 @@ class NPCGraphicsComponent : GraphicsComponent() {
             }
         }
 
+        if (isSelected) drawSelected(entity, mapMgr)
+
         batch.begin()
         batch.draw(currentFrame, currentPosition.x, currentPosition.y, 1f, 1f)
         batch.end()
@@ -122,6 +134,25 @@ shapeRenderer.apply {
     end()
 }*/
 
+    }
+
+    private fun drawSelected(entity: Entity, mapMgr: MapManager) {
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        val camera = mapMgr.camera
+        val rect = entity.getCurrentBoundingBox()
+        shapeRenderer.projectionMatrix = camera.combined
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+        shapeRenderer.setColor(0.0f, 1.0f, 1.0f, 0.5f)
+
+        val width = rect.getWidth() * Map.UNIT_SCALE * 2f
+        val height = rect.getHeight() * Map.UNIT_SCALE / 2f
+        val x = rect.x * Map.UNIT_SCALE - width / 4
+        val y = rect.y * Map.UNIT_SCALE - height / 2
+
+        shapeRenderer.ellipse(x, y, width, height)
+        shapeRenderer.end()
+        Gdx.gl.glDisable(GL20.GL_BLEND)
     }
 
     override fun dispose() {

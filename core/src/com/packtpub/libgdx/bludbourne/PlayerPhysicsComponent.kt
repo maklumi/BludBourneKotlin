@@ -3,14 +3,19 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.objects.RectangleMapObject
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.collision.Ray
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
 class PlayerPhysicsComponent : PhysicsComponent() {
     private val TAG = PlayerPhysicsComponent::class.java.simpleName
 
     private var state = Entity.State.IDLE
+    private var mouseSelectCoordinates: Vector3 = Vector3.Zero
+    private var isMouseSelectEnabled = false
+    private var selectionRay: Ray = Ray(Vector3.Zero, Vector3.Zero)
+    private var selectRayMaximumDistance = 32.0f
 
     init {
         boundingBoxLocation = BoundingBoxLocation.BOTTOM_CENTER
@@ -35,6 +40,9 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                 state = json.fromJson(Entity.State::class.java, string[1])
             } else if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION.toString(), ignoreCase = true)) {
                 currentDirection = json.fromJson(Entity.Direction::class.java, string[1])
+            } else if (string[0].equals(Component.MESSAGE.INIT_SELECT_ENTITY.toString(), true)) {
+                mouseSelectCoordinates = json.fromJson(Vector3::class.java, string[1])
+                isMouseSelectEnabled = true
             }
         }
     }
@@ -42,6 +50,12 @@ class PlayerPhysicsComponent : PhysicsComponent() {
     override fun update(entity: Entity, mapMgr: MapManager, delta: Float) {
         //We want the hit box to be at the feet for a better feel
         updateBoundingBoxPosition(nextEntityPosition)
+        updatePortalLayerActivation(mapMgr)
+
+        if (isMouseSelectEnabled) {
+            selectMapEntityCandidate(mapMgr)
+            isMouseSelectEnabled = false
+        }
 
         if (!isCollisionWithMapLayer(entity, mapMgr) &&
                 !isCollisionWithMapEntities(entity, mapMgr) &&
@@ -55,14 +69,43 @@ class PlayerPhysicsComponent : PhysicsComponent() {
         camera.position.set(currentEntityPosition.x, currentEntityPosition.y, 0f)
         camera.update()
 
-        updatePortalLayerActivation(mapMgr, boundingBox)
 
         calculateNextPosition(delta)
 
         //Gdx.app.debug(TAG, "update:: Next Position: (" + nextEntityPosition.x + "," + nextEntityPosition.y + ")" + "DELTA: " + delta);
     }
 
-    private fun updatePortalLayerActivation(mapMgr: MapManager, boundingBox: Rectangle): Boolean {
+    private fun selectMapEntityCandidate(mapMgr: MapManager) {
+        val currentEntities = mapMgr.getCurrentMapEntities()
+
+        //Convert screen coordinates to world coordinates, then to unit scale coordinates
+        mapMgr.camera.unproject(mouseSelectCoordinates)
+        mouseSelectCoordinates.x /= Map.UNIT_SCALE
+        mouseSelectCoordinates.y /= Map.UNIT_SCALE
+
+        Gdx.app.debug(TAG, "Mouse Coordinates " + "(" + mouseSelectCoordinates.x + "," + mouseSelectCoordinates.y + ")")
+
+        currentEntities.forEach { mapEntity ->
+            //Don't break, reset all entities
+            mapEntity.sendMessage(Component.MESSAGE.ENTITY_DESELECTED)
+            val mapEntityBoundingBox = mapEntity.getCurrentBoundingBox()
+            Gdx.app.debug(TAG, "Entity Candidate Location " + "(" + mapEntityBoundingBox.x + "," + mapEntityBoundingBox.y + ")")
+            if (mapEntity.getCurrentBoundingBox().contains(mouseSelectCoordinates.x, mouseSelectCoordinates.y)) {
+                //Check distance
+                selectionRay.set(boundingBox.x, boundingBox.y, 0.0f, mapEntityBoundingBox.x, mapEntityBoundingBox.y, 0.0f)
+                val distance = selectionRay.origin.dst(selectionRay.direction)
+
+                if (distance <= selectRayMaximumDistance) {
+                    //We have a valid entity selection
+                    //Picked/Selected
+                    Gdx.app.debug(TAG, "Selected Entity! " + mapEntity.entityConfig.entityID)
+                    mapEntity.sendMessage(Component.MESSAGE.ENTITY_SELECTED)
+                }
+            }
+        }
+    }
+
+    private fun updatePortalLayerActivation(mapMgr: MapManager): Boolean {
         // portal layer specifies its name as the layer to go
         val portalLayer = mapMgr.getPortalLayer()
 

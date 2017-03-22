@@ -41,7 +41,8 @@ class PlayerInputComponent : InputComponent(), InputProcessor {
 
         //Mouse input
         if (mouseButtons[Mouse.SELECT]!!) {
-            //Gdx.app.debug(TAG, "Mouse LEFT click at : (" + lastMouseCoordinates.x + "," + lastMouseCoordinates.y + ")" );
+            Gdx.app.debug(TAG, "Mouse LEFT click at : (" + lastMouseCoordinates.x + "," + lastMouseCoordinates.y + ")");
+            entity.sendMessage(Component.MESSAGE.INIT_SELECT_ENTITY, json.toJson(lastMouseCoordinates))
             mouseButtons.put(Mouse.SELECT, false)
         }
 
