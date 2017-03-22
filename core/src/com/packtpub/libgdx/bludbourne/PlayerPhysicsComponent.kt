@@ -83,13 +83,13 @@ class PlayerPhysicsComponent : PhysicsComponent() {
         mouseSelectCoordinates.x /= Map.UNIT_SCALE
         mouseSelectCoordinates.y /= Map.UNIT_SCALE
 
-        Gdx.app.debug(TAG, "Mouse Coordinates " + "(" + mouseSelectCoordinates.x + "," + mouseSelectCoordinates.y + ")")
+//        Gdx.app.debug(TAG, "Mouse Coordinates " + "(" + mouseSelectCoordinates.x + "," + mouseSelectCoordinates.y + ")")
 
         currentEntities.forEach { mapEntity ->
             //Don't break, reset all entities
             mapEntity.sendMessage(Component.MESSAGE.ENTITY_DESELECTED)
             val mapEntityBoundingBox = mapEntity.getCurrentBoundingBox()
-            Gdx.app.debug(TAG, "Entity Candidate Location " + "(" + mapEntityBoundingBox.x + "," + mapEntityBoundingBox.y + ")")
+//            Gdx.app.debug(TAG, "Entity Candidate Location " + "(" + mapEntityBoundingBox.x + "," + mapEntityBoundingBox.y + ")")
             if (mapEntity.getCurrentBoundingBox().contains(mouseSelectCoordinates.x, mouseSelectCoordinates.y)) {
                 //Check distance
                 selectionRay.set(boundingBox.x, boundingBox.y, 0.0f, mapEntityBoundingBox.x, mapEntityBoundingBox.y, 0.0f)
@@ -120,7 +120,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                 nextEntityPosition.x = mapMgr.getPlayerStartUnitScaled().x
                 nextEntityPosition.y = mapMgr.getPlayerStartUnitScaled().y
 
-                Gdx.app.debug(TAG, "Portal to $mapName Activated")
+//                Gdx.app.debug(TAG, "Portal to $mapName Activated")
                 return true
             }
         }

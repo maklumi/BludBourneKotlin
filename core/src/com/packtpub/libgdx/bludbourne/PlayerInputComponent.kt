@@ -10,7 +10,7 @@ import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
 class PlayerInputComponent : InputComponent(), InputProcessor {
 
-    private val TAG = InputComponent::class.java.simpleName
+    private val TAG = PlayerInputComponent::class.java.simpleName
 
     private val lastMouseCoordinates = Vector3()
 

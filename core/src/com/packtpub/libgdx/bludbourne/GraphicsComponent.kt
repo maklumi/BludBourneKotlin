@@ -3,15 +3,76 @@ package com.packtpub.libgdx.bludbourne
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.GridPoint2
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Json
 import java.util.*
 
 abstract class GraphicsComponent : Component {
 
     abstract fun update(entity: Entity, mapManager: MapManager, batch: Batch, delta: Float)
 
+    protected var currentPosition = Vector2(0f, 0f)
+    protected var currentState = Entity.State.WALKING
+    protected var currentDirection = Entity.Direction.DOWN
+    protected val shapeRenderer = ShapeRenderer()
+
+    protected val json = Json()
+    protected var frameTime = 0f
+    protected lateinit var currentFrame: TextureRegion
+
     var animations: Hashtable<Entity.AnimationType, Animation<TextureRegion>> = Hashtable()
+
+    protected fun updateAnimations(delta: Float) {
+        frameTime = (frameTime + delta) % 5
+
+        when (currentDirection) {
+            Entity.Direction.DOWN -> if (currentState === Entity.State.WALKING) {
+                val animation = animations[Entity.AnimationType.WALK_DOWN] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
+            } else if (currentState === Entity.State.IDLE) {
+                val animation = animations[Entity.AnimationType.WALK_DOWN] ?: return
+                currentFrame = animation.getKeyFrame(0f)
+            } else if (currentState === Entity.State.IMMOBILE) {
+                val animation = animations[Entity.AnimationType.IMMOBILE] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
+            }
+            Entity.Direction.LEFT -> if (currentState === Entity.State.WALKING) {
+                val animation = animations[Entity.AnimationType.WALK_LEFT] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
+            } else if (currentState === Entity.State.IDLE) {
+                val animation = animations[Entity.AnimationType.WALK_LEFT] ?: return
+                currentFrame = animation.getKeyFrame(0f)
+            } else if (currentState === Entity.State.IMMOBILE) {
+                val animation = animations[Entity.AnimationType.IMMOBILE] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
+            }
+            Entity.Direction.UP -> if (currentState === Entity.State.WALKING) {
+                val animation = animations[Entity.AnimationType.WALK_UP] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
+            } else if (currentState === Entity.State.IDLE) {
+                val animation = animations[Entity.AnimationType.WALK_UP] ?: return
+                currentFrame = animation.getKeyFrame(0f)
+            } else if (currentState === Entity.State.IMMOBILE) {
+                val animation = animations[Entity.AnimationType.IMMOBILE] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
+            }
+            Entity.Direction.RIGHT -> if (currentState === Entity.State.WALKING) {
+                val animation = animations[Entity.AnimationType.WALK_RIGHT] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
+            } else if (currentState === Entity.State.IDLE) {
+                val animation = animations[Entity.AnimationType.WALK_RIGHT] ?: return
+                currentFrame = animation.getKeyFrame(0f)
+            } else if (currentState === Entity.State.IMMOBILE) {
+                val animation = animations[Entity.AnimationType.IMMOBILE] ?: return
+                currentFrame = animation.getKeyFrame(frameTime)
+            }
+            else -> {
+            }
+        }
+    }
 
     internal fun loadAnimation(firstTexture: String, secondTexture: String, points: Array<GridPoint2>, frameDuration: Float): Animation<TextureRegion> {
         Utility.loadTextureAsset(firstTexture)
