@@ -11,6 +11,7 @@ import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.EntityFactory
 import com.packtpub.libgdx.bludbourne.Map.Companion.UNIT_SCALE
 import com.packtpub.libgdx.bludbourne.MapManager
+import com.packtpub.libgdx.bludbourne.UI.PlayerHUD
 
 
 class MainGameScreen : Screen {
@@ -25,16 +26,17 @@ class MainGameScreen : Screen {
     internal var aspectRatio: Float = 0f
 
     private lateinit var player: Entity
+    private lateinit var playerHUD: PlayerHUD
     private val mapMgr = MapManager()
     private lateinit var mapRenderer: OrthogonalTiledMapRenderer
-    private lateinit var camera: OrthographicCamera
+    private val camera: OrthographicCamera = OrthographicCamera()
+    private val hudCamera: OrthographicCamera = OrthographicCamera()
     private val json = Json()
 
     override fun show() {
         setupViewport(10, 10)
 
         //get the current size
-        camera = OrthographicCamera()
         camera.setToOrtho(false, viewportWidth, viewportHeight)
 
         mapRenderer = OrthogonalTiledMapRenderer(mapMgr.getCurrentTiledMap(), UNIT_SCALE)
@@ -43,6 +45,9 @@ class MainGameScreen : Screen {
 
         player = EntityFactory.getEntity(EntityFactory.EntityType.PLAYER)
         mapMgr.player = player
+
+        hudCamera.setToOrtho(false, physicalWidth, physicalHeight)
+        playerHUD = PlayerHUD(hudCamera)
     }
 
 
@@ -70,6 +75,7 @@ class MainGameScreen : Screen {
         mapMgr.updateCurrentMapEntities(mapMgr, mapRenderer.batch, delta)
 
         player.update(mapMgr, mapRenderer.batch, delta)
+        playerHUD.render(delta)
     }
 
     override fun resize(width: Int, height: Int) {}
