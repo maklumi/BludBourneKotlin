@@ -1,6 +1,8 @@
 package com.packtpub.libgdx.bludbourne.UI
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.*
@@ -8,6 +10,7 @@ import com.badlogic.gdx.utils.Align
 
 class StatusUI : Group() {
     private val textureAtlas: TextureAtlas
+    private val hudBackground: NinePatch
     private val hudBackgroundImage: Image
     private val hpBar: Image
     private val mpBar: Image
@@ -23,7 +26,9 @@ class StatusUI : Group() {
 
     init {
         textureAtlas = TextureAtlas(textureAtlasPath)
-        hudBackgroundImage = Image(textureAtlas.findRegion("HUD_Background"))
+        hudBackground = NinePatch(textureAtlas.findRegion("dialog"))
+        hudBackgroundImage = Image(hudBackground)
+        hudBackgroundImage.setSize(265f, 135f)
 
         skin = Skin()
         skin.load(Gdx.files.internal("skins/uiskin.json"))
@@ -97,8 +102,8 @@ class StatusUI : Group() {
         val goldVal = Label(gold.toString(), skin)
         table.add(goldVal)
 
-        table.debug()
-        table.setPosition(135f, 68f)
+//        table.debug()
+        table.padLeft(265f).padBottom(130f)
         table.setFillParent(true)
 
         this.addActor(hudBackgroundImage)
@@ -109,11 +114,11 @@ class StatusUI : Group() {
         private val textureAtlasPath = "skins/statusui.pack"
     }
 
-    /*
+
     override fun draw(batch: Batch, parentAlpha: Float) {
         super.draw(batch, parentAlpha)
-        batch.draw(hudBackgroundImage, 0f, 0f, 4f, 3f)
+        hudBackground.draw(batch, 0f, 0f, 400f, 200f)
     }
-*/
+
 
 }

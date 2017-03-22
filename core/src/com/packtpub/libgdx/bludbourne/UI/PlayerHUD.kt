@@ -19,6 +19,7 @@ class PlayerHUD(camera: Camera) : Screen {
         //Gdx.input.setInputProcessor(stage)
 
         statusUI = StatusUI()
+        statusUI.setPosition(0f, 0f)
 
         stage.addActor(statusUI)
     }
