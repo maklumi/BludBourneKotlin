@@ -9,6 +9,8 @@ class StatusUI(skin: Skin, textureAtlas: TextureAtlas) : Window("stats", skin) {
     private val hpBar: Image
     private val mpBar: Image
     private val xpBar: Image
+    val inventoryButton: ImageButton
+
 
     //Attributes
     private val levelVal = 1
@@ -44,6 +46,10 @@ class StatusUI(skin: Skin, textureAtlas: TextureAtlas) : Window("stats", skin) {
         val goldLabel = Label(" gp:", skin)
         val goldVal = Label(goldVal.toString(), skin)
 
+        //buttons
+        inventoryButton = ImageButton(skin, "inventory-button")
+        inventoryButton.imageCell.size(32f, 32f)
+
         //Align images
         hpBar.setPosition(3f, 6f)
         mpBar.setPosition(3f, 6f)
@@ -63,6 +69,11 @@ class StatusUI(skin: Skin, textureAtlas: TextureAtlas) : Window("stats", skin) {
         //account for the title padding
         this.pad(this.padTop + 10, 10f, 10f, 10f)
 
+        this.add()
+        this.add()
+        this.add(inventoryButton).align(Align.right)
+        this.row()
+
         this.add(group).size(bar.width, bar.height)
         this.add(hpLabel)
         this.add(hp).align(Align.left)
@@ -78,8 +89,9 @@ class StatusUI(skin: Skin, textureAtlas: TextureAtlas) : Window("stats", skin) {
         this.add(xp).align(Align.left)
         this.row()
 
-        this.add(levelLabel)
+        this.add(levelLabel).align(Align.left)
         this.add(levelVal).align(Align.left)
+        this.row()
         this.add(goldLabel)
         this.add(goldVal).align(Align.left)
 

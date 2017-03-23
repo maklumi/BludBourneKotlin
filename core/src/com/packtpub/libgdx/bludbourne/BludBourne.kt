@@ -5,6 +5,8 @@ import com.packtpub.libgdx.bludbourne.screens.MainGameScreen
 
 class BludBourne : Game() {
 
+    private lateinit var mainGameScreen: MainGameScreen
+
     override fun create() {
         mainGameScreen = MainGameScreen()
         setScreen(mainGameScreen)
@@ -12,10 +14,6 @@ class BludBourne : Game() {
 
     override fun dispose() {
         mainGameScreen.dispose()
-    }
-
-    companion object {
-        lateinit var mainGameScreen : MainGameScreen
     }
 
 }

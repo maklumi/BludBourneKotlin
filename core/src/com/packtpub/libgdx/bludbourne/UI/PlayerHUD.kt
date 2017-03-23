@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
@@ -34,9 +36,11 @@ class PlayerHUD(camera: Camera) : Screen {
 //        stage.setDebugAll(true)
 
         statusUI = StatusUI(statusUISkin, statusUITextureAtlas)
+        statusUI.isVisible = true
         statusUI.setPosition(0f, 0f)
 
         inventoryUI = InventoryUI(statusUISkin, statusUITextureAtlas)
+        inventoryUI.isVisible = false
         inventoryUI.isMovable = false
 
 
@@ -51,6 +55,13 @@ class PlayerHUD(camera: Camera) : Screen {
         for (actor in actors) {
             stage.addActor(actor)
         }
+
+        val inventoryButton = statusUI.inventoryButton
+        inventoryButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                inventoryUI.isVisible = !inventoryUI.isVisible
+            }
+        })
     }
 
     fun populateInventory(itemTypeIDs: Array<InventoryItem.ItemTypeID>) {
