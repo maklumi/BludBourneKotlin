@@ -35,7 +35,12 @@ class PlayerHUD(camera: Camera) : Screen {
         statusUI.setPosition(0f, 0f)
 
         inventoryUI = InventoryUI(statusUISkin, statusUITextureAtlas)
-        inventoryUI.setPosition(0f, 0f)
+        inventoryUI.isMovable = false
+
+        val centerX = (stage.width - inventoryUI.width) / 2
+        val centerY = (stage.height - inventoryUI.height) / 2
+        inventoryUI.setPosition(centerX, centerY)
+
 
         stage.addActor(statusUI)
         stage.addActor(inventoryUI)

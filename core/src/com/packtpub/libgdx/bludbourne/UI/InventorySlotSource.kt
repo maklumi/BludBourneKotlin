@@ -16,7 +16,7 @@ class InventorySlotSource(internal var sourceSlot: InventorySlot,
         sourceSlot.decrementItemCount()
 
         payload.dragActor = actor
-        dragAndDrop.setDragActorPosition(-x, -y + actor.height)
+        dragAndDrop.setDragActorPosition(-x+actor.width, -y)
 
         return payload
     }

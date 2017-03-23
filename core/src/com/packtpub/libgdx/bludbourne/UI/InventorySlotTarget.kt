@@ -15,11 +15,18 @@ class InventorySlotTarget(internal var targetSlot: InventorySlot) : Target(targe
         val sourceActor = payload.dragActor as InventoryItem
         val targetActor = targetSlot.getTopInventoryItem()
 
+        //First, does the slot accept the source item type?
+        if (!targetSlot.doesAcceptItemType(sourceActor.itemType)) {
+            //Put item back where it came from, slot doesn't accept item
+            (source as InventorySlotSource).sourceSlot.add(sourceActor)
+            return
+        }
+
         if (!targetSlot.hasItem()) {
             targetSlot.add(sourceActor)
         } else {
             //If the same item and stackable, add
-            if (sourceActor.isSameItemType(targetActor!!) && sourceActor.isStackable()) {
+            if (sourceActor.isSameItemType(targetActor!!) && sourceActor.isStackable) {
                 targetSlot.add(sourceActor)
             } else {
                 //If they aren't the same items or the items aren't stackable, then swap
