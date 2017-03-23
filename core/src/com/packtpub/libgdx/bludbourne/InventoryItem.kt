@@ -40,6 +40,8 @@ class InventoryItem : Image {
     var itemAttributes: Int = 0
     var itemUseType: Int = 0
     var itemTypeID: ItemTypeID? = null
+    var itemShortDescription: String? = null
+
 
     constructor(textureRegion: TextureRegion, itemAttributes: Int,
                 itemTypeID: ItemTypeID, itemUseType: Int) : super(textureRegion) {
@@ -55,6 +57,7 @@ class InventoryItem : Image {
         this.itemTypeID = inventoryItem.itemTypeID
         this.itemAttributes = inventoryItem.itemAttributes
         this.itemUseType = inventoryItem.itemUseType
+        this.itemShortDescription = inventoryItem.itemShortDescription
     }
 
     val isStackable: Boolean

@@ -33,7 +33,7 @@ class InventorySlot constructor() : Stack() {
         _defaultBackground.add(_customBackgroundDecal)
     }
 
-    fun decrementItemCount() {
+      fun decrementItemCount() {
         numItemsVal--
         numItemsLabel.setText(numItemsVal.toString())
         if (_defaultBackground.children.size == 1) {
@@ -114,7 +114,13 @@ class InventorySlot constructor() : Stack() {
     }
 
     companion object {
-        fun swapSlots(inventorySlotSource: InventorySlot, inventorySlotTarget: InventorySlot, dragActor: Actor) {
+        fun swapSlots(inventorySlotSource: InventorySlot, inventorySlotTarget: InventorySlot, dragActor: InventoryItem) {
+            //check if items can accept each other, otherwise, no swap
+            if (!inventorySlotTarget.doesAcceptItemUseType(dragActor.itemUseType) ||
+                    !inventorySlotSource.doesAcceptItemUseType(inventorySlotTarget.getTopInventoryItem()!!.itemUseType)) {
+                inventorySlotSource.add(dragActor)
+                return
+            }
             //swap
             val tempArray = inventorySlotSource.getAllInventoryItems()
             tempArray.add(dragActor)

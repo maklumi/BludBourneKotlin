@@ -16,11 +16,13 @@ class InventorySlotTarget(internal var targetSlot: InventorySlot) : Target(targe
     override fun drop(source: Source, payload: Payload, x: Float, y: Float, pointer: Int) {
         val sourceActor = payload.dragActor as InventoryItem
         val targetActor = targetSlot.getTopInventoryItem()
+        val sourceSlot = (source as InventorySlotSource).sourceSlot
+
 
         //First, does the slot accept the source item type?
         if (!targetSlot.doesAcceptItemUseType(sourceActor.itemUseType)) {
             //Put item back where it came from, slot doesn't accept item
-            (source as InventorySlotSource).sourceSlot.add(sourceActor)
+            sourceSlot.add(sourceActor)
             return
         }
 
@@ -32,7 +34,7 @@ class InventorySlotTarget(internal var targetSlot: InventorySlot) : Target(targe
                 targetSlot.add(sourceActor)
             } else {
                 //If they aren't the same items or the items aren't stackable, then swap
-                InventorySlot.swapSlots((source as InventorySlotSource).sourceSlot, targetSlot, sourceActor)
+                InventorySlot.swapSlots(sourceSlot, targetSlot, sourceActor)
             }
         }
     }

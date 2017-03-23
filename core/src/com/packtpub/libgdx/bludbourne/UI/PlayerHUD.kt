@@ -31,7 +31,7 @@ class PlayerHUD(camera: Camera) : Screen {
     init {
         viewport = ScreenViewport(camera)
         stage = Stage(viewport)
-        stage.setDebugAll(true)
+//        stage.setDebugAll(true)
 
         statusUI = StatusUI(statusUISkin, statusUITextureAtlas)
         statusUI.setPosition(0f, 0f)
@@ -39,13 +39,18 @@ class PlayerHUD(camera: Camera) : Screen {
         inventoryUI = InventoryUI(statusUISkin, statusUITextureAtlas)
         inventoryUI.isMovable = false
 
-        val centerX = (stage.width - inventoryUI.width) / 2
-        val centerY = (stage.height - inventoryUI.height) / 2
-        inventoryUI.setPosition(centerX, centerY)
+
+        inventoryUI.setPosition(stage.width / 2f, 0f)
 
 
         stage.addActor(statusUI)
         stage.addActor(inventoryUI)
+
+        //add tooltips to the stage
+        val actors = inventoryUI.inventoryActors
+        for (actor in actors) {
+            stage.addActor(actor)
+        }
     }
 
     fun populateInventory(itemTypeIDs: Array<InventoryItem.ItemTypeID>) {

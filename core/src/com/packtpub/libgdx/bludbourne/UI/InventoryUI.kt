@@ -14,18 +14,18 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
 
     private val _numSlots = 50
     private val _lengthSlotRow = 10
-    private val _inventorySlotTable: Table
-    private val _playerSlotsTable: Table
-    private val _equipSlots: Table
+    private val _inventorySlotTable = Table()
+    private val _playerSlotsTable = Table()
+    private val _equipSlots = Table()
     private val _dragAndDrop = DragAndDrop()
+    val inventoryActors = Array<Actor>()
+    private val _inventorySlotTooltip = InventorySlotTooltip(PlayerHUD.statusUISkin)
+
     private val _slotWidth = 52
     private val _slotHeight = 52
 
     init {
         //create
-        _inventorySlotTable = Table()
-        _playerSlotsTable = Table()
-        _equipSlots = Table()
         _equipSlots.defaults().space(10f)
 
         val headSlot = InventorySlot(
@@ -59,6 +59,12 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
                 ARMOR_FEET.value,
                 Image(PlayerHUD.itemsTextureAtlas.findRegion("inv_boot")))
 
+        headSlot.addListener(InventorySlotTooltipListener(_inventorySlotTooltip))
+        leftArmSlot.addListener(InventorySlotTooltipListener(_inventorySlotTooltip))
+        rightArmSlot.addListener(InventorySlotTooltipListener(_inventorySlotTooltip))
+        chestSlot.addListener(InventorySlotTooltipListener(_inventorySlotTooltip))
+        legsSlot.addListener(InventorySlotTooltipListener(_inventorySlotTooltip))
+
         _dragAndDrop.addTarget(InventorySlotTarget(headSlot))
         _dragAndDrop.addTarget(InventorySlotTarget(leftArmSlot))
         _dragAndDrop.addTarget(InventorySlotTarget(chestSlot))
@@ -71,6 +77,8 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
         //layout
         for (i in 1.._numSlots) {
             val inventorySlot = InventorySlot()
+            inventorySlot.addListener(InventorySlotTooltipListener(_inventorySlotTooltip))
+
             _dragAndDrop.addTarget(InventorySlotTarget(inventorySlot))
 
             _inventorySlotTable.add(inventorySlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
@@ -91,6 +99,7 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
         _equipSlots.right().add(legsSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
 
         _playerSlotsTable.add(_equipSlots)
+        inventoryActors.add(_inventorySlotTooltip)
 
         this.add(_playerSlotsTable).padBottom(20f).row()
         this.add(_inventorySlotTable).row()
