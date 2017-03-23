@@ -11,29 +11,34 @@ import com.badlogic.gdx.utils.viewport.Viewport
 
 class PlayerHUD(camera: Camera) : Screen {
 
-    companion object {
-        val STATUSUI_TEXTURE_ATLAS_PATH = "skins/statusui.atlas"
-    }
-
     val stage: Stage
     private val viewport: Viewport
     private val statusUI: StatusUI
+    private val inventoryUI: InventoryUI
 
-    private val statusUISkin: Skin
-    private val statusUITextureAtlas: TextureAtlas
+    companion object {
+        private val STATUSUI_TEXTURE_ATLAS_PATH = "skins/statusui.atlas"
+        private val STATUSUI_SKIN_PATH = "skins/statusui.json"
+        private val ITEMS_TEXTURE_ATLAS_PATH = "skins/items.atlas"
+        private val ITEMS_SKIN_PATH = "skins/items.json"
+        val statusUITextureAtlas = TextureAtlas(STATUSUI_TEXTURE_ATLAS_PATH)
+        val itemsTextureAtlas = TextureAtlas(ITEMS_TEXTURE_ATLAS_PATH)
+        val statusUISkin = Skin(Gdx.files.internal(STATUSUI_SKIN_PATH), statusUITextureAtlas)
+    }
 
     init {
         viewport = ScreenViewport(camera)
         stage = Stage(viewport)
         stage.setDebugAll(true)
 
-        statusUITextureAtlas = TextureAtlas(STATUSUI_TEXTURE_ATLAS_PATH)
-        statusUISkin = Skin(Gdx.files.internal("skins/statusui.json"), statusUITextureAtlas)
-
         statusUI = StatusUI(statusUISkin, statusUITextureAtlas)
         statusUI.setPosition(0f, 0f)
 
+        inventoryUI = InventoryUI(statusUISkin, statusUITextureAtlas)
+        inventoryUI.setPosition(0f, 0f)
+
         stage.addActor(statusUI)
+        stage.addActor(inventoryUI)
     }
 
     override fun show() {}
