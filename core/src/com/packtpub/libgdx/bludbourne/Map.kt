@@ -19,7 +19,6 @@ abstract class Map(var currentMapType: MapFactory.MapType,
     lateinit var currentTiledMap: TiledMap
         protected set
     var playerStart: Vector2 = Vector2(0f, 0f)
-        protected set
 
     var collisionLayer: MapLayer
         protected set

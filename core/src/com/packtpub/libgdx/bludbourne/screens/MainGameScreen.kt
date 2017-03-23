@@ -13,6 +13,7 @@ import com.packtpub.libgdx.bludbourne.EntityFactory
 import com.packtpub.libgdx.bludbourne.Map.Companion.UNIT_SCALE
 import com.packtpub.libgdx.bludbourne.MapManager
 import com.packtpub.libgdx.bludbourne.UI.PlayerHUD
+import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
 class MainGameScreen : Screen {
@@ -26,10 +27,10 @@ class MainGameScreen : Screen {
     internal var physicalHeight: Float = 0f
     internal var aspectRatio: Float = 0f
 
-    private lateinit var player: Entity
-    private lateinit var playerHUD: PlayerHUD
-    private lateinit var mapMgr: MapManager
-    private lateinit var mapRenderer: OrthogonalTiledMapRenderer
+    private var player: Entity
+    private var playerHUD: PlayerHUD
+    private var mapMgr: MapManager
+    private var mapRenderer: OrthogonalTiledMapRenderer
     private val camera: OrthographicCamera = OrthographicCamera()
     private val hudCamera: OrthographicCamera = OrthographicCamera()
     private val json = Json()
@@ -54,7 +55,7 @@ class MainGameScreen : Screen {
             }
     }
 
-    override fun show() {
+    init {
         setupViewport(10, 10)
         mapMgr = MapManager()
 
@@ -78,8 +79,14 @@ class MainGameScreen : Screen {
         multiplexer.addProcessor(playerHUD.stage)
         multiplexer.addProcessor(player.inputComponent)
         Gdx.input.inputProcessor = multiplexer
+
+        ProfileManager.instance.addObserver(mapMgr)
+        ProfileManager.instance.loadProfile(ProfileManager.DEFAULT_PROFILE)
     }
 
+    override fun show() {
+
+    }
 
     override fun hide() {}
 
@@ -124,10 +131,12 @@ class MainGameScreen : Screen {
 
     override fun pause() {
         gameState = GameState.PAUSED
+        ProfileManager.instance.saveProfile()
     }
 
     override fun resume() {
         gameState = GameState.RUNNING
+        ProfileManager.instance.loadProfile(ProfileManager.DEFAULT_PROFILE)
     }
 
     override fun dispose() {

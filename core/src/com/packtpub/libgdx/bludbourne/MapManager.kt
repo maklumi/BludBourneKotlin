@@ -7,13 +7,54 @@ import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
+import com.packtpub.libgdx.bludbourne.profile.ProfileManager
+import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
 
-class MapManager {
+class MapManager : ProfileObserver {
 
     lateinit var player: Entity //set from MainGameScreen
     var camera = OrthographicCamera()
     var hasMapChanged = false
     private var currentMap: Map = MapFactory.getMap(MapFactory.MapType.TOWN)
+
+    override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
+        when (event) {
+            ProfileObserver.ProfileEvent.PROFILE_LOADED -> {
+                val currentMap = profileManager.getProperty("currentMapType", String::class.java)
+                val mapType: MapFactory.MapType
+                if (currentMap == null || currentMap.isEmpty()) {
+                    mapType = MapFactory.MapType.TOWN
+                } else {
+                    mapType = MapFactory.MapType.valueOf(currentMap)
+                }
+
+                loadMap(mapType)
+
+                // Persisted the closest player position values for different maps
+                val topWorldMapStartPosition = profileManager.getProperty("topWorldMapStartPosition", Vector2::class.java)
+                if (topWorldMapStartPosition != null) {
+                    MapFactory.getMap(MapFactory.MapType.TOP_WORLD).playerStart = topWorldMapStartPosition
+                }
+
+                val castleOfDoomMapStartPosition = profileManager.getProperty("castleOfDoomMapStartPosition", Vector2::class.java)
+                if (castleOfDoomMapStartPosition != null) {
+                    MapFactory.getMap(MapFactory.MapType.CASTLE_OF_DOOM).playerStart = castleOfDoomMapStartPosition
+                }
+
+                val townMapStartPosition = profileManager.getProperty("townMapStartPosition", Vector2::class.java)
+                if (townMapStartPosition != null) {
+                    MapFactory.getMap(MapFactory.MapType.TOWN).playerStart = townMapStartPosition
+                }
+
+            }
+            ProfileObserver.ProfileEvent.SAVING_PROFILE -> {
+                profileManager.setProperty("currentMapType", currentMap.currentMapType.toString())
+                profileManager.setProperty("topWorldMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOP_WORLD).playerStart)
+                profileManager.setProperty("castleOfDoomMapStartPosition", MapFactory.getMap(MapFactory.MapType.CASTLE_OF_DOOM).playerStart)
+                profileManager.setProperty("townMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOWN).playerStart)
+            }
+        }
+    }
 
     fun loadMap(mapType: MapFactory.MapType) {
         currentMap = MapFactory.getMap(mapType)
