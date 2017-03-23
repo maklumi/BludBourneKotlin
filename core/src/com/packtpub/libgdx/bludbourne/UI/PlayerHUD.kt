@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import com.packtpub.libgdx.bludbourne.InventoryItem
 
 class PlayerHUD(camera: Camera) : Screen {
 
@@ -44,6 +46,10 @@ class PlayerHUD(camera: Camera) : Screen {
 
         stage.addActor(statusUI)
         stage.addActor(inventoryUI)
+    }
+
+    fun populateInventory(itemTypeIDs: Array<InventoryItem.ItemTypeID>) {
+        inventoryUI.populateInventory(itemTypeIDs)
     }
 
     override fun show() {}

@@ -2,6 +2,8 @@ package com.packtpub.libgdx.bludbourne.UI
 
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.*
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target
+import com.packtpub.libgdx.bludbourne.InventoryItem
+
 
 class InventorySlotTarget(internal var targetSlot: InventorySlot) : Target(targetSlot) {
 
@@ -16,7 +18,7 @@ class InventorySlotTarget(internal var targetSlot: InventorySlot) : Target(targe
         val targetActor = targetSlot.getTopInventoryItem()
 
         //First, does the slot accept the source item type?
-        if (!targetSlot.doesAcceptItemType(sourceActor.itemType)) {
+        if (!targetSlot.doesAcceptItemUseType(sourceActor.itemUseType)) {
             //Put item back where it came from, slot doesn't accept item
             (source as InventorySlotSource).sourceSlot.add(sourceActor)
             return

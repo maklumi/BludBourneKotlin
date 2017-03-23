@@ -8,6 +8,7 @@ import java.util.*
 
 class EntityConfig {
     var animationConfig: Array<AnimationConfig> = Array()
+    var inventory: Array<InventoryItem.ItemTypeID> = Array()
     var state: Entity.State = Entity.State.IDLE
     var direction: Entity.Direction = Entity.Direction.DOWN
     var entityID = UUID.randomUUID().toString()

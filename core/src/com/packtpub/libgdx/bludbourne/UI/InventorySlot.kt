@@ -7,14 +7,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
+import com.packtpub.libgdx.bludbourne.InventoryItem
 
 class InventorySlot constructor() : Stack() {
 
     //All slots have this default image
-    private val _defaultBackground =  Stack()
+    private val _defaultBackground = Stack()
     private var _customBackgroundDecal = Image()
     val image = Image(NinePatch(PlayerHUD.statusUITextureAtlas.createPatch("dialog")))
-    private val imageBackground = Image(NinePatch(PlayerHUD.statusUITextureAtlas.createPatch("dialog")))
     private var numItemsVal = 0
     private val numItemsLabel = Label(numItemsVal.toString(), PlayerHUD.statusUISkin, "inventory-item-count")
     private var _filterItemType: Int = 0
@@ -73,10 +73,10 @@ class InventorySlot constructor() : Stack() {
         return false
     }
 
-    fun doesAcceptItemType(itemType: Int): Boolean {
+    fun doesAcceptItemUseType(itemUseType: Int): Boolean {
         if (_filterItemType == 0) {
             return true
-        } else return _filterItemType and itemType == itemType
+        } else return _filterItemType and itemUseType == itemUseType
     }
 
     fun getTopInventoryItem(): InventoryItem? {
