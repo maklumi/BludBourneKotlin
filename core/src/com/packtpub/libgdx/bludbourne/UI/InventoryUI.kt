@@ -29,9 +29,16 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
 
             if (i == 5 || i == 10 || i == 15 || i == 20) {
                 //TEMP TODO
-                val image = Image(PlayerHUD.itemsTextureAtlas.findRegion("armor01"))
-                image.setScaling(Scaling.none)
-                inventorySlot.add(image)
+                val inventorySlotItem = InventoryItem(PlayerHUD.itemsTextureAtlas.findRegion("armor01"), InventoryItem.WEARABLE, "armor01")
+                inventorySlotItem.setScaling(Scaling.none)
+                inventorySlot.add(inventorySlotItem)
+
+                _dragAndDrop.addSource(InventorySlotSource(inventorySlot, _dragAndDrop))
+            } else if (i == 1 || i == 13 || i == 25 || i == 30) {
+                //TEMP TODO
+                val inventorySlotItem = InventoryItem(PlayerHUD.itemsTextureAtlas.findRegion("potions02"), InventoryItem.CONSUMABLE or InventoryItem.STACKABLE, "potions02")
+                inventorySlotItem.setScaling(Scaling.none)
+                inventorySlot.add(inventorySlotItem)
 
                 _dragAndDrop.addSource(InventorySlotSource(inventorySlot, _dragAndDrop))
             }
