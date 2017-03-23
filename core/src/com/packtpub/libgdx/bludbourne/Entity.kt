@@ -69,6 +69,10 @@ class Entity(val inputComponent: InputComponent,
         graphicsComponent.update(this, mapMgr, batch, delta)
     }
 
+    fun updateInput(delta: Float) {
+        inputComponent.update(this, delta)
+    }
+
     fun sendMessage(message: Component.MESSAGE, vararg args: String) {
         var fullMessage = message.toString()
 

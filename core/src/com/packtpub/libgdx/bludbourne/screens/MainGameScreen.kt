@@ -34,6 +34,26 @@ class MainGameScreen : Screen {
     private val hudCamera: OrthographicCamera = OrthographicCamera()
     private val json = Json()
 
+    enum class GameState {
+        RUNNING,
+        PAUSED
+    }
+
+    companion object {
+        var gameState: GameState = GameState.RUNNING
+            set(gameState) {
+                when (gameState) {
+                    MainGameScreen.GameState.RUNNING -> field = GameState.RUNNING
+                    MainGameScreen.GameState.PAUSED -> if (field == GameState.PAUSED) {
+                        field = GameState.RUNNING
+                    } else if (field == GameState.RUNNING) {
+                        field = GameState.PAUSED
+                    }
+                    else -> field = GameState.RUNNING
+                }
+            }
+    }
+
     override fun show() {
         setupViewport(10, 10)
         mapMgr = MapManager()
@@ -64,6 +84,10 @@ class MainGameScreen : Screen {
     override fun hide() {}
 
     override fun render(delta: Float) {
+        if (gameState == GameState.PAUSED) {
+            player.updateInput(delta)
+            return
+        }
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
@@ -98,9 +122,13 @@ class MainGameScreen : Screen {
         playerHUD.resize(physicalWidth.toInt(), physicalHeight.toInt())
     }
 
-    override fun pause() {}
+    override fun pause() {
+        gameState = GameState.PAUSED
+    }
 
-    override fun resume() {}
+    override fun resume() {
+        gameState = GameState.RUNNING
+    }
 
     override fun dispose() {
         player.dispose()

@@ -12,7 +12,7 @@ abstract class InputComponent : Component, InputProcessor {
     var json: Json = Json()
 
     enum class Keys {
-        LEFT, RIGHT, UP, DOWN, QUIT
+        LEFT, RIGHT, UP, DOWN, QUIT, PAUSE
     }
 
     enum class Mouse {
@@ -29,6 +29,7 @@ abstract class InputComponent : Component, InputProcessor {
         keys.put(Keys.UP, false)
         keys.put(Keys.DOWN, false)
         keys.put(Keys.QUIT, false)
+        keys.put(Keys.PAUSE, false)
 
         mouseButtons.put(Mouse.SELECT, false)
         mouseButtons.put(Mouse.DOACTION, false)

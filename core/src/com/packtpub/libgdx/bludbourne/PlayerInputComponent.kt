@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector3
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
+import com.packtpub.libgdx.bludbourne.screens.MainGameScreen
 
 
 class PlayerInputComponent : InputComponent() {
@@ -16,7 +17,11 @@ class PlayerInputComponent : InputComponent() {
 
     override fun update(entity: Entity, delta: Float) {
         //Keyboard input
-        if (keys[Keys.LEFT]!!) {
+        if (keys[InputComponent.Keys.PAUSE]!!) {
+            println("INPUT PAUSED")
+            MainGameScreen.gameState = MainGameScreen.GameState.PAUSED
+            pauseReleased()
+        } else if (keys[Keys.LEFT]!!) {
             entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.WALKING))
             entity.sendMessage(Component.MESSAGE.CURRENT_DIRECTION, json.toJson(Entity.Direction.LEFT))
         } else if (keys[Keys.RIGHT]!!) {
@@ -29,6 +34,7 @@ class PlayerInputComponent : InputComponent() {
             entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.WALKING))
             entity.sendMessage(Component.MESSAGE.CURRENT_DIRECTION, json.toJson(Entity.Direction.DOWN))
         } else if (keys[Keys.QUIT]!!) {
+            quitReleased()
             Gdx.app.exit()
         } else {
             entity.sendMessage(Component.MESSAGE.CURRENT_STATE, json.toJson(Entity.State.IDLE))
@@ -73,6 +79,9 @@ class PlayerInputComponent : InputComponent() {
         if (keycode == Input.Keys.Q) {
             this.quitPressed()
         }
+        if (keycode == Input.Keys.P) {
+            this.pausePressed()
+        }
 
         return true
     }
@@ -92,6 +101,9 @@ class PlayerInputComponent : InputComponent() {
         }
         if (keycode == Input.Keys.Q) {
             this.quitReleased()
+        }
+        if (keycode == Input.Keys.P) {
+            this.pauseReleased()
         }
         return true
     }
@@ -147,7 +159,7 @@ class PlayerInputComponent : InputComponent() {
     fun upPressed() = keys.put(Keys.UP, true)
     fun downPressed() = keys.put(Keys.DOWN, true)
     fun quitPressed() = keys.put(Keys.QUIT, true)
-
+    fun pausePressed() = keys.put(InputComponent.Keys.PAUSE, true)
 
     fun setClickedMouseCoordinates(x: Int, y: Int): Vector3 =
             lastMouseCoordinates.set(x.toFloat(), y.toFloat(), 0f)
@@ -164,6 +176,8 @@ class PlayerInputComponent : InputComponent() {
     fun upReleased() = keys.put(Keys.UP, false)
     fun downReleased() = keys.put(Keys.DOWN, false)
     fun quitReleased() = keys.put(Keys.QUIT, false)
+    fun pauseReleased() = keys.put(InputComponent.Keys.PAUSE, false)
+
     fun selectMouseButtonReleased(x: Int, y: Int) =
             mouseButtons.put(Mouse.SELECT, false)
 
@@ -171,7 +185,7 @@ class PlayerInputComponent : InputComponent() {
             mouseButtons.put(Mouse.DOACTION, false)
 
 
-    fun hide() {
+    fun clear() {
         keys.put(Keys.LEFT, false)
         keys.put(Keys.RIGHT, false)
         keys.put(Keys.UP, false)
