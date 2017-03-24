@@ -43,19 +43,19 @@ object ConversationGraphTest {
         _conversations.put(yesAnswer.id, yesAnswer)
         _conversations.put(unconnectedTest.id, unconnectedTest)
 
-        _graph = ConversationGraph(_conversations, start)
+        _graph = ConversationGraph(_conversations, start.id)
 
-        _graph.addChoice(start, yesAnswer)
-        _graph.addChoice(start, noAnswer)
-        _graph.addChoice(noAnswer, start)
-        _graph.addChoice(yesAnswer, start)
+        _graph.addChoice(start.id, yesAnswer.id)
+        _graph.addChoice(start.id, noAnswer.id)
+        _graph.addChoice(noAnswer.id, start.id)
+        _graph.addChoice(yesAnswer.id, start.id)
 
         println(_graph.toString())
         println(_graph.displayCurrentConversation())
 
         while (!_input.equals(quit, ignoreCase = true)) {
             val conversation = nextChoice
-            _graph.setCurrentConversation(conversation)
+            _graph.setCurrentConversation(conversation.id)
             println(_graph.displayCurrentConversation())
         }
     }
@@ -63,14 +63,14 @@ object ConversationGraphTest {
     val nextChoice: Conversation
         get() {
             val choices = _graph.currentChoices
-            for (conversation in choices) {
-                println(conversation.id.toString() + " " + conversation.choicePhrase)
+            for (id in choices) {
+                val conversation = _graph.getConversationByID(id)
+                println(id.toString() + " " + conversation.choicePhrase)
             }
 //            _input = System.console().readLine()
             val br = BufferedReader(InputStreamReader(System.`in`))
             _input = br.readLine()
-
-            var choice: Conversation
+            val choice: Conversation
             try {
                 choice = _graph.getConversationByID(Integer.parseInt(_input))
             } catch (nfe: NumberFormatException) {

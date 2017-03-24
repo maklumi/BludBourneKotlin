@@ -3,63 +3,64 @@ package com.packtpub.libgdx.bludbourne.dialog
 import java.util.ArrayList
 import java.util.Hashtable
 
-class ConversationGraph(private val _conversations: Hashtable<Int, Conversation>, root: Conversation) {
+class ConversationGraph(private val _conversations: Hashtable<Int, Conversation>, rootID: Int) {
+
     var numChoices = 0
-        private set
-    private val _associatedChoices: Hashtable<Conversation, ArrayList<Conversation>>
-    private var _currentConversation = root
+
+    private val _associatedChoices: Hashtable<Int, ArrayList<Int>> = Hashtable(_conversations.size)
+    private var _currentConversation = getConversationByID(rootID)
 
     init {
-        if (_conversations.size < 0) {
-            throw IllegalArgumentException("Can't have a negative amount of conversations")
-        }
-        _associatedChoices = Hashtable(_conversations.size)
-
         for (conversation in _conversations.values) {
-            _associatedChoices.put(conversation, ArrayList<Conversation>())
+            _associatedChoices.put(conversation.id, ArrayList<Int>())
         }
     }
 
-    val currentChoices: ArrayList<Conversation> = _associatedChoices[_currentConversation]!!
+    val currentChoices: ArrayList<Int>
+        get() = _associatedChoices[_currentConversation.id]!!
 
-    fun setCurrentConversation(conversation: Conversation) {
-//        if ( _associatedChoices[conversation] == null) return
-        //Can we reach the new conversation from the current one?
-        if (isReachable(_currentConversation, conversation)) {
+    fun setCurrentConversation(id: Int) {
+        val conversation = getConversationByID(id)
+//Can we reach the new conversation from the current one?
+        if (isReachable(_currentConversation.id, id)) {
             _currentConversation = conversation
         } else {
             println("New conversation node is not reachable from current node!")
         }
     }
 
-    fun isValid(conversation: Conversation): Boolean {
-        if (_conversations[conversation.id] == null) return false
-        return true
+    fun isValid(conversationID: Int): Boolean {
+        return _conversations[conversationID] != null
     }
 
-    fun isReachable(source: Conversation, sink: Conversation): Boolean {
-        if (!isValid(source) || !isValid(sink)) return false
+    fun isReachable(sourceID: Int, sinkID: Int): Boolean {
+        if (!isValid(sourceID) || !isValid(sinkID)) return false
+        if (_conversations[sourceID] == null) return false
 
         //First get edges/choices from the source
-        val list = _associatedChoices[source]!!
-        for (conversation in list) {
-            if (conversation.id == sink.id) {
-                return true
-            }
-        }
-        return false
+        val list = _associatedChoices[sourceID]!!
+        return list.contains(sinkID)
     }
 
-    fun getConversationByID(id: Int): Conversation = _conversations[id]!!
+    fun getConversationByID(id: Int): Conversation {
+        if (!isValid(id)) {
+            println("Id $id is not valid!")
+            return Conversation()
+        }
+        return _conversations[id]!!
+    }
 
-    fun displayCurrentConversation(): String = _currentConversation.dialog
+    fun displayCurrentConversation(): String {
+        return _currentConversation.dialog
+    }
 
     val numConversations: Int = _conversations.size
 
-    fun addChoice(sourceConversation: Conversation, targetConversation: Conversation) {
-        val list = _associatedChoices[sourceConversation] ?: return
+    fun addChoice(sourceConversationID: Int, targetConversationID: Int) {
 
-        list.add(targetConversation)
+        val list = _associatedChoices[sourceConversationID] ?: return
+
+        list.add(targetConversationID)
         numChoices++
     }
 
@@ -70,11 +71,11 @@ class ConversationGraph(private val _conversations: Hashtable<Int, Conversation>
         outputString.append(System.getProperty("line.separator"))
 
         val keys = _associatedChoices.keys
-        for (conversation in keys) {
-            outputString.append(String.format("[%d]: ", conversation.id))
+        for (id in keys) {
+            outputString.append(String.format("[%d]: ", id))
 
-            for (choices in _associatedChoices[conversation]!!) {
-                outputString.append(String.format("%d ", choices.id))
+            for (choiceID in _associatedChoices[id!!]!!) {
+                outputString.append(String.format("%d ", choiceID))
             }
 
             outputString.append(System.getProperty("line.separator"))
