@@ -1,22 +1,21 @@
 package com.packtpub.libgdx.bludbourne.dialog
 
-import java.util.ArrayList
-import java.util.Hashtable
+import java.util.*
 
 class ConversationGraph(private val _conversations: Hashtable<Int, Conversation>, rootID: Int) {
 
     var numChoices = 0
 
-    private val _associatedChoices: Hashtable<Int, ArrayList<Int>> = Hashtable(_conversations.size)
+    private val _associatedChoices: Hashtable<Int, ArrayList<ConversationChoice>> = Hashtable(_conversations.size)
     private var _currentConversation = getConversationByID(rootID)
 
     init {
         for (conversation in _conversations.values) {
-            _associatedChoices.put(conversation.id, ArrayList<Int>())
+            _associatedChoices.put(conversation.id, ArrayList<ConversationChoice>())
         }
     }
 
-    val currentChoices: ArrayList<Int>
+    val currentChoices: ArrayList<ConversationChoice>
         get() = _associatedChoices[_currentConversation.id]!!
 
     fun setCurrentConversation(id: Int) {
@@ -38,8 +37,9 @@ class ConversationGraph(private val _conversations: Hashtable<Int, Conversation>
         if (_conversations[sourceID] == null) return false
 
         //First get edges/choices from the source
-        val list = _associatedChoices[sourceID]!!
-        return list.contains(sinkID)
+        val list: ArrayList<ConversationChoice> = _associatedChoices[sourceID]!!
+        list.forEach { choice -> return choice.sourceId == sourceID && choice.destinationId == sinkID }
+        return false
     }
 
     fun getConversationByID(id: Int): Conversation {
@@ -50,17 +50,27 @@ class ConversationGraph(private val _conversations: Hashtable<Int, Conversation>
         return _conversations[id]!!
     }
 
+    fun getDestinationChoicePhraseById(id: Int): String {
+        if (isReachable(_currentConversation.id, id)) {
+            val list = _associatedChoices[_currentConversation.id]!!
+            list.forEach { choice ->
+                if (choice.destinationId == id) return choice.choicePhrase
+            }
+        }
+        return ""
+    }
+
     fun displayCurrentConversation(): String {
         return _currentConversation.dialog
     }
 
     val numConversations: Int = _conversations.size
 
-    fun addChoice(sourceConversationID: Int, targetConversationID: Int) {
+    fun addChoice(conversationChoice: ConversationChoice) {
 
-        val list = _associatedChoices[sourceConversationID] ?: return
+        val list = _associatedChoices[conversationChoice.sourceId] ?: return
 
-        list.add(targetConversationID)
+        list.add(conversationChoice)
         numChoices++
     }
 
@@ -74,8 +84,8 @@ class ConversationGraph(private val _conversations: Hashtable<Int, Conversation>
         for (id in keys) {
             outputString.append(String.format("[%d]: ", id))
 
-            for (choiceID in _associatedChoices[id!!]!!) {
-                outputString.append(String.format("%d ", choiceID))
+            for (choice in _associatedChoices[id!!]!!) {
+                outputString.append(String.format("%d ", choice.destinationId))
             }
 
             outputString.append(System.getProperty("line.separator"))
