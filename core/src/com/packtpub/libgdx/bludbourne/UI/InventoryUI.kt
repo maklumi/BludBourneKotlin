@@ -9,8 +9,9 @@ import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.InventoryItem
 import com.packtpub.libgdx.bludbourne.InventoryItem.ItemUseType.*
 import com.packtpub.libgdx.bludbourne.InventoryItemFactory
+import com.packtpub.libgdx.bludbourne.Utility
 
-class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", skin, "solidbackground") {
+class InventoryUI() : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground") {
 
     private val _numSlots = 50
     private val _lengthSlotRow = 10
@@ -19,7 +20,7 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
     val equipSlots = Table()
     private val _dragAndDrop = DragAndDrop()
     val inventoryActors = Array<Actor>()
-    private val _inventorySlotTooltip = InventorySlotTooltip(PlayerHUD.statusUISkin)
+    private val _inventorySlotTooltip = InventorySlotTooltip(Utility.STATUSUI_SKIN)
 
     private val _slotWidth = 52
     private val _slotHeight = 52
@@ -32,7 +33,7 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
 
         val headSlot = InventorySlot(
                 ARMOR_HELMET.value,
-                Image(PlayerHUD.itemsTextureAtlas.findRegion("inv_helmet")))
+                Image(Utility.ITEMS_TEXTUREATLAS.findRegion("inv_helmet")))
 
         val leftArmSlot = InventorySlot(
                 WEAPON_ONEHAND.value or
@@ -40,7 +41,7 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
                         ARMOR_SHIELD.value or
                         WAND_ONEHAND.value or
                         WAND_TWOHAND.value,
-                Image(PlayerHUD.itemsTextureAtlas.findRegion("inv_weapon"))
+                Image(Utility.ITEMS_TEXTUREATLAS.findRegion("inv_weapon"))
         )
 
         val rightArmSlot = InventorySlot(
@@ -49,17 +50,17 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
                         ARMOR_SHIELD.value or
                         WAND_ONEHAND.value or
                         WAND_TWOHAND.value,
-                Image(PlayerHUD.itemsTextureAtlas.findRegion("inv_shield"))
+                Image(Utility.ITEMS_TEXTUREATLAS.findRegion("inv_shield"))
 
         )
 
         val chestSlot = InventorySlot(
                 ARMOR_CHEST.value,
-                Image(PlayerHUD.itemsTextureAtlas.findRegion("inv_chest")))
+                Image(Utility.ITEMS_TEXTUREATLAS.findRegion("inv_chest")))
 
         val legsSlot = InventorySlot(
                 ARMOR_FEET.value,
-                Image(PlayerHUD.itemsTextureAtlas.findRegion("inv_boot")))
+                Image(Utility.ITEMS_TEXTUREATLAS.findRegion("inv_boot")))
 
         headSlot.addListener(InventorySlotTooltipListener(_inventorySlotTooltip))
         leftArmSlot.addListener(InventorySlotTooltipListener(_inventorySlotTooltip))
@@ -73,7 +74,7 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
         _dragAndDrop.addTarget(InventorySlotTarget(rightArmSlot))
         _dragAndDrop.addTarget(InventorySlotTarget(legsSlot))
 
-        playerSlotsTable.background = Image(NinePatch(textureAtlas.createPatch("dialog"))).drawable
+        playerSlotsTable.background = Image(NinePatch(Utility.STATUSUI_TEXTUREATLAS.createPatch("dialog"))).drawable
 
 
         //layout

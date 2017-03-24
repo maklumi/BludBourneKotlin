@@ -18,6 +18,29 @@ class ProfileManager private constructor() : ProfileSubject() {
         storeAllProfiles()
     }
 
+    fun getProfileList(): Array<String> {
+        val profiles = Array<String>()
+        val iter = _profiles.keys.iterator()
+        while (iter.hasNext()) {
+            profiles.add(iter.next())
+        }
+        return profiles
+    }
+
+
+    fun getProfileFile(profileName: String): FileHandle? {
+        if (!doesProfileExist(profileName)) return null
+        return _profiles[profileName]!!
+    }
+
+    fun doesProfileExist(profileName: String): Boolean = _profiles.containsKey(profileName)
+
+    fun setCurrentProfile(profileName: String) = if (doesProfileExist(profileName)) {
+        _profileName = profileName
+    } else {
+        _profileName = DEFAULT_PROFILE
+    }
+
     fun storeAllProfiles() {
         if (Gdx.files.isLocalStorageAvailable) {
             val files = Gdx.files.local(".").list(SAVEGAME_SUFFIX)
@@ -56,7 +79,7 @@ class ProfileManager private constructor() : ProfileSubject() {
     }
 
     fun <T : Any> getProperty(key: String, type: Class<T>): T {
-        var property: T?= null
+        var property: T? = null
         if (!_profileProperties.containsKey(key)) {
             return Array<Any>() as T
         }
@@ -68,11 +91,11 @@ class ProfileManager private constructor() : ProfileSubject() {
         notify(this, ProfileObserver.ProfileEvent.SAVING_PROFILE)
         val text = _json.prettyPrint(_json.toJson(_profileProperties))
         writeProfileToStorage(_profileName, text, true)
-        println(text)
+//        println(text)
     }
 
-    fun loadProfile(profileName: String) {
-        val fullProfileFileName = profileName + SAVEGAME_SUFFIX
+    fun loadProfile() {
+        val fullProfileFileName = _profileName + SAVEGAME_SUFFIX
         val doesProfileFileExist = Gdx.files.internal(fullProfileFileName).exists()
 
         if (!doesProfileFileExist) {
@@ -80,9 +103,7 @@ class ProfileManager private constructor() : ProfileSubject() {
             return
         }
 
-        _profileName = profileName
-        _profiles.put(profileName, Gdx.files.internal(fullProfileFileName))
-        _profileProperties = _json.fromJson(ObjectMap::class.java, _profiles!![profileName]) as ObjectMap<String, Any>
+        _profileProperties = _json.fromJson(ObjectMap::class.java, _profiles!![_profileName]) as ObjectMap<String, Any>
         notify(this, ProfileObserver.ProfileEvent.PROFILE_LOADED)
     }
 

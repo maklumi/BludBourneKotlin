@@ -1,10 +1,10 @@
 package com.packtpub.libgdx.bludbourne.UI
 
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.Align
+import com.packtpub.libgdx.bludbourne.Utility
 
-class StatusUI(skin: Skin, textureAtlas: TextureAtlas) : Window("stats", skin) {
+class StatusUI : Window("stats", Utility.STATUSUI_SKIN) {
 
     private val hpBar: Image
     private val mpBar: Image
@@ -27,27 +27,27 @@ class StatusUI(skin: Skin, textureAtlas: TextureAtlas) : Window("stats", skin) {
         val group3 = WidgetGroup()
 
         //images
-        hpBar = Image(textureAtlas.findRegion("HP_Bar"))
-        val bar = Image(textureAtlas.findRegion("Bar"))
-        mpBar = Image(textureAtlas.findRegion("MP_Bar"))
-        val bar2 = Image(textureAtlas.findRegion("Bar"))
-        xpBar = Image(textureAtlas.findRegion("XP_Bar"))
-        val bar3 = Image(textureAtlas.findRegion("Bar"))
+        hpBar = Image(Utility.STATUSUI_TEXTUREATLAS.findRegion("HP_Bar"))
+        val bar = Image(Utility.STATUSUI_TEXTUREATLAS.findRegion("Bar"))
+        mpBar = Image(Utility.STATUSUI_TEXTUREATLAS.findRegion("MP_Bar"))
+        val bar2 = Image(Utility.STATUSUI_TEXTUREATLAS.findRegion("Bar"))
+        xpBar = Image(Utility.STATUSUI_TEXTUREATLAS.findRegion("XP_Bar"))
+        val bar3 = Image(Utility.STATUSUI_TEXTUREATLAS.findRegion("Bar"))
 
         //labels
-        val hpLabel = Label(" hp:", skin)
-        val hp = Label(hpVal.toString(), skin)
-        val mpLabel = Label(" mp:", skin)
-        val mp = Label(mpVal.toString(), skin)
-        val xpLabel = Label(" xp:", skin)
-        val xp = Label(xpVal.toString(), skin)
-        val levelLabel = Label(" lv:", skin)
-        val levelVal = Label(levelVal.toString(), skin)
-        val goldLabel = Label(" gp:", skin)
-        val goldVal = Label(goldVal.toString(), skin)
+        val hpLabel = Label(" hp:", Utility.STATUSUI_SKIN)
+        val hp = Label(hpVal.toString(), Utility.STATUSUI_SKIN)
+        val mpLabel = Label(" mp:", Utility.STATUSUI_SKIN)
+        val mp = Label(mpVal.toString(), Utility.STATUSUI_SKIN)
+        val xpLabel = Label(" xp:", Utility.STATUSUI_SKIN)
+        val xp = Label(xpVal.toString(), Utility.STATUSUI_SKIN)
+        val levelLabel = Label(" lv:", Utility.STATUSUI_SKIN)
+        val levelVal = Label(levelVal.toString(), Utility.STATUSUI_SKIN)
+        val goldLabel = Label(" gp:", Utility.STATUSUI_SKIN)
+        val goldVal = Label(goldVal.toString(), Utility.STATUSUI_SKIN)
 
         //buttons
-        inventoryButton = ImageButton(skin, "inventory-button")
+        inventoryButton = ImageButton(Utility.STATUSUI_SKIN, "inventory-button")
         inventoryButton.imageCell.size(32f, 32f)
 
         //Align images

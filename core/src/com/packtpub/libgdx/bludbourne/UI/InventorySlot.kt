@@ -9,15 +9,16 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.SnapshotArray
 import com.packtpub.libgdx.bludbourne.InventoryItem
+import com.packtpub.libgdx.bludbourne.Utility
 
 class InventorySlot constructor() : Stack() {
 
     //All slots have this default image
     private val _defaultBackground = Stack()
     private var _customBackgroundDecal = Image()
-    val image = Image(NinePatch(PlayerHUD.statusUITextureAtlas.createPatch("dialog")))
+    val image = Image(NinePatch(Utility.STATUSUI_TEXTUREATLAS.createPatch("dialog")))
     private var numItemsVal = 0
-    private val numItemsLabel = Label(numItemsVal.toString(), PlayerHUD.statusUISkin, "inventory-item-count")
+    private val numItemsLabel = Label(numItemsVal.toString(), Utility.STATUSUI_SKIN, "inventory-item-count")
     private var _filterItemType: Int = 0
 
     init {
@@ -34,7 +35,7 @@ class InventorySlot constructor() : Stack() {
         _defaultBackground.add(_customBackgroundDecal)
     }
 
-      fun decrementItemCount() {
+    fun decrementItemCount() {
         numItemsVal--
         numItemsLabel.setText(numItemsVal.toString())
         if (_defaultBackground.children.size == 1) {
@@ -74,8 +75,8 @@ class InventorySlot constructor() : Stack() {
         return false
     }
 
-    fun getNumItems(): Int{
-        if( hasChildren() ){
+    fun getNumItems(): Int {
+        if (hasChildren()) {
             val items: SnapshotArray<Actor> = this.children
             return items.size - 2
         }
@@ -86,7 +87,7 @@ class InventorySlot constructor() : Stack() {
         if (hasItem()) {
             val arrayChildren = this.children
             val numInventoryItems = getNumItems()
-            for (i in 0..numInventoryItems-1) {
+            for (i in 0..numInventoryItems - 1) {
                 arrayChildren.pop()
                 decrementItemCount()
             }

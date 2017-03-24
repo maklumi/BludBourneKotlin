@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.Scaling
 import com.packtpub.libgdx.bludbourne.InventoryItem.ItemTypeID
-import com.packtpub.libgdx.bludbourne.UI.PlayerHUD
 import java.util.*
 
 class InventoryItemFactory private constructor() {
@@ -28,7 +27,7 @@ class InventoryItemFactory private constructor() {
 
     fun getInventoryItem(inventoryItemType: ItemTypeID): InventoryItem {
         val item = InventoryItem(_inventoryItemList[inventoryItemType]!!)
-        item.drawable = TextureRegionDrawable(PlayerHUD.itemsTextureAtlas.findRegion(item.itemTypeID!!.toString()))
+        item.drawable = TextureRegionDrawable(Utility.ITEMS_TEXTUREATLAS.findRegion(item.itemTypeID!!.toString()))
         item.setScaling(Scaling.none)
         return item
     }

@@ -7,16 +7,13 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.utils.Json
-import com.packtpub.libgdx.bludbourne.Component
-import com.packtpub.libgdx.bludbourne.Entity
-import com.packtpub.libgdx.bludbourne.EntityFactory
+import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.Map.Companion.UNIT_SCALE
-import com.packtpub.libgdx.bludbourne.MapManager
 import com.packtpub.libgdx.bludbourne.UI.PlayerHUD
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
-class MainGameScreen : Screen {
+class MainGameScreen(game: BludBourne) : Screen {
     private val TAG = MainGameScreen::class.java.simpleName
 
     internal var viewportWidth: Float = 0f
@@ -40,11 +37,16 @@ class MainGameScreen : Screen {
         PAUSED
     }
 
+    val multiplexer: InputMultiplexer
+
     companion object {
         var gameState: GameState = GameState.RUNNING
             set(gameState) {
                 when (gameState) {
-                    MainGameScreen.GameState.RUNNING -> field = GameState.RUNNING
+                    MainGameScreen.GameState.RUNNING -> {
+                        field = GameState.RUNNING
+                        ProfileManager.instance.loadProfile()
+                    }
                     MainGameScreen.GameState.PAUSED -> if (field == GameState.PAUSED) {
                         field = GameState.RUNNING
                     } else if (field == GameState.RUNNING) {
@@ -74,21 +76,24 @@ class MainGameScreen : Screen {
         hudCamera.setToOrtho(false, physicalWidth, physicalHeight)
         playerHUD = PlayerHUD(hudCamera, player)
 
-        val multiplexer = InputMultiplexer()
+        multiplexer = InputMultiplexer()
         multiplexer.addProcessor(playerHUD.stage)
         multiplexer.addProcessor(player.inputComponent)
         Gdx.input.inputProcessor = multiplexer
 
         ProfileManager.instance.addObserver(playerHUD)
         ProfileManager.instance.addObserver(mapMgr)
-        ProfileManager.instance.loadProfile(ProfileManager.DEFAULT_PROFILE)
     }
 
     override fun show() {
-
+        gameState = GameState.RUNNING
+        Gdx.input.inputProcessor = multiplexer
     }
 
-    override fun hide() {}
+    override fun hide() {
+        gameState = GameState.PAUSED
+        Gdx.input.inputProcessor = null
+    }
 
     override fun render(delta: Float) {
         if (gameState == GameState.PAUSED) {
@@ -136,7 +141,7 @@ class MainGameScreen : Screen {
 
     override fun resume() {
         gameState = GameState.RUNNING
-        ProfileManager.instance.loadProfile(ProfileManager.DEFAULT_PROFILE)
+        ProfileManager.instance.loadProfile()
     }
 
     override fun dispose() {

@@ -23,26 +23,17 @@ class PlayerHUD(camera: Camera, val player: Entity) : Screen, ProfileObserver {
     private val statusUI: StatusUI
     private val inventoryUI: InventoryUI
 
-    companion object {
-        private val STATUSUI_TEXTURE_ATLAS_PATH = "skins/statusui.atlas"
-        private val STATUSUI_SKIN_PATH = "skins/statusui.json"
-        private val ITEMS_TEXTURE_ATLAS_PATH = "skins/items.atlas"
-        private val ITEMS_SKIN_PATH = "skins/items.json"
-        val statusUITextureAtlas = TextureAtlas(STATUSUI_TEXTURE_ATLAS_PATH)
-        val itemsTextureAtlas = TextureAtlas(ITEMS_TEXTURE_ATLAS_PATH)
-        val statusUISkin = Skin(Gdx.files.internal(STATUSUI_SKIN_PATH), statusUITextureAtlas)
-    }
 
     init {
         viewport = ScreenViewport(camera)
         stage = Stage(viewport)
 //        stage.setDebugAll(true)
 
-        statusUI = StatusUI(statusUISkin, statusUITextureAtlas)
+        statusUI = StatusUI()
         statusUI.isVisible = true
         statusUI.setPosition(0f, 0f)
 
-        inventoryUI = InventoryUI(statusUISkin, statusUITextureAtlas)
+        inventoryUI = InventoryUI()
         inventoryUI.isVisible = false
         inventoryUI.isMovable = false
 
