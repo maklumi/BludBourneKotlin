@@ -14,9 +14,9 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
 
     private val _numSlots = 50
     private val _lengthSlotRow = 10
-    private val _inventorySlotTable = Table()
-    private val _playerSlotsTable = Table()
-    private val _equipSlots = Table()
+    val inventorySlotTable = Table()
+    val playerSlotsTable = Table()
+    val equipSlots = Table()
     private val _dragAndDrop = DragAndDrop()
     val inventoryActors = Array<Actor>()
     private val _inventorySlotTooltip = InventorySlotTooltip(PlayerHUD.statusUISkin)
@@ -26,7 +26,9 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
 
     init {
         //create
-        _equipSlots.defaults().space(10f)
+        inventorySlotTable.name = "Inventory_Slot_Table"
+        equipSlots.name = "Equipment_Slot_Table"
+        equipSlots.defaults().space(10f)
 
         val headSlot = InventorySlot(
                 ARMOR_HELMET.value,
@@ -71,7 +73,7 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
         _dragAndDrop.addTarget(InventorySlotTarget(rightArmSlot))
         _dragAndDrop.addTarget(InventorySlotTarget(legsSlot))
 
-        _playerSlotsTable.background = Image(NinePatch(textureAtlas.createPatch("dialog"))).drawable
+        playerSlotsTable.background = Image(NinePatch(textureAtlas.createPatch("dialog"))).drawable
 
 
         //layout
@@ -81,37 +83,60 @@ class InventoryUI(skin: Skin, textureAtlas: TextureAtlas) : Window("Inventory", 
 
             _dragAndDrop.addTarget(InventorySlotTarget(inventorySlot))
 
-            _inventorySlotTable.add(inventorySlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
+            inventorySlotTable.add(inventorySlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
 
-            if (i % _lengthSlotRow == 0) _inventorySlotTable.row()
+            if (i % _lengthSlotRow == 0) inventorySlotTable.row()
         }
 
-        _equipSlots.add()
-        _equipSlots.add(headSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
-        _equipSlots.row()
+        equipSlots.add()
+        equipSlots.add(headSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
+        equipSlots.row()
 
-        _equipSlots.add(leftArmSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
-        _equipSlots.add(chestSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
-        _equipSlots.add(rightArmSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
-        _equipSlots.row()
+        equipSlots.add(leftArmSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
+        equipSlots.add(chestSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
+        equipSlots.add(rightArmSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
+        equipSlots.row()
 
-        _equipSlots.add()
-        _equipSlots.right().add(legsSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
+        equipSlots.add()
+        equipSlots.right().add(legsSlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
 
-        _playerSlotsTable.add(_equipSlots)
+        playerSlotsTable.add(equipSlots)
         inventoryActors.add(_inventorySlotTooltip)
 
-        this.add(_playerSlotsTable).padBottom(20f).row()
-        this.add(_inventorySlotTable).row()
+        this.add(playerSlotsTable).padBottom(20f).row()
+        this.add(inventorySlotTable).row()
         this.pack()
     }
 
-    fun populateInventory(itemTypeIDs: Array<InventoryItem.ItemTypeID>) {
-        val cells: Array<Cell<Actor>> = _inventorySlotTable.cells
-        for (i in 0..itemTypeIDs.size - 1) {
-            val inventorySlot = cells.get(i).actor as InventorySlot
-            inventorySlot.add(InventoryItemFactory.instance.getInventoryItem(itemTypeIDs.get(i)))
-            _dragAndDrop.addSource(InventorySlotSource(inventorySlot, _dragAndDrop))
+    fun populateInventory(targetTable: Table, inventoryItems: Array<InventoryItemLocation>) {
+        val cells: Array<Cell<Actor>> = targetTable.cells
+        for (i in 0..inventoryItems.size - 1) {
+            val itemLocation = inventoryItems[i]
+            val itemTypeId = InventoryItem.ItemTypeID.valueOf(itemLocation.itemTypeAtLocation)
+
+            val inventorySlot = cells[itemLocation.locationIndex].actor as InventorySlot
+            inventorySlot.clearAllInventoryItems()
+
+            for (index in 0..itemLocation.numberItemsAtLocation - 1) {
+                inventorySlot.add(InventoryItemFactory.instance.getInventoryItem(itemTypeId))
+                _dragAndDrop.addSource(InventorySlotSource(inventorySlot, _dragAndDrop))
+            }
         }
+    }
+
+    fun getInventory(targetTable: Table): Array<InventoryItemLocation> {
+        val cells: Array<Cell<Actor>> = targetTable.cells
+        val items = Array<InventoryItemLocation>()
+        for (i in 0..cells.size - 1) {
+            if (cells[i].actor == null) continue
+            val inventorySlot = cells[i].actor as InventorySlot
+            val numItems = inventorySlot.getNumItems()
+            if (numItems > 0) {
+                items.add(InventoryItemLocation(i,
+                        inventorySlot.getTopInventoryItem()!!.itemTypeID.toString(),
+                        numItems))
+            }
+        }
+        return items
     }
 }

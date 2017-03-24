@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.SnapshotArray
 import com.packtpub.libgdx.bludbourne.InventoryItem
 
 class InventorySlot constructor() : Stack() {
@@ -71,6 +72,25 @@ class InventorySlot constructor() : Stack() {
             }
         }
         return false
+    }
+
+    fun getNumItems(): Int{
+        if( hasChildren() ){
+            val items: SnapshotArray<Actor> = this.children
+            return items.size - 2
+        }
+        return 0
+    }
+
+    fun clearAllInventoryItems() {
+        if (hasItem()) {
+            val arrayChildren = this.children
+            val numInventoryItems = getNumItems()
+            for (i in 0..numInventoryItems-1) {
+                arrayChildren.pop()
+                decrementItemCount()
+            }
+        }
     }
 
     fun doesAcceptItemUseType(itemUseType: Int): Boolean {

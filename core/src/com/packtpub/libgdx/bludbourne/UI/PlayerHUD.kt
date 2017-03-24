@@ -11,9 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.InventoryItem
+import com.packtpub.libgdx.bludbourne.profile.ProfileManager
+import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
 
-class PlayerHUD(camera: Camera) : Screen {
+class PlayerHUD(camera: Camera, val player: Entity) : Screen, ProfileObserver {
 
     val stage: Stage
     private val viewport: Viewport
@@ -64,8 +67,33 @@ class PlayerHUD(camera: Camera) : Screen {
         })
     }
 
-    fun populateInventory(itemTypeIDs: Array<InventoryItem.ItemTypeID>) {
-        inventoryUI.populateInventory(itemTypeIDs)
+    override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
+        when (event) {
+            ProfileObserver.ProfileEvent.PROFILE_LOADED -> {
+                val inventory = profileManager.getProperty("playerInventory", Array::class.java) as Array<InventoryItemLocation>
+                if (inventory.size > 0) {
+                    inventoryUI.populateInventory(inventoryUI.inventorySlotTable, inventory)
+                } else {
+                    //add default items if nothing is found
+                    val items: Array<InventoryItem.ItemTypeID> = player.entityConfig.inventory
+                    val itemLocations = Array<InventoryItemLocation>()
+                    for (i in 0..items.size - 1) {
+                        itemLocations.add(InventoryItemLocation(i, items.get(i).toString(), 1))
+                    }
+                    inventoryUI.populateInventory(inventoryUI.inventorySlotTable, itemLocations)
+                }
+
+                val equipInventory = profileManager.getProperty("playerEquipInventory", Array::class.java) as Array<InventoryItemLocation>
+                if (equipInventory.size > 0) {
+                    inventoryUI.populateInventory(inventoryUI.equipSlots, equipInventory)
+                }
+            }
+
+            ProfileObserver.ProfileEvent.SAVING_PROFILE -> {
+                profileManager.setProperty("playerInventory", inventoryUI.getInventory(inventoryUI.inventorySlotTable))
+                profileManager.setProperty("playerEquipInventory", inventoryUI.getInventory(inventoryUI.equipSlots))
+            }
+        }
     }
 
     override fun show() {}

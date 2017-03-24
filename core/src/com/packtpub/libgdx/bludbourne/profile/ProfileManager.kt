@@ -2,6 +2,7 @@ package com.packtpub.libgdx.bludbourne.profile
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.ObjectMap
 import java.util.*
@@ -54,10 +55,10 @@ class ProfileManager private constructor() : ProfileSubject() {
         _profileProperties.put(key, `object`)
     }
 
-    fun <T : Any> getProperty(key: String, type: Class<T>): T? {
-        var property: T? = null
+    fun <T : Any> getProperty(key: String, type: Class<T>): T {
+        var property: T?= null
         if (!_profileProperties.containsKey(key)) {
-            return property
+            return Array<Any>() as T
         }
         property = _profileProperties.get(key) as T
         return property

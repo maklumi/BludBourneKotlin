@@ -72,14 +72,14 @@ class MainGameScreen : Screen {
         mapMgr.player = player
 
         hudCamera.setToOrtho(false, physicalWidth, physicalHeight)
-        playerHUD = PlayerHUD(hudCamera)
-        playerHUD.populateInventory(player.entityConfig.inventory)
+        playerHUD = PlayerHUD(hudCamera, player)
 
         val multiplexer = InputMultiplexer()
         multiplexer.addProcessor(playerHUD.stage)
         multiplexer.addProcessor(player.inputComponent)
         Gdx.input.inputProcessor = multiplexer
 
+        ProfileManager.instance.addObserver(playerHUD)
         ProfileManager.instance.addObserver(mapMgr)
         ProfileManager.instance.loadProfile(ProfileManager.DEFAULT_PROFILE)
     }
