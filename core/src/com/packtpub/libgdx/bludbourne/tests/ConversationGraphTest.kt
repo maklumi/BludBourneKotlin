@@ -68,6 +68,7 @@ object ConversationGraphTest {
 
         println(_graph.toString())
         println(_graph.displayCurrentConversation())
+        println(_graph.toJson())
 
         while (!_input.equals(quit, ignoreCase = true)) {
             val conversation = nextChoice
@@ -85,14 +86,14 @@ object ConversationGraphTest {
 //            _input = System.console().readLine()
             val br = BufferedReader(InputStreamReader(System.`in`))
             _input = br.readLine()
-            val choice: Conversation
+            val choice: Conversation?
             try {
                 choice = _graph.getConversationByID(Integer.parseInt(_input))
             } catch (nfe: NumberFormatException) {
                 return Conversation()
             }
 
-            return choice
+            return choice!!
         }
 
 }
