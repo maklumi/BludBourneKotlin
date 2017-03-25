@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.GridPoint2
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
+import com.packtpub.libgdx.bludbourne.UI.UIObserver
 
 class NPCGraphicsComponent : GraphicsComponent() {
 
@@ -29,7 +30,6 @@ class NPCGraphicsComponent : GraphicsComponent() {
             }
         }
 
-        //Specifically for messages with 1 object payload
         if (string.size == 2) {
             if (string[0].equals(Component.MESSAGE.CURRENT_POSITION.toString(), ignoreCase = true)) {
                 currentPosition = json.fromJson<Vector2>(Vector2::class.java, string[1])
@@ -60,7 +60,12 @@ class NPCGraphicsComponent : GraphicsComponent() {
     override fun update(entity: Entity, mapMgr: MapManager, batch: Batch, delta: Float) {
         updateAnimations(delta)
 
-        if (isSelected) drawSelected(entity, mapMgr)
+        if (isSelected) {
+            drawSelected(entity, mapMgr)
+            notify(json.toJson(entity.entityConfig), UIObserver.UIEvent.SHOW_CONVERSATION)
+        } else {
+            notify(json.toJson(entity.entityConfig), UIObserver.UIEvent.HIDE_CONVERSATION)
+        }
 
         batch.begin()
         batch.draw(currentFrame, currentPosition.x, currentPosition.y, 1f, 1f)

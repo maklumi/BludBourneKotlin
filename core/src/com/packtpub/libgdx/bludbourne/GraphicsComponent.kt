@@ -8,9 +8,10 @@ import com.badlogic.gdx.math.GridPoint2
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
+import com.packtpub.libgdx.bludbourne.UI.UISubject
 import java.util.*
 
-abstract class GraphicsComponent : Component {
+abstract class GraphicsComponent : UISubject(), Component {
 
     abstract fun update(entity: Entity, mapManager: MapManager, batch: Batch, delta: Float)
 

@@ -7,8 +7,9 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.Entity.Companion.FRAME_HEIGHT
 import com.packtpub.libgdx.bludbourne.Entity.Companion.FRAME_WIDTH
+import com.packtpub.libgdx.bludbourne.UI.UISubject
 
-abstract class PhysicsComponent : Component {
+abstract class PhysicsComponent : UISubject(), Component {
     private val TAG = PhysicsComponent::class.java.simpleName
 
     val velocity = Vector2(2f, 2f)

@@ -1,11 +1,15 @@
 package com.packtpub.libgdx.bludbourne.dialog
 
 import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonWriter
 import java.util.*
 
-class ConversationGraph(private val conversations: Hashtable<Int, Conversation>, private var currentConversationId: Int) {
+class ConversationGraph(private val conversations: Hashtable<String, Conversation>, var currentConversationID: String) {
 
-    private val associatedChoices: Hashtable<Int, ArrayList<ConversationChoice>> = Hashtable(conversations.size)
+    private val associatedChoices: Hashtable<String, ArrayList<ConversationChoice>> = Hashtable(conversations.size)
+
+    constructor() : this(Hashtable(), "")
+
 
     init {
         for (conversation in conversations.values) {
@@ -14,23 +18,23 @@ class ConversationGraph(private val conversations: Hashtable<Int, Conversation>,
     }
 
     val currentChoices: ArrayList<ConversationChoice>
-        get() = associatedChoices[currentConversationId]!!
+        get() = associatedChoices[currentConversationID]!!
 
-    fun setCurrentConversation(id: Int) {
+    fun setCurrentConversation(id: String) {
         val conversation = getConversationByID(id) ?: return
         //Can we reach the new conversation from the current one?
-        if (isReachable(currentConversationId, id)) {
-            currentConversationId = id
+        if (isReachable(currentConversationID, id)) {
+            currentConversationID = id
         } else {
-            println("New conversation node is not reachable from current node!")
+            println("New conversation node $id is not reachable from current node [$currentConversationID]!")
         }
     }
 
-    fun isValid(conversationID: Int): Boolean {
+    fun isValid(conversationID: String): Boolean {
         return conversations[conversationID] != null
     }
 
-    fun isReachable(sourceID: Int, sinkID: Int): Boolean {
+    fun isReachable(sourceID: String, sinkID: String): Boolean {
         if (!isValid(sourceID) || !isValid(sinkID)) return false
         if (conversations[sourceID] == null) return false
 
@@ -40,7 +44,7 @@ class ConversationGraph(private val conversations: Hashtable<Int, Conversation>,
         return false
     }
 
-    fun getConversationByID(id: Int): Conversation? {
+    fun getConversationByID(id: String): Conversation? {
         if (!isValid(id)) {
             println("Id $id is not valid!")
             return null
@@ -49,7 +53,7 @@ class ConversationGraph(private val conversations: Hashtable<Int, Conversation>,
     }
 
     fun displayCurrentConversation(): String {
-        return conversations[currentConversationId]!!.dialog
+        return conversations[currentConversationID]!!.dialog
     }
 
     fun addChoice(conversationChoice: ConversationChoice) {
@@ -66,10 +70,10 @@ class ConversationGraph(private val conversations: Hashtable<Int, Conversation>,
 
         val keys = associatedChoices.keys
         for (id in keys) {
-            outputString.append(String.format("[%d]: ", id))
+            outputString.append(String.format("[%s]: ", id))
 
             for (choice in associatedChoices[id!!]!!) {
-                outputString.append(String.format("%d ", choice.destinationId))
+                outputString.append(String.format("%s ", choice.destinationId))
             }
 
             outputString.append(System.getProperty("line.separator"))
@@ -81,7 +85,9 @@ class ConversationGraph(private val conversations: Hashtable<Int, Conversation>,
     }
 
     fun toJson(): String {
-        return Json().prettyPrint(this)
+        val json = Json()
+        json.setOutputType(JsonWriter.OutputType.json) // as opposed toOutputType.minimal output
+        return json.prettyPrint(this)
     }
 
 }

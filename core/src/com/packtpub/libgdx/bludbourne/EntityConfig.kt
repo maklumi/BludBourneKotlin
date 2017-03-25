@@ -12,6 +12,8 @@ class EntityConfig {
     var state: Entity.State = Entity.State.IDLE
     var direction: Entity.Direction = Entity.Direction.DOWN
     var entityID = UUID.randomUUID().toString()
+    var conversationConfigPath: String = ""
+
 
     fun addAnimationConfig(animationConfig: AnimationConfig) {
         this.animationConfig.add(animationConfig)

@@ -1,27 +1,29 @@
 package com.packtpub.libgdx.bludbourne.UI
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import com.packtpub.libgdx.bludbourne.Entity
+import com.packtpub.libgdx.bludbourne.EntityConfig
 import com.packtpub.libgdx.bludbourne.InventoryItem
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
 
-class PlayerHUD(camera: Camera, val player: Entity) : Screen, ProfileObserver {
+class PlayerHUD(camera: Camera, val player: Entity) :
+        Screen, ProfileObserver, UIObserver {
 
     val stage: Stage
     private val viewport: Viewport
     private val statusUI: StatusUI
     private val inventoryUI: InventoryUI
+    private val conversationUI: ConversationUI
+    private val json = Json()
 
 
     init {
@@ -41,8 +43,17 @@ class PlayerHUD(camera: Camera, val player: Entity) : Screen, ProfileObserver {
         inventoryUI.setPosition(stage.width / 2f, 0f)
 
 
+        conversationUI = ConversationUI()
+        conversationUI.apply {
+            isMovable = true
+            isVisible = false
+        }
+        conversationUI.setPosition(stage.width / 2f, 0f)
+        conversationUI.setSize(stage.width / 2f, stage.height / 2f)
+
         stage.addActor(statusUI)
         stage.addActor(inventoryUI)
+        stage.addActor(conversationUI)
 
         //add tooltips to the stage
         val actors = inventoryUI.inventoryActors
@@ -85,6 +96,29 @@ class PlayerHUD(camera: Camera, val player: Entity) : Screen, ProfileObserver {
                 profileManager.setProperty("playerEquipInventory", inventoryUI.getInventory(inventoryUI.equipSlots))
             }
         }
+    }
+
+    override fun onNotify(value: String, event: UIObserver.UIEvent) {
+
+        when (event) {
+            UIObserver.UIEvent.LOAD_CONVERSATION -> {
+                val config = json.fromJson(EntityConfig::class.java, value)
+                conversationUI.loadConversation(config)
+            }
+            UIObserver.UIEvent.SHOW_CONVERSATION -> {
+                val configShow = json.fromJson(EntityConfig::class.java, value)
+                if (configShow.entityID.equals(conversationUI.currentEntityID, true)) {
+                    conversationUI.isVisible = true
+                }
+            }
+            UIObserver.UIEvent.HIDE_CONVERSATION -> {
+                val configHide = json.fromJson(EntityConfig::class.java, value)
+                if (configHide.entityID.equals(conversationUI.currentEntityID, true)) {
+                    conversationUI.isVisible = false
+                }
+            }
+        }
+
     }
 
     override fun show() {}

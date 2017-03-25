@@ -83,6 +83,9 @@ class MainGameScreen(game: BludBourne) : Screen {
 
         ProfileManager.instance.addObserver(playerHUD)
         ProfileManager.instance.addObserver(mapMgr)
+
+        player.registerObserver(playerHUD)
+
     }
 
     override fun show() {
@@ -116,6 +119,10 @@ class MainGameScreen(game: BludBourne) : Screen {
             camera.position.set(mapMgr.getPlayerStartUnitScaled().x, mapMgr.getPlayerStartUnitScaled().y, 0f)
             camera.update()
 
+            // register observers
+            val entities = mapMgr.getCurrentMapEntities()
+            entities.forEach { entity -> entity.registerObserver(playerHUD) }
+
             mapMgr.hasMapChanged = false
 
         }
@@ -145,6 +152,7 @@ class MainGameScreen(game: BludBourne) : Screen {
     }
 
     override fun dispose() {
+        player.unregisterObservers()
         player.dispose()
         mapRenderer.dispose()
     }

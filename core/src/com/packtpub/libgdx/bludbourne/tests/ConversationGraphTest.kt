@@ -9,28 +9,28 @@ import java.io.InputStreamReader
 import java.util.*
 
 object ConversationGraphTest {
-    internal lateinit var _conversations: Hashtable<Int, Conversation>
+    internal lateinit var _conversations: Hashtable<String, Conversation>
     internal lateinit var _graph: ConversationGraph
     internal var quit = "q"
     internal var _input = ""
 
     @JvmStatic fun main(arg: Array<String>) {
-        _conversations = Hashtable<Int, Conversation>()
+        _conversations = Hashtable<String, Conversation>()
 
         val start = Conversation()
-        start.id = 500
+        start.id = "500"
         start.dialog = "Do you want to play a game?"
 
         val yesAnswer = Conversation()
-        yesAnswer.id = 601
+        yesAnswer.id = "601"
         yesAnswer.dialog = "BOOM! Bombs dropping everywhere"
 
         val noAnswer = Conversation()
-        noAnswer.id = 802
+        noAnswer.id = "802"
         noAnswer.dialog = "Too bad!"
 
         val unconnectedTest = Conversation()
-        unconnectedTest.id = 250
+        unconnectedTest.id = "250"
         unconnectedTest.dialog = "I am unconnected"
 
         _conversations.put(start.id, start)
@@ -88,12 +88,12 @@ object ConversationGraphTest {
             _input = br.readLine()
             val choice: Conversation?
             try {
-                choice = _graph.getConversationByID(Integer.parseInt(_input))
+                choice = _graph.getConversationByID(_input)
             } catch (nfe: NumberFormatException) {
                 return Conversation()
             }
-
-            return choice!!
+            if (choice == null) return Conversation()
+            return choice
         }
 
 }

@@ -2,10 +2,11 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.utils.Json
+import com.packtpub.libgdx.bludbourne.UI.UISubject
 import java.util.*
 
 
-abstract class InputComponent : Component, InputProcessor {
+abstract class InputComponent : UISubject(), Component, InputProcessor {
 
     var currentDirection: Entity.Direction = Entity.Direction.DOWN
     var currentState: Entity.State = Entity.State.IDLE

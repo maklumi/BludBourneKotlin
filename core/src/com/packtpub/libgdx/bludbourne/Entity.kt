@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
+import com.packtpub.libgdx.bludbourne.UI.UIObserver
 
 class Entity(val inputComponent: InputComponent,
              val physicsComponent: PhysicsComponent,
@@ -79,6 +80,18 @@ class Entity(val inputComponent: InputComponent,
         args.forEach { fullMessage += MESSAGE_TOKEN + it }
 
         components.forEach { it.receiveMessage(fullMessage) }
+    }
+
+    fun registerObserver(observer: UIObserver) {
+        inputComponent.addObserver(observer)
+        physicsComponent.addObserver(observer)
+        graphicsComponent.addObserver(observer)
+    }
+
+    fun unregisterObservers() {
+        inputComponent.removeAllObservers()
+        physicsComponent.removeAllObservers()
+        graphicsComponent.removeAllObservers()
     }
 
     fun getCurrentBoundingBox(): Rectangle = physicsComponent.boundingBox

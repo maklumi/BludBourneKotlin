@@ -57,6 +57,11 @@ class MapManager : ProfileObserver {
     }
 
     fun loadMap(mapType: MapFactory.MapType) {
+
+        // unregister observers
+        val entities : Array<Entity> = currentMap.mapEntities
+        entities.forEach(Entity::unregisterObservers)
+
         currentMap = MapFactory.getMap(mapType)
         hasMapChanged = true
 
