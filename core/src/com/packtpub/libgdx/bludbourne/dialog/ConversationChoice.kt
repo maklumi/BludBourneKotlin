@@ -5,6 +5,7 @@ class ConversationChoice {
     var sourceId = ""
     var destinationId = ""
     var choicePhrase = ""
+    var conversationCommandEvent = ConversationGraphObserver.ConversationCommandEvent.NONE
 
     override fun toString(): String {
         return choicePhrase

@@ -15,7 +15,8 @@ class MapManager : ProfileObserver {
     lateinit var player: Entity //set from MainGameScreen
     var camera = OrthographicCamera()
     var hasMapChanged = false
-    private var currentMap: Map = MapFactory.getMap(MapFactory.MapType.TOWN)
+    //    private var currentMap: Map = MapFactory.getMap(MapFactory.MapType.TOWN)
+    private var currentMap: Map? = null
 
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
         when (event) {
@@ -48,7 +49,7 @@ class MapManager : ProfileObserver {
 
             }
             ProfileObserver.ProfileEvent.SAVING_PROFILE -> {
-                profileManager.setProperty("currentMapType", currentMap.currentMapType.toString())
+                profileManager.setProperty("currentMapType", currentMap?.currentMapType.toString())
                 profileManager.setProperty("topWorldMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOP_WORLD).playerStart)
                 profileManager.setProperty("castleOfDoomMapStartPosition", MapFactory.getMap(MapFactory.MapType.CASTLE_OF_DOOM).playerStart)
                 profileManager.setProperty("townMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOWN).playerStart)
@@ -59,39 +60,40 @@ class MapManager : ProfileObserver {
     fun loadMap(mapType: MapFactory.MapType) {
 
         // unregister observers
-        val entities : Array<Entity> = currentMap.mapEntities
-        entities.forEach(Entity::unregisterObservers)
+        val entities: Array<Entity>? = currentMap?.mapEntities
+        entities?.forEach(Entity::unregisterObservers)
 
         currentMap = MapFactory.getMap(mapType)
         hasMapChanged = true
 
-        Gdx.app.debug(TAG, "Player Start: (" + currentMap.playerStart.x + "," + currentMap.playerStart.y + ")")
+        Gdx.app.debug(TAG, "Player Start: (" + currentMap?.playerStart?.x + "," + currentMap?.playerStart?.y + ")")
     }
 
     fun setClosestStartPositionFromScaledUnits(position: Vector2) {
-        currentMap.setClosestStartPositionFromScaledUnits(position)
+        currentMap!!.setClosestStartPositionFromScaledUnits(position)
     }
 
     fun updateCurrentMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
-        currentMap.updateMapEntities(mapMgr, batch, delta)
+        currentMap!!.updateMapEntities(mapMgr, batch, delta)
     }
 
-    fun getCurrentMapEntities(): Array<Entity> = currentMap.mapEntities
+    fun getCurrentMapEntities(): Array<Entity> = currentMap!!.mapEntities
 
     fun getCollisionLayer(): MapLayer {
-        return currentMap.collisionLayer
+        return currentMap!!.collisionLayer
     }
 
     fun getPortalLayer(): MapLayer {
-        return currentMap.portalLayer
+        return currentMap!!.portalLayer
     }
 
     fun getPlayerStartUnitScaled(): Vector2 {
-        return currentMap.playerStartUnitScaled
+        return currentMap!!.playerStartUnitScaled
     }
 
     fun getCurrentTiledMap(): TiledMap {
-        return currentMap.currentTiledMap
+        if (currentMap == null) loadMap(MapFactory.MapType.TOWN)
+        return currentMap!!.currentTiledMap
     }
 
     fun setMapChanged(hasMapChanged: Boolean) {

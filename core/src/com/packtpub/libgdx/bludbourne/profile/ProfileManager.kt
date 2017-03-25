@@ -78,10 +78,11 @@ class ProfileManager private constructor() : ProfileSubject() {
         _profileProperties.put(key, `object`)
     }
 
-    fun <T : Any> getProperty(key: String, type: Class<T>): T {
+    fun <T : Any> getProperty(key: String, type: Class<T>): T? {
         var property: T? = null
         if (!_profileProperties.containsKey(key)) {
-            return Array<Any>() as T
+//            return Array<Any>() as T
+            return property
         }
         property = _profileProperties.get(key) as T
         return property

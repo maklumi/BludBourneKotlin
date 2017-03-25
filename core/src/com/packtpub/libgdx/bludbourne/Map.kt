@@ -64,9 +64,10 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         var shortestDistance = 0f
 
         //Go through all player start positions and choose closest to last known position
-        for (`object` in spawnsLayer.objects) {
-            if (`object`.name.equals(PLAYER_START, ignoreCase = true)) {
-                (`object` as RectangleMapObject).rectangle.getPosition(playerStartPositionRect)
+        for (mapObject in spawnsLayer.objects) {
+            if (mapObject.name.equals(PLAYER_START, ignoreCase = true)) {
+                if (mapObject.name == null || mapObject.name.isEmpty()) continue
+                (mapObject as RectangleMapObject).rectangle.getPosition(playerStartPositionRect)
                 val distance = position.dst2(playerStartPositionRect)
 
                 Gdx.app.debug(TAG, "DISTANCE: " + distance + " for " + currentMapType.toString())

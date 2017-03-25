@@ -1,6 +1,7 @@
 package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 
 class InventoryItem : Image {
@@ -41,14 +42,17 @@ class InventoryItem : Image {
     var itemUseType: Int = 0
     var itemTypeID: ItemTypeID? = null
     var itemShortDescription: String? = null
+    var itemValue: Int = 0
 
 
     constructor(textureRegion: TextureRegion, itemAttributes: Int,
-                itemTypeID: ItemTypeID, itemUseType: Int) : super(textureRegion) {
+                itemTypeID: ItemTypeID, itemUseType: Int, itemValue: Int)
+            : super(textureRegion) {
 
         this.itemTypeID = itemTypeID
         this.itemAttributes = itemAttributes
         this.itemUseType = itemUseType
+        this.itemValue = itemValue
     }
 
     constructor() : super()
@@ -58,6 +62,7 @@ class InventoryItem : Image {
         this.itemAttributes = inventoryItem.itemAttributes
         this.itemUseType = inventoryItem.itemUseType
         this.itemShortDescription = inventoryItem.itemShortDescription
+        this.itemValue = inventoryItem.itemValue
     }
 
     val isStackable: Boolean
@@ -66,5 +71,10 @@ class InventoryItem : Image {
 
     fun isSameItemType(candidateInventoryItem: InventoryItem): Boolean {
         return itemTypeID == candidateInventoryItem.itemTypeID
+    }
+
+    fun getTradeValue(): Int {
+        //For now, we will set the trade in value of items at about one third their original value
+        return MathUtils.floor(itemValue * .33f) + 2
     }
 }

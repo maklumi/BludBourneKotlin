@@ -80,7 +80,7 @@ object ConversationGraphTest {
     val nextChoice: Conversation
         get() {
             val choices = _graph.currentChoices
-            choices.forEach { choice ->
+            choices?.forEach { choice ->
                 println("" + choice.destinationId + " " + choice.choicePhrase)
             }
 //            _input = System.console().readLine()

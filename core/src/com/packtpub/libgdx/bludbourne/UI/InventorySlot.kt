@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.SnapshotArray
 import com.packtpub.libgdx.bludbourne.InventoryItem
 import com.packtpub.libgdx.bludbourne.Utility
 
-class InventorySlot constructor() : Stack() {
+class InventorySlot constructor() : Stack(), InventorySlotSubject {
 
     //All slots have this default image
     private val _defaultBackground = Stack()
@@ -20,6 +20,7 @@ class InventorySlot constructor() : Stack() {
     private var numItemsVal = 0
     private val numItemsLabel = Label(numItemsVal.toString(), Utility.STATUSUI_SKIN, "inventory-item-count")
     private var _filterItemType: Int = 0
+    private val _observers = Array<InventorySlotObserver>()
 
     init {
         numItemsLabel.setAlignment(Align.bottomRight)
@@ -42,6 +43,7 @@ class InventorySlot constructor() : Stack() {
             _defaultBackground.add(_customBackgroundDecal)
         }
         checkVisibilityOfItemCount()
+        notify(this, InventorySlotObserver.SlotEvent.REMOVED_ITEM)
     }
 
     fun incrementItemCount() {
@@ -51,6 +53,7 @@ class InventorySlot constructor() : Stack() {
             _defaultBackground.children.pop()
         }
         checkVisibilityOfItemCount()
+        notify(this, InventorySlotObserver.SlotEvent.ADDED_ITEM)
     }
 
     override fun add(actor: Actor) {
@@ -88,8 +91,8 @@ class InventorySlot constructor() : Stack() {
             val arrayChildren = this.children
             val numInventoryItems = getNumItems()
             for (i in 0..numInventoryItems - 1) {
-                arrayChildren.pop()
                 decrementItemCount()
+                arrayChildren.pop()
             }
         }
     }
@@ -127,11 +130,27 @@ class InventorySlot constructor() : Stack() {
             val arrayChildren = this.children
             val numInventoryItems = arrayChildren.size - 2
             for (i in 0..numInventoryItems - 1) {
-                items.add(arrayChildren.pop())
                 decrementItemCount()
+                items.add(arrayChildren.pop())
             }
         }
         return items
+    }
+
+    override fun addObserver(inventorySlotObserver: InventorySlotObserver) {
+        _observers.add(inventorySlotObserver)
+    }
+
+    override fun removeObserver(inventorySlotObserver: InventorySlotObserver) {
+        _observers.removeValue(inventorySlotObserver, true)
+    }
+
+    override fun removeAllObservers() {
+        _observers.forEach { observer -> _observers.removeValue(observer, true) }
+    }
+
+    override fun notify(slot: InventorySlot, event: InventorySlotObserver.SlotEvent) {
+        _observers.forEach { observer -> observer.onNotify(slot, event) }
     }
 
     companion object {

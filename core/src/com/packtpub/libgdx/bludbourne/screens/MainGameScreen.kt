@@ -74,7 +74,7 @@ class MainGameScreen(game: BludBourne) : Screen {
         mapMgr.player = player
 
         hudCamera.setToOrtho(false, physicalWidth, physicalHeight)
-        playerHUD = PlayerHUD(hudCamera, player)
+        playerHUD = PlayerHUD(hudCamera, player, mapMgr)
 
         multiplexer = InputMultiplexer()
         multiplexer.addProcessor(playerHUD.stage)

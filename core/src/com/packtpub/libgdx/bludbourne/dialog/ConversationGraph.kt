@@ -4,7 +4,9 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonWriter
 import java.util.*
 
-class ConversationGraph(private val conversations: Hashtable<String, Conversation>, var currentConversationID: String) {
+class ConversationGraph(private val conversations: Hashtable<String, Conversation>,
+                        var currentConversationID: String) :
+        ConversationGraphSubject() {
 
     private val associatedChoices: Hashtable<String, ArrayList<ConversationChoice>> = Hashtable(conversations.size)
 
@@ -17,14 +19,14 @@ class ConversationGraph(private val conversations: Hashtable<String, Conversatio
         }
     }
 
-    val currentChoices: ArrayList<ConversationChoice>
-        get() = associatedChoices[currentConversationID]!!
+    val currentChoices: ArrayList<ConversationChoice>?
+        get() = associatedChoices[currentConversationID]
 
     fun setCurrentConversation(id: String) {
         val conversation = getConversationByID(id) ?: return
         //Can we reach the new conversation from the current one?
         // check case where the current node is checked against itself
-        if ( currentConversationID.equals(id, true) || isReachable(currentConversationID, id)) {
+        if (currentConversationID.equals(id, true) || isReachable(currentConversationID, id)) {
             currentConversationID = id
         } else {
             println("New conversation node $id is not reachable from current node [$currentConversationID]!")

@@ -24,7 +24,13 @@ class InventorySlotTooltip(_skin: Skin) : Window("", _skin) {
 
     fun updateDescription(inventorySlot: InventorySlot) {
         if (inventorySlot.hasItem()) {
-            _description.setText(inventorySlot.getTopInventoryItem()!!.itemShortDescription)
+            val string = StringBuilder()
+            string.append(inventorySlot.getTopInventoryItem()!!.itemShortDescription)
+            string.append(System.getProperty("line.separator"))
+            string.append(String.format("Original Value: %s GP", inventorySlot.getTopInventoryItem()!!.itemValue))
+            string.append(System.getProperty("line.separator"))
+            string.append(String.format("Trade Value: %s GP", inventorySlot.getTopInventoryItem()!!.getTradeValue()))
+            _description.setText(string)
             this.pack()
         } else {
             _description.setText("")
