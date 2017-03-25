@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.GridPoint2
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
-import com.packtpub.libgdx.bludbourne.UI.UIObserver
+import com.packtpub.libgdx.bludbourne.ComponentObserver
 
 class NPCGraphicsComponent : GraphicsComponent() {
 
@@ -68,13 +68,13 @@ class NPCGraphicsComponent : GraphicsComponent() {
         if (isSelected) {
             drawSelected(entity, mapMgr)
             if (!sentShowConversationMessage) {
-                notify(json.toJson(entity.entityConfig), UIObserver.UIEvent.SHOW_CONVERSATION)
+                notify(json.toJson(entity.entityConfig), ComponentObserver.UIEvent.SHOW_CONVERSATION)
                 sentShowConversationMessage = true
                 sentHideConversationMessage = false
             }
         } else {
             if (!sentHideConversationMessage) {
-                notify(json.toJson(entity.entityConfig), UIObserver.UIEvent.HIDE_CONVERSATION)
+                notify(json.toJson(entity.entityConfig), ComponentObserver.UIEvent.HIDE_CONVERSATION)
                 sentHideConversationMessage = true
                 sentShowConversationMessage = false
             }

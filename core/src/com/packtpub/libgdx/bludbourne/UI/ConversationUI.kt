@@ -95,5 +95,5 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
     }
 
     private val TAG = ConversationUI::class.java.simpleName
-    
+
 }

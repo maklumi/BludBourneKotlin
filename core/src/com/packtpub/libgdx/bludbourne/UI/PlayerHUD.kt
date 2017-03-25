@@ -12,11 +12,12 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.EntityConfig
 import com.packtpub.libgdx.bludbourne.InventoryItem
+import com.packtpub.libgdx.bludbourne.ComponentObserver
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
 
 class PlayerHUD(camera: Camera, val player: Entity) :
-        Screen, ProfileObserver, UIObserver {
+        Screen, ProfileObserver, ComponentObserver {
 
     val stage: Stage
     private val viewport: Viewport
@@ -104,20 +105,20 @@ class PlayerHUD(camera: Camera, val player: Entity) :
         }
     }
 
-    override fun onNotify(value: String, event: UIObserver.UIEvent) {
+    override fun onNotify(value: String, event: ComponentObserver.UIEvent) {
 
         when (event) {
-            UIObserver.UIEvent.LOAD_CONVERSATION -> {
+            ComponentObserver.UIEvent.LOAD_CONVERSATION -> {
                 val config = json.fromJson(EntityConfig::class.java, value)
                 conversationUI.loadConversation(config)
             }
-            UIObserver.UIEvent.SHOW_CONVERSATION -> {
+            ComponentObserver.UIEvent.SHOW_CONVERSATION -> {
                 val configShow = json.fromJson(EntityConfig::class.java, value)
                 if (configShow.entityID.equals(conversationUI.currentEntityID, true)) {
                     conversationUI.isVisible = true
                 }
             }
-            UIObserver.UIEvent.HIDE_CONVERSATION -> {
+            ComponentObserver.UIEvent.HIDE_CONVERSATION -> {
                 val configHide = json.fromJson(EntityConfig::class.java, value)
                 if (configHide.entityID.equals(conversationUI.currentEntityID, true)) {
                     conversationUI.isVisible = false

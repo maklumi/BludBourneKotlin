@@ -1,15 +1,15 @@
-package com.packtpub.libgdx.bludbourne.UI
+package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.utils.Array
 
-open class UISubject {
-    private val _observers = Array<UIObserver>()
+open class ComponentSubject {
+    private val _observers = Array<ComponentObserver>()
 
-    fun addObserver(conversationObserver: UIObserver) {
+    fun addObserver(conversationObserver: ComponentObserver) {
         _observers.add(conversationObserver)
     }
 
-    fun removeObserver(conversationObserver: UIObserver) {
+    fun removeObserver(conversationObserver: ComponentObserver) {
         _observers.removeValue(conversationObserver, true)
     }
 
@@ -19,7 +19,7 @@ open class UISubject {
         }
     }
 
-    fun notify(value: String, event: UIObserver.UIEvent) {
+    fun notify(value: String, event: ComponentObserver.UIEvent) {
         for (observer in _observers) {
             observer.onNotify(value, event)
         }

@@ -6,7 +6,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
-import com.packtpub.libgdx.bludbourne.UI.UIObserver
+import com.packtpub.libgdx.bludbourne.ComponentObserver
 
 class PlayerPhysicsComponent : PhysicsComponent() {
     private val TAG = PlayerPhysicsComponent::class.java.simpleName
@@ -98,7 +98,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                     //Picked/Selected
                     Gdx.app.debug(TAG, "Selected Entity! " + mapEntity.entityConfig.entityID)
                     mapEntity.sendMessage(Component.MESSAGE.ENTITY_SELECTED)
-                    notify(json.toJson(mapEntity.entityConfig), UIObserver.UIEvent.LOAD_CONVERSATION)
+                    notify(json.toJson(mapEntity.entityConfig), ComponentObserver.UIEvent.LOAD_CONVERSATION)
                 }
             }
         }

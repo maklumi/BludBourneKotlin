@@ -1,6 +1,6 @@
-package com.packtpub.libgdx.bludbourne.UI
+package com.packtpub.libgdx.bludbourne
 
-interface UIObserver {
+interface ComponentObserver {
     enum class UIEvent {
         LOAD_CONVERSATION,
         SHOW_CONVERSATION,
