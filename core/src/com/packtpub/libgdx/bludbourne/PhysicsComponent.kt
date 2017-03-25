@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.collision.Ray
 import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.Entity.Companion.FRAME_HEIGHT
 import com.packtpub.libgdx.bludbourne.Entity.Companion.FRAME_WIDTH
@@ -19,6 +21,9 @@ abstract class PhysicsComponent : UISubject(), Component {
     var currentEntityPosition: Vector2 = Vector2(0f, 0f)
     var currentDirection = Entity.Direction.DOWN
     val json = Json()
+
+    var selectionRay = Ray(Vector3(), Vector3())
+    val selectRayMaximumDistance = 32.0f
 
     enum class BoundingBoxLocation {
         BOTTOM_LEFT,

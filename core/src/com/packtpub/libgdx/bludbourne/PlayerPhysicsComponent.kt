@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.math.collision.Ray
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 import com.packtpub.libgdx.bludbourne.UI.UIObserver
 
@@ -15,8 +14,6 @@ class PlayerPhysicsComponent : PhysicsComponent() {
     private var state = Entity.State.IDLE
     private var mouseSelectCoordinates: Vector3 = Vector3.Zero
     private var isMouseSelectEnabled = false
-    private var selectionRay: Ray = Ray(Vector3.Zero, Vector3.Zero)
-    private var selectRayMaximumDistance = 32.0f
 
     init {
         boundingBoxLocation = BoundingBoxLocation.BOTTOM_CENTER

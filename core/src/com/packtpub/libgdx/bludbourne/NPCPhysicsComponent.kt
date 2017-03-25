@@ -36,6 +36,10 @@ class NPCPhysicsComponent : PhysicsComponent() {
     override fun update(entity: Entity, mapMgr: MapManager, delta: Float) {
         updateBoundingBoxPosition(nextEntityPosition)
 
+        if (isEntityFarFromPlayer(mapMgr)) {
+            entity.sendMessage(Component.MESSAGE.ENTITY_DESELECTED)
+        }
+
         if (state === Entity.State.IMMOBILE) return
 
         if (!isCollisionWithMapLayer(entity, mapMgr) &&
@@ -47,6 +51,16 @@ class NPCPhysicsComponent : PhysicsComponent() {
         }
 
         calculateNextPosition(delta)
+    }
+
+    fun isEntityFarFromPlayer(mapMgr: MapManager): Boolean {
+        // check distance
+        selectionRay.set(mapMgr.player.getCurrentBoundingBox().x, mapMgr.player.getCurrentBoundingBox().y, 0.0f,
+                boundingBox.x, boundingBox.y, 0.0f)
+
+        val distance = selectionRay.origin.dst(selectionRay.direction)
+
+        return distance > selectRayMaximumDistance
     }
 
     override fun isCollisionWithMapEntities(entity: Entity, mapMgr: MapManager): Boolean {

@@ -67,6 +67,12 @@ class PlayerHUD(camera: Camera, val player: Entity) :
                 inventoryUI.isVisible = !inventoryUI.isVisible
             }
         })
+
+        conversationUI._closeButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent, x: Float, y: Float) {
+                conversationUI.isVisible = false
+            }
+        })
     }
 
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {

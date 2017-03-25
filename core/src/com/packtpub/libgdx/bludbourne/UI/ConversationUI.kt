@@ -2,10 +2,8 @@ package com.packtpub.libgdx.bludbourne.UI
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.ui.List
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
-import com.badlogic.gdx.scenes.scene2d.ui.Window
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Json
@@ -21,6 +19,8 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
     private var _graph: ConversationGraph? = null
     var currentEntityID: String? = null
         private set
+
+    val _closeButton = TextButton("X", Utility.STATUSUI_SKIN)
 
     private val _json = Json()
 
@@ -41,6 +41,10 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
         scrollPane.setScrollbarsOnTop(true)
 
         //layout
+        add()
+        add(_closeButton)
+        row()
+
         this.defaults().expand().fill()
         this.add(_dialogText).pad(10f, 10f, 10f, 10f)
         this.row()
@@ -50,16 +54,6 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
         this.pack()
 
         //Listeners
-//        scrollPane.addListener(object : InputListener() {
-//            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-//                val choice = _listItems.selected
-//                _graph!!.setCurrentConversation(choice.destinationId)
-//                _dialogText.setText(_graph!!.getConversationByID(choice.destinationId)!!.dialog)
-//                _listItems.setItems(*_graph!!.currentChoices.toTypedArray())
-//                return true
-//            }
-//        }
-//        )
         _listItems.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent, x: Float, y: Float) {
                 val choice = _listItems.selected
@@ -73,14 +67,16 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
     }
 
     fun loadConversation(entityConfig: EntityConfig) {
-        val json = Json()
         val fullFilenamePath = entityConfig.conversationConfigPath
-        currentEntityID = entityConfig.entityID
         if (fullFilenamePath.isEmpty() || !Gdx.files.internal(fullFilenamePath).exists()) {
             Gdx.app.debug(TAG, "Conversation file does not exist!")
+            _dialogText.setText("")
+            _listItems.clearItems()
             return
         }
 
+        currentEntityID = entityConfig.entityID
+        val json = Json()
         val graph = json.fromJson(ConversationGraph::class.java, Gdx.files.internal(fullFilenamePath))
         setConversationGraph(graph)
     }

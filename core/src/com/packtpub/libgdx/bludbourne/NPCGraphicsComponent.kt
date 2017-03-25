@@ -15,6 +15,10 @@ import com.packtpub.libgdx.bludbourne.UI.UIObserver
 class NPCGraphicsComponent : GraphicsComponent() {
 
     private var isSelected = false
+    private var wasSelected = false
+
+    private var sentShowConversationMessage = false
+    private var sentHideConversationMessage = false
 
     override fun receiveMessage(message: String) {
         //Gdx.app.debug(TAG, "Got message " + message);
@@ -24,8 +28,9 @@ class NPCGraphicsComponent : GraphicsComponent() {
 
         if (string.size == 1) {
             if (string[0].equals(Component.MESSAGE.ENTITY_SELECTED.toString(), true)) {
-                isSelected = true
+                isSelected = !wasSelected
             } else if (string[0].equals(Component.MESSAGE.ENTITY_DESELECTED.toString(), true)) {
+                wasSelected = isSelected
                 isSelected = false
             }
         }
@@ -62,9 +67,17 @@ class NPCGraphicsComponent : GraphicsComponent() {
 
         if (isSelected) {
             drawSelected(entity, mapMgr)
-            notify(json.toJson(entity.entityConfig), UIObserver.UIEvent.SHOW_CONVERSATION)
+            if (!sentShowConversationMessage) {
+                notify(json.toJson(entity.entityConfig), UIObserver.UIEvent.SHOW_CONVERSATION)
+                sentShowConversationMessage = true
+                sentHideConversationMessage = false
+            }
         } else {
-            notify(json.toJson(entity.entityConfig), UIObserver.UIEvent.HIDE_CONVERSATION)
+            if (!sentHideConversationMessage) {
+                notify(json.toJson(entity.entityConfig), UIObserver.UIEvent.HIDE_CONVERSATION)
+                sentHideConversationMessage = true
+                sentShowConversationMessage = false
+            }
         }
 
         batch.begin()
@@ -87,7 +100,7 @@ shapeRenderer.apply {
 
     private fun drawSelected(entity: Entity, mapMgr: MapManager) {
         Gdx.gl.glEnable(GL20.GL_BLEND)
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         val camera = mapMgr.camera
         val rect = entity.getCurrentBoundingBox()
         shapeRenderer.projectionMatrix = camera.combined
