@@ -20,7 +20,7 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
     var currentEntityID: String? = null
         private set
 
-    val _closeButton = TextButton("X", Utility.STATUSUI_SKIN)
+    val closeButton = TextButton("X", Utility.STATUSUI_SKIN)
 
     init {
 
@@ -41,7 +41,7 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
 
         //layout
         add()
-        add(_closeButton)
+        add(closeButton)
         row()
 
         this.defaults().expand().fill()

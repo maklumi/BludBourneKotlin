@@ -19,7 +19,7 @@ open class ComponentSubject {
         }
     }
 
-    fun notify(value: String, event: ComponentObserver.UIEvent) {
+    fun notify(value: String, event: ComponentObserver.ComponentEvent) {
         for (observer in _observers) {
             observer.onNotify(value, event)
         }

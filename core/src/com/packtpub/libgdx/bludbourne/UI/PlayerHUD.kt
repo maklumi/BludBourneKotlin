@@ -83,9 +83,17 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             }
         })
 
-        conversationUI._closeButton.addListener(object : ClickListener() {
+        conversationUI.closeButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent, x: Float, y: Float) {
                 conversationUI.isVisible = false
+                mapMgr.clearCurrentSelectedMapEntity()
+            }
+        })
+
+        storeInventoryUI.closeButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                storeInventoryUI.isVisible = false
+                mapMgr.clearCurrentSelectedMapEntity()
             }
         })
     }
@@ -119,21 +127,21 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         }
     }
 
-    override fun onNotify(value: String, event: ComponentObserver.UIEvent) {
+    override fun onNotify(value: String, event: ComponentObserver.ComponentEvent) {
 
         when (event) {
-            ComponentObserver.UIEvent.LOAD_CONVERSATION -> {
+            ComponentObserver.ComponentEvent.LOAD_CONVERSATION -> {
                 val config = json.fromJson(EntityConfig::class.java, value)
                 conversationUI.loadConversation(config)
                 conversationUI.getCurrentConversationGraph().addObserver(this)
             }
-            ComponentObserver.UIEvent.SHOW_CONVERSATION -> {
+            ComponentObserver.ComponentEvent.SHOW_CONVERSATION -> {
                 val configShow = json.fromJson(EntityConfig::class.java, value)
                 if (configShow.entityID.equals(conversationUI.currentEntityID, true)) {
                     conversationUI.isVisible = true
                 }
             }
-            ComponentObserver.UIEvent.HIDE_CONVERSATION -> {
+            ComponentObserver.ComponentEvent.HIDE_CONVERSATION -> {
                 val configHide = json.fromJson(EntityConfig::class.java, value)
                 if (configHide.entityID.equals(conversationUI.currentEntityID, true)) {
                     conversationUI.isVisible = false
@@ -146,21 +154,31 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     override fun onNotify(graph: ConversationGraph, event: ConversationGraphObserver.ConversationCommandEvent) {
         when (event) {
             ConversationGraphObserver.ConversationCommandEvent.LOAD_STORE_INVENTORY -> {
+                val selectedEntity = mapMgr.currentSelectedEntity ?: return
+
                 val inventory = InventoryUI.getInventory(inventoryUI.inventorySlotTable)
                 storeInventoryUI.loadPlayerInventory(inventory)
 
-                val entities = mapMgr.getCurrentMapEntities()
-                for (entity in entities) {
-                    if (entity.entityConfig.entityID.equals("TOWN_BLACKSMITH", true)) {
-                        val items = entity.entityConfig.inventory
-                        val itemLocations = Array<InventoryItemLocation>()
-                        for (i in 0..items.size - 1) {
-                            itemLocations.add(InventoryItemLocation(i, items[i].toString(), 1))
-                        }
-                        storeInventoryUI.loadStoreInventory(itemLocations)
-                        break
-                    }
+//                val entities = mapMgr.getCurrentMapEntities()
+//                for (entity in entities) {
+//                    if (entity.entityConfig.entityID.equals("TOWN_BLACKSMITH", true)) {
+//                        val items = entity.entityConfig.inventory
+//                        val itemLocations = Array<InventoryItemLocation>()
+//                        for (i in 0..items.size - 1) {
+//                            itemLocations.add(InventoryItemLocation(i, items[i].toString(), 1))
+//                        }
+//                        storeInventoryUI.loadStoreInventory(itemLocations)
+//                        break
+//                    }
+//                }
+
+                val items = selectedEntity.entityConfig.inventory
+                val itemLocations = Array<InventoryItemLocation>()
+                for (i in 0.. items.size-1){
+                    itemLocations.add(InventoryItemLocation(i, items[i].toString(), 1))
                 }
+
+                storeInventoryUI.loadStoreInventory(itemLocations)
 
                 conversationUI.isVisible = false
 
@@ -170,6 +188,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
             ConversationGraphObserver.ConversationCommandEvent.EXIT_CONVERSATION -> {
                 conversationUI.isVisible = false
+                mapMgr.clearCurrentSelectedMapEntity()
             }
 
             ConversationGraphObserver.ConversationCommandEvent.NONE -> {

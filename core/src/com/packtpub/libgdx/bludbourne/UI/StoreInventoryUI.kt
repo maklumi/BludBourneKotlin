@@ -31,6 +31,7 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
 
     private val _sellButton: Button
     private val _buyButton: Button
+    val closeButton: Button
 
     private val _buttons: Table
     private val _totalLabels: Table
@@ -61,6 +62,8 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
         _buyButton = TextButton(BUY, Utility.STATUSUI_SKIN, "inventory")
         _buyButton.isDisabled = true
         _buyButton.touchable = Touchable.disabled
+
+        closeButton = TextButton("X", Utility.STATUSUI_SKIN)
 
         _buttons = Table()
         _buttons.defaults().expand().fill()
@@ -105,6 +108,10 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
         }
 
         inventoryActors.add(_inventorySlotTooltip)
+
+        add()
+        add(closeButton)
+        row()
 
         //this.debugAll();
         this.defaults().expand().fill()

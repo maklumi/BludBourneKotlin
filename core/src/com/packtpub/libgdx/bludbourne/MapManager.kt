@@ -17,6 +17,7 @@ class MapManager : ProfileObserver {
     var hasMapChanged = false
     //    private var currentMap: Map = MapFactory.getMap(MapFactory.MapType.TOWN)
     private var currentMap: Map? = null
+    var currentSelectedEntity: Entity? = null
 
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
         when (event) {
@@ -58,14 +59,21 @@ class MapManager : ProfileObserver {
     }
 
     fun loadMap(mapType: MapFactory.MapType) {
+        val map = MapFactory.getMap(mapType)
+
+        if (map == null) {
+            Gdx.app.debug(TAG, "Map does not exist!")
+        }
 
         // unregister observers
-        val entities: Array<Entity>? = currentMap?.mapEntities
-        entities?.forEach(Entity::unregisterObservers)
+        if (currentMap != null) {
+            val entities: Array<Entity>? = currentMap?.mapEntities
+            entities?.forEach(Entity::unregisterObservers)
+        }
 
-        currentMap = MapFactory.getMap(mapType)
+        currentMap = map
         hasMapChanged = true
-
+        clearCurrentSelectedMapEntity()
         Gdx.app.debug(TAG, "Player Start: (" + currentMap?.playerStart?.x + "," + currentMap?.playerStart?.y + ")")
     }
 
@@ -78,6 +86,12 @@ class MapManager : ProfileObserver {
     }
 
     fun getCurrentMapEntities(): Array<Entity> = currentMap!!.mapEntities
+
+    fun clearCurrentSelectedMapEntity() {
+        if (currentSelectedEntity == null) return
+        currentSelectedEntity!!.sendMessage(Component.MESSAGE.ENTITY_DESELECTED)
+        currentSelectedEntity = null
+    }
 
     fun getCollisionLayer(): MapLayer {
         return currentMap!!.collisionLayer

@@ -98,7 +98,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                     //Picked/Selected
                     Gdx.app.debug(TAG, "Selected Entity! " + mapEntity.entityConfig.entityID)
                     mapEntity.sendMessage(Component.MESSAGE.ENTITY_SELECTED)
-                    notify(json.toJson(mapEntity.entityConfig), ComponentObserver.UIEvent.LOAD_CONVERSATION)
+                    notify(json.toJson(mapEntity.entityConfig), ComponentObserver.ComponentEvent.LOAD_CONVERSATION)
                 }
             }
         }
