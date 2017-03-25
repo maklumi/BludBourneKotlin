@@ -22,8 +22,6 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
 
     val _closeButton = TextButton("X", Utility.STATUSUI_SKIN)
 
-    private val _json = Json()
-
     init {
 
         _graph = ConversationGraph()
@@ -57,11 +55,8 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
         //Listeners
         _listItems.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent, x: Float, y: Float) {
-                val choice = _listItems.selected
-                _graph!!.setCurrentConversation(choice.destinationId)
-                _dialogText.setText(_graph!!.getConversationByID(choice.destinationId)!!.dialog)
-                _listItems.setItems(*_graph!!.currentChoices.toTypedArray())
-                _listItems.selectedIndex = -1
+                val choice = _listItems.selected ?: return
+                populateConversationDialog(choice.destinationId)
             }
         }
         )
@@ -69,10 +64,11 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
 
     fun loadConversation(entityConfig: EntityConfig) {
         val fullFilenamePath = entityConfig.conversationConfigPath
+        _dialogText.setText("")
+        _listItems.clearItems()
+
         if (fullFilenamePath.isEmpty() || !Gdx.files.internal(fullFilenamePath).exists()) {
             Gdx.app.debug(TAG, "Conversation file does not exist!")
-            _dialogText.setText("")
-            _listItems.clearItems()
             return
         }
 
@@ -85,15 +81,19 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
 
     fun setConversationGraph(graph: ConversationGraph) {
         this._graph = graph
-        val id = _graph!!.currentConversationID
-        val conversation = _graph!!.getConversationByID(id) ?: return
-        this._dialogText.setText(conversation.dialog)
-        this._listItems.setItems(*_graph!!.currentChoices.toTypedArray())
-        _listItems.selectedIndex = -1
+        populateConversationDialog(_graph!!.currentConversationID)
     }
 
+    fun populateConversationDialog(conversationID: String) {
+        val conversation = _graph!!.getConversationByID(conversationID) ?: return
+        _graph!!.setCurrentConversation(conversationID)
+        _dialogText.setText(conversation.dialog)
+        val choices = _graph!!.currentChoices
+        _listItems.setItems(*choices.toTypedArray())
+        _listItems.selectedIndex = -1
+
+    }
 
     private val TAG = ConversationUI::class.java.simpleName
-
-
+    
 }

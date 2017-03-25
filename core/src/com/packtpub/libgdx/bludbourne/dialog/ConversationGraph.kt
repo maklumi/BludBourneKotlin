@@ -23,7 +23,8 @@ class ConversationGraph(private val conversations: Hashtable<String, Conversatio
     fun setCurrentConversation(id: String) {
         val conversation = getConversationByID(id) ?: return
         //Can we reach the new conversation from the current one?
-        if (isReachable(currentConversationID, id)) {
+        // check case where the current node is checked against itself
+        if ( currentConversationID.equals(id, true) || isReachable(currentConversationID, id)) {
             currentConversationID = id
         } else {
             println("New conversation node $id is not reachable from current node [$currentConversationID]!")
@@ -40,6 +41,7 @@ class ConversationGraph(private val conversations: Hashtable<String, Conversatio
 
         //First get edges/choices from the source
         val list: ArrayList<ConversationChoice> = associatedChoices[sourceID]!!
+//        if (list == null) return false
         list.forEach { choice -> return choice.sourceId == sourceID && choice.destinationId == sinkID }
         return false
     }
