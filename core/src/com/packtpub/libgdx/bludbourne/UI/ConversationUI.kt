@@ -34,11 +34,12 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
         _dialogText.setAlignment(Align.center)
         _listItems = List<ConversationChoice>(Utility.STATUSUI_SKIN)
 
-        val scrollPane = ScrollPane(_listItems)
+        val scrollPane = ScrollPane(_listItems, Utility.STATUSUI_SKIN, "inventoryPane")
         scrollPane.setOverscroll(false, false)
         scrollPane.setFadeScrollBars(false)
         scrollPane.setScrollingDisabled(true, false)
-        scrollPane.setScrollbarsOnTop(true)
+        scrollPane.setForceScroll(true, false)
+        scrollPane.setScrollBarPositions(false, true)
 
         //layout
         add()
@@ -48,7 +49,7 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
         this.defaults().expand().fill()
         this.add(_dialogText).pad(10f, 10f, 10f, 10f)
         this.row()
-        this.add(scrollPane)
+        this.add(scrollPane).pad(10f, 10f, 10f, 10f)
 
         //this.debug();
         this.pack()
@@ -76,6 +77,7 @@ class ConversationUI : Window("dialog", Utility.STATUSUI_SKIN, "solidbackground"
         }
 
         currentEntityID = entityConfig.entityID
+        this.titleLabel.setText(entityConfig.entityID)
         val json = Json()
         val graph = json.fromJson(ConversationGraph::class.java, Gdx.files.internal(fullFilenamePath))
         setConversationGraph(graph)
