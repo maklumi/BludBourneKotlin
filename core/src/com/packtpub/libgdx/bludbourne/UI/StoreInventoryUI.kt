@@ -1,15 +1,18 @@
 package com.packtpub.libgdx.bludbourne.UI
 
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
+import com.packtpub.libgdx.bludbourne.UI.StoreInventoryObserver.StoreInventoryEvent
 import com.packtpub.libgdx.bludbourne.Utility
 
 class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solidbackground"),
-        InventorySlotObserver {
+        InventorySlotObserver, StoreInventorySubject {
 
     private val _numStoreInventorySlots = 30
     private val _lengthSlotRow = 10
@@ -25,9 +28,11 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
 
     private val _sellTotalLabel: Label
     private val _buyTotalLabel: Label
+    private val _playerTotalGP: Label
 
     private var _tradeInVal = 0
     private var _fullValue = 0
+    private var _playerTotal = 0
 
     private val _sellButton: Button
     private val _buyButton: Button
@@ -35,6 +40,8 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
 
     private val _buttons: Table
     private val _totalLabels: Table
+
+    private val observers = Array<StoreInventoryObserver>()
 
     init {
 
@@ -51,17 +58,17 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
         _inventorySlotTooltip = InventorySlotTooltip(Utility.STATUSUI_SKIN)
 
         _sellButton = TextButton(SELL, Utility.STATUSUI_SKIN, "inventory")
-        _sellButton.isDisabled = true
-        _sellButton.touchable = Touchable.disabled
+        disableButton(_sellButton, true)
 
         _sellTotalLabel = Label(SELL + " : " + _tradeInVal + GP, Utility.STATUSUI_SKIN)
         _sellTotalLabel.setAlignment(Align.center)
         _buyTotalLabel = Label(BUY + " : " + _fullValue + GP, Utility.STATUSUI_SKIN)
         _buyTotalLabel.setAlignment(Align.center)
 
+        _playerTotalGP = Label("$PLAYER_TOTAL : $_playerTotal $GP", Utility.STATUSUI_SKIN)
+
         _buyButton = TextButton(BUY, Utility.STATUSUI_SKIN, "inventory")
-        _buyButton.isDisabled = true
-        _buyButton.touchable = Touchable.disabled
+        disableButton(_buyButton, true)
 
         closeButton = TextButton("X", Utility.STATUSUI_SKIN)
 
@@ -122,7 +129,46 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
         this.add(_totalLabels)
         this.row()
         this.add(_playerInventorySlotTable).pad(10f, 10f, 10f, 10f)
+        row()
+        add(_playerTotalGP)
         this.pack()
+
+        // Listeners
+        _buyButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                if (_fullValue in 1.._playerTotal) {
+                    _playerTotal -= _fullValue
+                    this@StoreInventoryUI.notify(_playerTotal.toString(), StoreInventoryEvent.PLAYER_GP_TOTAL_UPDATED)
+                    _fullValue = 0
+                    _buyTotalLabel.setText("$BUY : $_fullValue$GP")
+                    disableButton(_buyButton, true)
+                }
+            }
+        })
+
+        _sellButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                if (_tradeInVal > 0) {
+                    _playerTotal += _tradeInVal
+                    this@StoreInventoryUI.notify(_playerTotal.toString(), StoreInventoryEvent.PLAYER_GP_TOTAL_UPDATED)
+                    _tradeInVal = 0
+                    _sellTotalLabel.setText("$SELL : $_tradeInVal$GP")
+                    disableButton(_sellButton, true)
+
+                    // remove sold items
+                    val cells = inventorySlotTable.cells
+                    for (i in 0..cells.size - 1) {
+                        val inventorySlot = cells[i].actor as InventorySlot
+                        if (inventorySlot == null) continue
+                        if (inventorySlot.hasItem() &&
+                                inventorySlot.getTopInventoryItem()!!.name.equals(PLAYER_INVENTORY, true)) {
+                            inventorySlot.clearAllInventoryItems(false)
+                        }
+                    }
+                }
+            }
+        })
+
     }
 
     fun loadPlayerInventory(playerInventoryItems: Array<InventoryItemLocation>) {
@@ -136,21 +182,21 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
     override fun onNotify(slot: InventorySlot, event: InventorySlotObserver.SlotEvent) {
         when (event) {
             InventorySlotObserver.SlotEvent.ADDED_ITEM -> {
+                // moving from player inventory to store inventory to sell
                 if (slot.getTopInventoryItem()!!.name.equals(PLAYER_INVENTORY, ignoreCase = true) && slot.name.equals(STORE_INVENTORY, ignoreCase = true)) {
                     _tradeInVal += slot.getTopInventoryItem()!!.getTradeValue()
                     _sellTotalLabel.setText(SELL + " : " + _tradeInVal + GP)
                     if (_tradeInVal > 0) {
-                        _sellButton.isDisabled = false
-                        _sellButton.touchable = Touchable.enabled
+                        disableButton(_sellButton, false)
                     }
                 }
 
+                // moving from store inventory to player inventory to buy
                 if (slot.getTopInventoryItem()!!.name.equals(STORE_INVENTORY, ignoreCase = true) && slot.name.equals(PLAYER_INVENTORY, ignoreCase = true)) {
                     _fullValue += slot.getTopInventoryItem()!!.itemValue
                     _buyTotalLabel.setText(BUY + " : " + _fullValue + GP)
-                    if (_fullValue > 0) {
-                        _buyButton.isDisabled = false
-                        _buyButton.touchable = Touchable.enabled
+                    if (_fullValue > 0 && _playerTotal >= _fullValue) {
+                        disableButton(_buyButton, false)
                     }
                 }
             }
@@ -159,20 +205,49 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
                     _tradeInVal -= slot.getTopInventoryItem()!!.getTradeValue()
                     _sellTotalLabel.setText(SELL + " : " + _tradeInVal + GP)
                     if (_tradeInVal <= 0) {
-                        _sellButton.isDisabled = true
-                        _sellButton.touchable = Touchable.disabled
+                        disableButton(_sellButton, true)
                     }
                 }
                 if (slot.getTopInventoryItem()!!.name.equals(STORE_INVENTORY, ignoreCase = true) && slot.name.equals(PLAYER_INVENTORY, ignoreCase = true)) {
                     _fullValue -= slot.getTopInventoryItem()!!.itemValue
                     _buyTotalLabel.setText(BUY + " : " + _fullValue + GP)
                     if (_fullValue <= 0) {
-                        _buyButton.isDisabled = true
-                        _buyButton.touchable = Touchable.disabled
+                        disableButton(_buyButton, true)
                     }
                 }
             }
         }
+    }
+
+    fun setPlayerGP(value: Int) {
+        _playerTotal = value
+        _playerTotalGP.setText("$PLAYER_TOTAL : $_playerTotal$GP")
+    }
+
+    private fun disableButton(button: Button, disable: Boolean) {
+        if (disable) {
+            button.isDisabled = true
+            button.touchable = Touchable.disabled
+        } else {
+            button.isDisabled = false
+            button.touchable = Touchable.enabled
+        }
+    }
+
+    override fun addObserver(storeObserver: StoreInventoryObserver) {
+        observers.add(storeObserver)
+    }
+
+    override fun removeObserver(storeObserver: StoreInventoryObserver) {
+        observers.removeValue(storeObserver, true)
+    }
+
+    override fun removeAllObservers() {
+        observers.forEach { observer -> observers.removeValue(observer, true) }
+    }
+
+    override fun notify(value: String, event: StoreInventoryObserver.StoreInventoryEvent) {
+        observers.forEach { observer -> observer.onNotify(value, event) }
     }
 
     companion object {
@@ -183,5 +258,6 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
         private val SELL = "SELL"
         private val BUY = "BUY"
         private val GP = " GP"
+        private val PLAYER_TOTAL = "Player Total"
     }
 }

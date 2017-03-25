@@ -2,22 +2,26 @@ package com.packtpub.libgdx.bludbourne.UI
 
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.Utility
 
-class StatusUI : Window("stats", Utility.STATUSUI_SKIN) {
+class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
     private val hpBar: Image
     private val mpBar: Image
     private val xpBar: Image
     val inventoryButton: ImageButton
+    val observers = Array<StatusObserver>()
 
 
     //Attributes
     private val levelVal = 1
-    private val goldVal = 0
+    private var _goldVal = -1
     private val hpVal = 50
     private val mpVal = 50
     private val xpVal = 0
+
+    val goldLabel: Label
 
     init {
 
@@ -43,8 +47,8 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN) {
         val xp = Label(xpVal.toString(), Utility.STATUSUI_SKIN)
         val levelLabel = Label(" lv:", Utility.STATUSUI_SKIN)
         val levelVal = Label(levelVal.toString(), Utility.STATUSUI_SKIN)
-        val goldLabel = Label(" gp:", Utility.STATUSUI_SKIN)
-        val goldVal = Label(goldVal.toString(), Utility.STATUSUI_SKIN)
+        goldLabel = Label(" gp:", Utility.STATUSUI_SKIN)
+        val goldVal = Label(_goldVal.toString(), Utility.STATUSUI_SKIN)
 
         //buttons
         inventoryButton = ImageButton(Utility.STATUSUI_SKIN, "inventory-button")
@@ -99,5 +103,27 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN) {
         this.pack()
     }
 
+    fun getGoldValue() : Int = _goldVal
 
+    fun setGoldValue(value: Int) {
+        _goldVal = value
+        goldLabel.setText(getGoldValue().toString())
+        notify(value, StatusObserver.StatusEvent.UPDATED_GP)
+    }
+
+    override fun addObserver(statusObserver: StatusObserver) {
+        observers.add(statusObserver)
+    }
+
+    override fun removeObserver(statusObserver: StatusObserver) {
+        observers.removeValue(statusObserver, true)
+    }
+
+    override fun removeAllObservers() {
+        observers.forEach { observer -> observers.removeValue(observer, true) }
+    }
+
+    override fun notify(value: Int, event: StatusObserver.StatusEvent) {
+        observers.forEach { observer -> observer.onNotify(value, event) }
+    }
 }

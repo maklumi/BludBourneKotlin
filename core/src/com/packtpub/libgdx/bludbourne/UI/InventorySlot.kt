@@ -36,31 +36,35 @@ class InventorySlot constructor() : Stack(), InventorySlotSubject {
         _defaultBackground.add(_customBackgroundDecal)
     }
 
-    fun decrementItemCount() {
+    fun decrementItemCount(sendRemoveNotification: Boolean) {
         numItemsVal--
         numItemsLabel.setText(numItemsVal.toString())
         if (_defaultBackground.children.size == 1) {
             _defaultBackground.add(_customBackgroundDecal)
         }
         checkVisibilityOfItemCount()
-        notify(this, InventorySlotObserver.SlotEvent.REMOVED_ITEM)
+        if (sendRemoveNotification) {
+            notify(this, InventorySlotObserver.SlotEvent.REMOVED_ITEM)
+        }
     }
 
-    fun incrementItemCount() {
+    fun incrementItemCount(sendAddNotification: Boolean) {
         numItemsVal++
         numItemsLabel.setText(numItemsVal.toString())
         if (_defaultBackground.children.size > 1) {
             _defaultBackground.children.pop()
         }
         checkVisibilityOfItemCount()
-        notify(this, InventorySlotObserver.SlotEvent.ADDED_ITEM)
+        if (sendAddNotification) {
+            notify(this, InventorySlotObserver.SlotEvent.ADDED_ITEM)
+        }
     }
 
     override fun add(actor: Actor) {
         super.add(actor)
 
         if (actor != _defaultBackground && actor != numItemsLabel) {
-            incrementItemCount()
+            incrementItemCount(true)
         }
     }
 
@@ -86,12 +90,12 @@ class InventorySlot constructor() : Stack(), InventorySlotSubject {
         return 0
     }
 
-    fun clearAllInventoryItems() {
+    fun clearAllInventoryItems(sendRemoveNotification: Boolean) {
         if (hasItem()) {
             val arrayChildren = this.children
             val numInventoryItems = getNumItems()
             for (i in 0..numInventoryItems - 1) {
-                decrementItemCount()
+                decrementItemCount(sendRemoveNotification)
                 arrayChildren.pop()
             }
         }
@@ -119,7 +123,7 @@ class InventorySlot constructor() : Stack(), InventorySlotSubject {
             super.add(actor)
 
             if (actor != _defaultBackground && actor != numItemsLabel) {
-                incrementItemCount()
+                incrementItemCount(true)
             }
         }
     }
@@ -130,7 +134,7 @@ class InventorySlot constructor() : Stack(), InventorySlotSubject {
             val arrayChildren = this.children
             val numInventoryItems = arrayChildren.size - 2
             for (i in 0..numInventoryItems - 1) {
-                decrementItemCount()
+                decrementItemCount(true)
                 items.add(arrayChildren.pop())
             }
         }

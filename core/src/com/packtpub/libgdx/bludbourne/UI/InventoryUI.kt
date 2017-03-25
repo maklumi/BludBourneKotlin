@@ -1,9 +1,11 @@
 package com.packtpub.libgdx.bludbourne.UI
 
 import com.badlogic.gdx.graphics.g2d.NinePatch
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.Window
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.InventoryItem
@@ -115,9 +117,9 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
         fun populateInventory(targetTable: Table, inventoryItems: Array<InventoryItemLocation>, dragAndDrop: DragAndDrop) {
             val cells: Array<Cell<Actor>> = targetTable.cells
 
-            (0..cells.size-1).forEach { i ->
+            (0..cells.size - 1).forEach { i ->
                 val inventorySlot = cells[i].actor as InventorySlot
-                inventorySlot.clearAllInventoryItems()
+                inventorySlot.clearAllInventoryItems(true)
             }
 
             for (i in 0..inventoryItems.size - 1) {
@@ -127,7 +129,7 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
                 val inventorySlot = cells[itemLocation.locationIndex].actor as InventorySlot
 
                 for (index in 0..itemLocation.numberItemsAtLocation - 1) {
-                   val item = InventoryItemFactory.instance.getInventoryItem(itemTypeId)
+                    val item = InventoryItemFactory.instance.getInventoryItem(itemTypeId)
                     item.name = targetTable.name
                     inventorySlot.add(item)
                     dragAndDrop.addSource(InventorySlotSource(inventorySlot, dragAndDrop))

@@ -13,7 +13,7 @@ class InventorySlotSource(internal var sourceSlot: InventorySlot,
         val payload = Payload()
 
         sourceSlot = actor.parent as InventorySlot
-        sourceSlot.decrementItemCount()
+        sourceSlot.decrementItemCount(true)
 
         payload.dragActor = actor
         dragAndDrop.setDragActorPosition(-x+actor.width, -y)

@@ -16,7 +16,8 @@ import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
 
 class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
-        Screen, ProfileObserver, ComponentObserver, ConversationGraphObserver {
+        Screen, ProfileObserver, ComponentObserver, ConversationGraphObserver,
+        StoreInventoryObserver, StatusObserver {
 
     val stage: Stage
     private val viewport: Viewport
@@ -76,6 +77,13 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             stage.addActor(actor)
         }
 
+        // Observers
+        ProfileManager.instance.addObserver(this)
+        player.registerObserver(this)
+        statusUI.addObserver(this)
+        storeInventoryUI.addObserver(this)
+
+        // Listeners
         val inventoryButton = statusUI.inventoryButton
         inventoryButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
@@ -118,11 +126,20 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 if (equipInventory.size > 0) {
                     InventoryUI.populateInventory(inventoryUI.equipSlots, equipInventory, inventoryUI.dragAndDrop)
                 }
+
+                // check gold
+                var goldVal = profileManager.getProperty("currentPlayerGP", Int::class.java) as Int
+                if (goldVal < 0) {
+                    // start the player with some money
+                    goldVal = 20
+                }
+                statusUI.setGoldValue(goldVal)
             }
 
             ProfileObserver.ProfileEvent.SAVING_PROFILE -> {
                 profileManager.setProperty("playerInventory", InventoryUI.getInventory(inventoryUI.inventorySlotTable))
                 profileManager.setProperty("playerEquipInventory", InventoryUI.getInventory(inventoryUI.equipSlots))
+                profileManager.setProperty("currentPlayerGP", statusUI.getGoldValue())
             }
         }
     }
@@ -159,22 +176,9 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 val inventory = InventoryUI.getInventory(inventoryUI.inventorySlotTable)
                 storeInventoryUI.loadPlayerInventory(inventory)
 
-//                val entities = mapMgr.getCurrentMapEntities()
-//                for (entity in entities) {
-//                    if (entity.entityConfig.entityID.equals("TOWN_BLACKSMITH", true)) {
-//                        val items = entity.entityConfig.inventory
-//                        val itemLocations = Array<InventoryItemLocation>()
-//                        for (i in 0..items.size - 1) {
-//                            itemLocations.add(InventoryItemLocation(i, items[i].toString(), 1))
-//                        }
-//                        storeInventoryUI.loadStoreInventory(itemLocations)
-//                        break
-//                    }
-//                }
-
                 val items = selectedEntity.entityConfig.inventory
                 val itemLocations = Array<InventoryItemLocation>()
-                for (i in 0.. items.size-1){
+                for (i in 0..items.size - 1) {
                     itemLocations.add(InventoryItemLocation(i, items[i].toString(), 1))
                 }
 
@@ -193,6 +197,26 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
             ConversationGraphObserver.ConversationCommandEvent.NONE -> {
                 // do nothing
+            }
+        }
+    }
+
+    override fun onNotify(value: String, event: StoreInventoryObserver.StoreInventoryEvent) {
+        when (event) {
+            StoreInventoryObserver.StoreInventoryEvent.PLAYER_GP_TOTAL_UPDATED -> {
+                statusUI.setGoldValue(value.toInt())
+            }
+
+            StoreInventoryObserver.StoreInventoryEvent.PLAYER_INVENTORY_UPDATED -> {
+                // json
+            }
+        }
+    }
+
+    override fun onNotify(value: Int, event: StatusObserver.StatusEvent) {
+        when (event) {
+            StatusObserver.StatusEvent.UPDATED_GP -> {
+                storeInventoryUI.setPlayerGP(value)
             }
         }
     }
