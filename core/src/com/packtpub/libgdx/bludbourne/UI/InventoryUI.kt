@@ -124,6 +124,17 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
             }
         }
 
+        fun removeInventoryItems(name: String, inventoryTable: Table): Array<InventoryItemLocation> {
+            val cells: Array<Cell<Actor>> = inventoryTable.cells
+            val items = Array<InventoryItemLocation>()
+            for (i in 0..cells.size - 1) {
+                val inventorySlot = cells.get(i).actor as InventorySlot
+                if (inventorySlot == null) continue
+                inventorySlot.removeAllInventoryItemsWithName(name)
+            }
+            return items
+        }
+
         fun populateInventory(targetTable: Table, inventoryItems: Array<InventoryItemLocation>, dragAndDrop: DragAndDrop) {
             clearInventoryItems(targetTable)
 
@@ -165,14 +176,12 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
             return items
         }
 
-        //        fun removeInventoryItems(name: String, inventoryTable: Table): Array<InventoryItemLocation> {
         fun getInventory(targetTable: Table, name: String): Array<InventoryItemLocation> {
             val cells: Array<Cell<Actor>> = targetTable.cells
             val items: Array<InventoryItemLocation> = Array()
             for (i in 0..cells.size - 1) {
                 val inventorySlot = cells[i].actor as InventorySlot
                 if (inventorySlot == null) continue
-//                inventorySlot.removeAllInventoryItemsWithName(name)
                 val numItems = inventorySlot.getNumItems(name)
                 if (numItems > 0) {
                     items.add(InventoryItemLocation(i,
@@ -186,15 +195,24 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
         fun getInventory(sourceTable: Table, targetTable: Table, name: String): Array<InventoryItemLocation> {
             val items: Array<InventoryItemLocation> = getInventory(targetTable, name)
             val sourceCells: Array<Cell<Actor>> = sourceTable.cells
+            var counter = 0
             for (item in items) {
                 for (index in 0..sourceCells.size - 1) {
+                    counter = index
                     val inventorySlot = sourceCells[index].actor as InventorySlot
                     if (inventorySlot == null) continue
                     val numItems = inventorySlot.getNumItems(name)
                     if (numItems == 0) {
                         item.locationIndex = index
+//                        println("[index]: $index itemtype: ${item.itemTypeAtLocation} numItems: $numItems")
+                        counter++
                         break
                     }
+                }
+                // If we run out of room when buying items and still left items to be sold,
+                // then we will stack remaining items in the last slot.
+                if (counter == sourceCells.size) {
+                    item.locationIndex = counter - 1
                 }
             }
             return items

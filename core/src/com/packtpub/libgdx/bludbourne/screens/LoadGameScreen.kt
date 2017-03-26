@@ -65,7 +65,7 @@ class LoadGameScreen(private val _game: BludBourne) : Screen {
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 val fileName = listItems.selected.toString()
                 val file = ProfileManager.instance.getProfileFile(fileName)
-                if (file != null) {
+                if (file != null && !fileName.isEmpty()) {
                     ProfileManager.instance.setCurrentProfile(fileName)
                     ProfileManager.instance.loadProfile()
                     _game.screen = _game.getScreenType(BludBourne.ScreenType.MainGame)

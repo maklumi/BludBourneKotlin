@@ -101,6 +101,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         storeInventoryUI.closeButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 storeInventoryUI.savePlayerInventory()
+                storeInventoryUI.cleanupStoreInventory()
                 storeInventoryUI.isVisible = false
                 mapMgr.clearCurrentSelectedMapEntity()
             }
