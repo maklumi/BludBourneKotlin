@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.UI.StoreInventoryObserver.StoreInventoryEvent
 import com.packtpub.libgdx.bludbourne.Utility
 
@@ -42,6 +43,7 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
     private val _totalLabels: Table
 
     private val observers = Array<StoreInventoryObserver>()
+    private val _json = Json()
 
     init {
 
@@ -142,6 +144,16 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
                     _fullValue = 0
                     _buyTotalLabel.setText("$BUY : $_fullValue$GP")
                     disableButton(_buyButton, true)
+
+                    if (_tradeInVal > 0) {
+                        disableButton(_sellButton, false)
+                    } else {
+                        disableButton(_sellButton, true)
+                    }
+
+                    //Make sure we update the owner of the items
+                    InventoryUI.setInventoryItemNames(_playerInventorySlotTable, PLAYER_INVENTORY)
+                    savePlayerInventory()
                 }
             }
         })
@@ -155,6 +167,12 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
                     _sellTotalLabel.setText("$SELL : $_tradeInVal$GP")
                     disableButton(_sellButton, true)
 
+                    if (_fullValue > 0 && _playerTotal >= _fullValue) {
+                        disableButton(_buyButton, false)
+                    } else {
+                        disableButton(_buyButton, true)
+                    }
+
                     // remove sold items
                     val cells = inventorySlotTable.cells
                     for (i in 0..cells.size - 1) {
@@ -165,6 +183,7 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
                             inventorySlot.clearAllInventoryItems(false)
                         }
                     }
+                    savePlayerInventory()
                 }
             }
         })
@@ -179,6 +198,17 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
         InventoryUI.populateInventory(inventorySlotTable, storeInventoryItems, _dragAndDrop)
     }
 
+    fun savePlayerInventory() {
+//        InventoryUI.removeInventoryItems(STORE_INVENTORY, _playerInventorySlotTable)
+//        val items = InventoryUI.getInventory(_playerInventorySlotTable)
+//        this@StoreInventoryUI.notify(_json.toJson(items), StoreInventoryEvent.PLAYER_INVENTORY_UPDATED)
+        val playerItemsInPlayerInventory = InventoryUI.getInventory(_playerInventorySlotTable, PLAYER_INVENTORY)
+        val playerItemsInStoreInventory = InventoryUI.getInventory(_playerInventorySlotTable, inventorySlotTable, PLAYER_INVENTORY)
+        playerItemsInPlayerInventory.addAll(playerItemsInStoreInventory)
+        this@StoreInventoryUI.notify(_json.toJson(playerItemsInPlayerInventory), StoreInventoryEvent.PLAYER_INVENTORY_UPDATED);
+
+    }
+
     override fun onNotify(slot: InventorySlot, event: InventorySlotObserver.SlotEvent) {
         when (event) {
             InventorySlotObserver.SlotEvent.ADDED_ITEM -> {
@@ -186,34 +216,48 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
                 if (slot.getTopInventoryItem()!!.name.equals(PLAYER_INVENTORY, ignoreCase = true) && slot.name.equals(STORE_INVENTORY, ignoreCase = true)) {
                     _tradeInVal += slot.getTopInventoryItem()!!.getTradeValue()
                     _sellTotalLabel.setText(SELL + " : " + _tradeInVal + GP)
-                    if (_tradeInVal > 0) {
-                        disableButton(_sellButton, false)
-                    }
                 }
 
                 // moving from store inventory to player inventory to buy
                 if (slot.getTopInventoryItem()!!.name.equals(STORE_INVENTORY, ignoreCase = true) && slot.name.equals(PLAYER_INVENTORY, ignoreCase = true)) {
                     _fullValue += slot.getTopInventoryItem()!!.itemValue
                     _buyTotalLabel.setText(BUY + " : " + _fullValue + GP)
-                    if (_fullValue > 0 && _playerTotal >= _fullValue) {
-                        disableButton(_buyButton, false)
-                    }
                 }
+
+                if (_tradeInVal > 0) {
+                    disableButton(_sellButton, false)
+                } else {
+                    disableButton(_sellButton, true)
+                }
+
+                if (_fullValue in 1.._playerTotal) {
+                    disableButton(_buyButton, false)
+                } else {
+                    disableButton(_buyButton, true)
+                }
+
             }
             InventorySlotObserver.SlotEvent.REMOVED_ITEM -> {
                 if (slot.getTopInventoryItem()!!.name.equals(PLAYER_INVENTORY, ignoreCase = true) && slot.name.equals(STORE_INVENTORY, ignoreCase = true)) {
                     _tradeInVal -= slot.getTopInventoryItem()!!.getTradeValue()
                     _sellTotalLabel.setText(SELL + " : " + _tradeInVal + GP)
-                    if (_tradeInVal <= 0) {
-                        disableButton(_sellButton, true)
-                    }
                 }
+
                 if (slot.getTopInventoryItem()!!.name.equals(STORE_INVENTORY, ignoreCase = true) && slot.name.equals(PLAYER_INVENTORY, ignoreCase = true)) {
                     _fullValue -= slot.getTopInventoryItem()!!.itemValue
                     _buyTotalLabel.setText(BUY + " : " + _fullValue + GP)
-                    if (_fullValue <= 0) {
-                        disableButton(_buyButton, true)
-                    }
+                }
+
+                if (_tradeInVal <= 0) {
+                    disableButton(_sellButton, true)
+                } else {
+                    disableButton(_sellButton, false)
+                }
+
+                if (_fullValue <= 0 || _playerTotal < _fullValue) {
+                    disableButton(_buyButton, true)
+                } else {
+                    disableButton(_buyButton, false)
                 }
             }
         }

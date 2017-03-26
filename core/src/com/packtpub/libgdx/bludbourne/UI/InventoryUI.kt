@@ -114,7 +114,19 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
     companion object {
         val numSlots = 50
 
+        fun clearInventoryItems(targetTable: Table) {
+            val cells: Array<Cell<Actor>> = targetTable.cells
+
+            for (i in 0..cells.size - 1) {
+                val inventorySlot = cells[i].actor as InventorySlot
+                if (inventorySlot == null) continue
+                inventorySlot.clearAllInventoryItems(false)
+            }
+        }
+
         fun populateInventory(targetTable: Table, inventoryItems: Array<InventoryItemLocation>, dragAndDrop: DragAndDrop) {
+            clearInventoryItems(targetTable)
+
             val cells: Array<Cell<Actor>> = targetTable.cells
 
             (0..cells.size - 1).forEach { i ->
@@ -151,6 +163,50 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
                 }
             }
             return items
+        }
+
+        //        fun removeInventoryItems(name: String, inventoryTable: Table): Array<InventoryItemLocation> {
+        fun getInventory(targetTable: Table, name: String): Array<InventoryItemLocation> {
+            val cells: Array<Cell<Actor>> = targetTable.cells
+            val items: Array<InventoryItemLocation> = Array()
+            for (i in 0..cells.size - 1) {
+                val inventorySlot = cells[i].actor as InventorySlot
+                if (inventorySlot == null) continue
+//                inventorySlot.removeAllInventoryItemsWithName(name)
+                val numItems = inventorySlot.getNumItems(name)
+                if (numItems > 0) {
+                    items.add(InventoryItemLocation(i,
+                            inventorySlot.getTopInventoryItem()!!.itemTypeID.toString(),
+                            numItems))
+                }
+            }
+            return items
+        }
+
+        fun getInventory(sourceTable: Table, targetTable: Table, name: String): Array<InventoryItemLocation> {
+            val items: Array<InventoryItemLocation> = getInventory(targetTable, name)
+            val sourceCells: Array<Cell<Actor>> = sourceTable.cells
+            for (item in items) {
+                for (index in 0..sourceCells.size - 1) {
+                    val inventorySlot = sourceCells[index].actor as InventorySlot
+                    if (inventorySlot == null) continue
+                    val numItems = inventorySlot.getNumItems(name)
+                    if (numItems == 0) {
+                        item.locationIndex = index
+                        break
+                    }
+                }
+            }
+            return items
+        }
+
+        fun setInventoryItemNames(targetTable: Table, name: String) {
+            val cells: Array<Cell<Actor>> = targetTable.cells
+            for (i in 0..cells.size - 1) {
+                val inventorySlot: InventorySlot = cells[i].actor as InventorySlot
+                if (inventorySlot == null) continue
+                inventorySlot.updateAllInventoryItemNames(name)
+            }
         }
     }
 

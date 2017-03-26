@@ -100,6 +100,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
         storeInventoryUI.closeButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                storeInventoryUI.savePlayerInventory()
                 storeInventoryUI.isVisible = false
                 mapMgr.clearCurrentSelectedMapEntity()
             }
@@ -109,18 +110,24 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
         when (event) {
             ProfileObserver.ProfileEvent.PROFILE_LOADED -> {
-                val inventory = profileManager.getProperty("playerInventory", Array::class.java) as Array<InventoryItemLocation>
-                if (inventory.size > 0) {
-                    InventoryUI.populateInventory(inventoryUI.inventorySlotTable, inventory, inventoryUI.dragAndDrop)
-                } else {
-                    //add default items if nothing is found
+                //if goldval is negative, this is our first save
+                var goldVal = profileManager.getProperty("currentPlayerGP", Int::class.java) as Int
+                val firstTime = goldVal < 0
+
+                if (firstTime) {
+                    //add default items if first time
                     val items: Array<InventoryItem.ItemTypeID> = player.entityConfig.inventory
                     val itemLocations = Array<InventoryItemLocation>()
                     for (i in 0..items.size - 1) {
                         itemLocations.add(InventoryItemLocation(i, items.get(i).toString(), 1))
                     }
                     InventoryUI.populateInventory(inventoryUI.inventorySlotTable, itemLocations, inventoryUI.dragAndDrop)
+                    profileManager.setProperty("playerInventory", InventoryUI.getInventory(inventoryUI.inventorySlotTable))
                 }
+
+
+                val inventory = profileManager.getProperty("playerInventory", Array::class.java) as Array<InventoryItemLocation>
+                InventoryUI.populateInventory(inventoryUI.inventorySlotTable, inventory, inventoryUI.dragAndDrop)
 
                 val equipInventory = profileManager.getProperty("playerEquipInventory", Array::class.java) as Array<InventoryItemLocation>
                 if (equipInventory.size > 0) {
@@ -128,8 +135,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 }
 
                 // check gold
-                var goldVal = profileManager.getProperty("currentPlayerGP", Int::class.java) as Int
-                if (goldVal < 0) {
+                if (firstTime) {
                     // start the player with some money
                     goldVal = 20
                 }
@@ -208,7 +214,8 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             }
 
             StoreInventoryObserver.StoreInventoryEvent.PLAYER_INVENTORY_UPDATED -> {
-                // json
+                val items = json.fromJson(Array::class.java, value) as Array<InventoryItemLocation>
+                InventoryUI.populateInventory(inventoryUI.inventorySlotTable, items, inventoryUI.dragAndDrop)
             }
         }
     }

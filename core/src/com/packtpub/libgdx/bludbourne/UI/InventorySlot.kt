@@ -25,7 +25,11 @@ class InventorySlot constructor() : Stack(), InventorySlotSubject {
     init {
         numItemsLabel.setAlignment(Align.bottomRight)
         numItemsLabel.isVisible = false
+        numItemsLabel.name = "numitems"
+
         _defaultBackground.add(image)
+        _defaultBackground.name = "background"
+
         this.add(_defaultBackground)
         this.add(numItemsLabel)
     }
@@ -90,6 +94,20 @@ class InventorySlot constructor() : Stack(), InventorySlotSubject {
         return 0
     }
 
+    fun getNumItems(name: String): Int {
+        if (hasChildren()) {
+            val items: SnapshotArray<Actor> = this.getChildren()
+            var totalFilteredSize = 0
+            for (actor in items) {
+                if (actor.getName().equals(name, true)) {
+                    totalFilteredSize++
+                }
+            }
+            return totalFilteredSize
+        }
+        return 0
+    }
+
     fun clearAllInventoryItems(sendRemoveNotification: Boolean) {
         if (hasItem()) {
             val arrayChildren = this.children
@@ -139,6 +157,30 @@ class InventorySlot constructor() : Stack(), InventorySlotSubject {
             }
         }
         return items
+    }
+
+    fun updateAllInventoryItemNames(name: String) {
+        if (hasItem()) {
+            val arrayChildren: SnapshotArray<Actor> = this.children
+            //skip first two elements
+            for (i in arrayChildren.size - 1 downTo 2) {
+                arrayChildren.get(i).name = name
+            }
+        }
+    }
+
+    fun removeAllInventoryItemsWithName(name: String) {
+        if (hasItem()) {
+            val arrayChildren: SnapshotArray<Actor> = this.children
+            //skip first two elements
+            for (i in arrayChildren.size - 1 downTo 2) {
+                val itemName = arrayChildren.get(i).name
+                if (itemName.equals(name, true)) {
+                    decrementItemCount(true)
+                    arrayChildren.removeIndex(i)
+                }
+            }
+        }
     }
 
     override fun addObserver(inventorySlotObserver: InventorySlotObserver) {
