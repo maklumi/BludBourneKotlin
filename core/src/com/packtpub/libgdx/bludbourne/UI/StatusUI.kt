@@ -4,6 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.Utility
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+
 
 class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
@@ -11,6 +13,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
     private val mpBar: Image
     private val xpBar: Image
     val inventoryButton: ImageButton
+    val questButton: ImageButton
     val observers = Array<StatusObserver>()
 
 
@@ -54,6 +57,9 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
         inventoryButton = ImageButton(Utility.STATUSUI_SKIN, "inventory-button")
         inventoryButton.imageCell.size(32f, 32f)
 
+        questButton = ImageButton(Utility.STATUSUI_SKIN, "quest-button")
+        questButton.imageCell.size(32f, 32f)
+
         //Align images
         hpBar.setPosition(3f, 6f)
         mpBar.setPosition(3f, 6f)
@@ -74,7 +80,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
         this.pad(this.padTop + 10, 10f, 10f, 10f)
 
         this.add()
-        this.add()
+        this.add(questButton).align(Align.center)
         this.add(inventoryButton).align(Align.right)
         this.row()
 
@@ -103,7 +109,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
         this.pack()
     }
 
-    fun getGoldValue() : Int = _goldVal
+    fun getGoldValue(): Int = _goldVal
 
     fun setGoldValue(value: Int) {
         _goldVal = value

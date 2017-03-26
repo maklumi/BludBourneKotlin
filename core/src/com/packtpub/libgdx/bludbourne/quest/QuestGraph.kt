@@ -1,13 +1,13 @@
 package com.packtpub.libgdx.bludbourne.quest
 
 import com.badlogic.gdx.utils.Json
-
-import java.util.ArrayList
-import java.util.Hashtable
+import java.util.*
 
 class QuestGraph {
     private var questTasks: Hashtable<String, QuestTask> = Hashtable()
     private var questTaskDependencies: Hashtable<String, ArrayList<QuestTaskDependency>> = Hashtable()
+
+    var questTitle: String = ""
 
     fun setTasks(questTasks: Hashtable<String, QuestTask>) {
         if (questTasks.size < 0) {
@@ -20,6 +20,16 @@ class QuestGraph {
         for (questTask in questTasks.values) {
             questTaskDependencies.put(questTask.id, ArrayList<QuestTaskDependency>())
         }
+    }
+
+    fun getAllQuestTasks(): ArrayList<QuestTask> {
+        val enumeration = questTasks.elements()
+        return Collections.list(enumeration)
+    }
+
+    fun clear() {
+        questTasks.clear()
+        questTaskDependencies.clear()
     }
 
     fun isValid(taskID: String): Boolean {
@@ -79,27 +89,7 @@ class QuestGraph {
     }
 
     override fun toString(): String {
-        val outputString = StringBuilder()
-        var numberTotalChoices = 0
-
-        val keys = questTaskDependencies.keys
-        for (id in keys) {
-            outputString.append(String.format("[%s]: ", id))
-            outputString.append(String.format("[%s]: ", getQuestTaskByID(id)!!.taskPhrase))
-
-            for (dependency in questTaskDependencies[id]!!) {
-                numberTotalChoices++
-                outputString.append(String.format("%s ", dependency.destinationId))
-            }
-
-            outputString.append(System.getProperty("line.separator"))
-        }
-
-        outputString.append(String.format("Number quest tasks: %d", questTasks.size))
-        outputString.append(String.format(", Number of dependencies: %d", numberTotalChoices))
-        outputString.append(System.getProperty("line.separator"))
-
-        return outputString.toString()
+        return questTitle
     }
 
     fun toJson(): String {

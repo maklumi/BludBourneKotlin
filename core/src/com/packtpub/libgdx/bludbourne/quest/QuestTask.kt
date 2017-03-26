@@ -19,5 +19,8 @@ class QuestTask {
             return taskProperties[IS_TASK_COMPLETE] as Boolean
         }
 
+    override fun toString(): String {
+        return taskPhrase
+    }
 
 }

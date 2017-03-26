@@ -13,6 +13,7 @@ class EntityConfig {
     var direction: Entity.Direction = Entity.Direction.DOWN
     var entityID = UUID.randomUUID().toString()
     var conversationConfigPath: String = ""
+    var questConfigPath = ""
 
 
     fun addAnimationConfig(animationConfig: AnimationConfig) {

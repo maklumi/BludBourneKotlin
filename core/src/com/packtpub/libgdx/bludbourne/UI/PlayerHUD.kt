@@ -14,6 +14,10 @@ import com.packtpub.libgdx.bludbourne.dialog.ConversationGraph
 import com.packtpub.libgdx.bludbourne.dialog.ConversationGraphObserver
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
+import com.sun.awt.SecurityWarning.setPosition
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.packtpub.libgdx.bludbourne.quest.QuestGraph
+
 
 class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         Screen, ProfileObserver, ComponentObserver, ConversationGraphObserver,
@@ -25,7 +29,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     private val inventoryUI: InventoryUI
     private val conversationUI: ConversationUI
     private val storeInventoryUI: StoreInventoryUI
-
+    private var _questUI: QuestUI
     private val json = Json()
 
 
@@ -61,6 +65,14 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         }
         storeInventoryUI.setPosition(0f, 0f)
 
+        _questUI = QuestUI()
+        _questUI.isMovable = false
+        _questUI.isVisible = false
+        _questUI.setPosition(0f, stage.height / 2)
+        _questUI.width = stage.width
+        _questUI.height = stage.height / 2
+
+        stage.addActor(_questUI)
         stage.addActor(statusUI)
         stage.addActor(inventoryUI)
         stage.addActor(conversationUI)
@@ -88,6 +100,13 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         inventoryButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 inventoryUI.isVisible = !inventoryUI.isVisible
+            }
+        })
+
+        val questButton = statusUI.questButton
+        questButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                _questUI.isVisible = !_questUI.isVisible
             }
         })
 
@@ -135,6 +154,9 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                     InventoryUI.populateInventory(inventoryUI.equipSlots, equipInventory, inventoryUI.dragAndDrop)
                 }
 
+                val quests = profileManager.getProperty("playerQuests", Array::class.java)
+                _questUI.quests = quests as Array<QuestGraph>
+
                 // check gold
                 if (firstTime) {
                     // start the player with some money
@@ -144,6 +166,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             }
 
             ProfileObserver.ProfileEvent.SAVING_PROFILE -> {
+                profileManager.setProperty("playerQuests", _questUI.quests)
                 profileManager.setProperty("playerInventory", InventoryUI.getInventory(inventoryUI.inventorySlotTable))
                 profileManager.setProperty("playerEquipInventory", InventoryUI.getInventory(inventoryUI.equipSlots))
                 profileManager.setProperty("currentPlayerGP", statusUI.getGoldValue())
@@ -198,6 +221,15 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             }
 
             ConversationGraphObserver.ConversationCommandEvent.EXIT_CONVERSATION -> {
+                conversationUI.isVisible = false
+                mapMgr.clearCurrentSelectedMapEntity()
+            }
+
+            ConversationGraphObserver.ConversationCommandEvent.ACCEPT_QUEST -> {
+                val currentlySelectedEntity = mapMgr.currentSelectedEntity ?: return
+
+                _questUI.addQuest(currentlySelectedEntity.entityConfig.questConfigPath)
+
                 conversationUI.isVisible = false
                 mapMgr.clearCurrentSelectedMapEntity()
             }
