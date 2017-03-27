@@ -3,6 +3,7 @@ package com.packtpub.libgdx.bludbourne
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.maps.MapLayer
+import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.Vector2
@@ -16,7 +17,7 @@ abstract class Map(var currentMapType: MapFactory.MapType,
     protected var playerStartPositionRect: Vector2 = Vector2(0f, 0f)
     protected var closestPlayerStartPosition: Vector2 = Vector2(0f, 0f)
     protected var convertedUnits: Vector2 = Vector2(0f, 0f)
-    lateinit var currentTiledMap: TiledMap
+    lateinit var currentMap: TiledMap
         protected set
     var playerStart: Vector2 = Vector2(0f, 0f)
 
@@ -24,7 +25,12 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected set
     var portalLayer: MapLayer
         protected set
-    protected var spawnsLayer: MapLayer
+    var spawnsLayer: MapLayer
+        protected set
+    var questItemSpawnLayer: MapLayer ? = null
+        protected set
+    var questDiscoverLayer: MapLayer ? = null
+        protected set
 
     protected val npcStartPositions: Array<Vector2>
     protected val specialNPCStartPositions: Hashtable<String, Vector2>
@@ -34,18 +40,52 @@ abstract class Map(var currentMapType: MapFactory.MapType,
     init {
         Utility.loadMapAsset(fullMapPath)
         if (Utility.isAssetLoaded(fullMapPath)) {
-            currentTiledMap = Utility.getMapAsset(fullMapPath)
+            currentMap = Utility.getMapAsset(fullMapPath)
         } else {
             Gdx.app.debug(TAG, "Map not loaded")
         }
 
-        collisionLayer = currentTiledMap.layers.get(COLLISION_LAYER)
-        portalLayer = currentTiledMap.layers.get(PORTAL_LAYER)
-        spawnsLayer = currentTiledMap.layers.get(SPAWNS_LAYER)
+        collisionLayer = currentMap.layers.get(COLLISION_LAYER)
+        portalLayer = currentMap.layers.get(PORTAL_LAYER)
+        spawnsLayer = currentMap.layers.get(SPAWNS_LAYER)
         setClosestStartPosition(playerStart)
+
+        questItemSpawnLayer = currentMap.layers.get(QUEST_ITEM_SPAWN_LAYER)
+        questDiscoverLayer = currentMap.layers.get(QUEST_DISCOVER_LAYER)
 
         npcStartPositions = getNPCStartPositions()
         specialNPCStartPositions = getExtraNPCStartPositions()
+    }
+
+    fun getQuestItemSpawnPositions(objectName: String, objectTaskID: String): Array<Vector2> {
+        val objects = Array<MapObject>()
+        val positions = Array<Vector2>()
+
+        for (mapObject in questItemSpawnLayer!!.objects) {
+            val name = mapObject.name
+            val taskID = mapObject.properties.get("taskID") as String
+
+            if (name == null || taskID == null ||
+                    name.isEmpty() || taskID.isEmpty() ||
+                    !name.equals(objectName, true) ||
+                    !taskID.equals(objectTaskID, true)) {
+                continue
+            }
+            //Get center of rectangle
+            var x = (mapObject as RectangleMapObject).rectangle.getX()
+            var y = mapObject.rectangle.getY()
+
+            //scale by the unit to convert from map coordinates
+            x *= UNIT_SCALE
+            y *= UNIT_SCALE
+
+            positions.add(Vector2(x, y))
+        }
+        return positions
+    }
+
+    fun addMapEntities(entities: Array<Entity>) {
+        mapEntities.addAll(entities)
     }
 
     val playerStartUnitScaled: Vector2
@@ -151,10 +191,25 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected val COLLISION_LAYER = "MAP_COLLISION_LAYER"
         protected val SPAWNS_LAYER = "MAP_SPAWNS_LAYER"
         protected val PORTAL_LAYER = "MAP_PORTAL_LAYER"
+        protected val QUEST_ITEM_SPAWN_LAYER = "MAP_QUEST_ITEM_SPAWN_LAYER"
+        protected val QUEST_DISCOVER_LAYER = "MAP_QUEST_DISCOVER_LAYER"
+
+        // starting locations
         protected val NPC_START = "NPC_START"
-
-
-        //Starting locations
         protected val PLAYER_START = "PLAYER_START"
+
+        fun initEntity(entityConfig: EntityConfig, position: Vector2): Entity {
+            val json = Json()
+            val entity = EntityFactory.getEntity(EntityFactory.EntityType.NPC)
+            entity.entityConfig = entityConfig
+
+            entity.apply {
+                sendMessage(Component.MESSAGE.LOAD_ANIMATIONS, json.toJson(entity.entityConfig))
+                sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(position))
+                sendMessage(Component.MESSAGE.INIT_STATE, json.toJson(entity.entityConfig.state))
+                sendMessage(Component.MESSAGE.INIT_DIRECTION, json.toJson(entity.entityConfig.direction))
+            }
+            return entity
+        }
     }
 }

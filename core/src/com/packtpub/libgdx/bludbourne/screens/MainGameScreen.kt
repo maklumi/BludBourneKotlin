@@ -123,6 +123,8 @@ class MainGameScreen(game: BludBourne) : Screen {
             val entities = mapMgr.getCurrentMapEntities()
             entities.forEach { entity -> entity.registerObserver(playerHUD) }
 
+            playerHUD.mapChanged()
+
             mapMgr.hasMapChanged = false
 
         }

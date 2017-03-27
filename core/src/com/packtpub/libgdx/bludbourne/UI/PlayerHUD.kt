@@ -14,8 +14,6 @@ import com.packtpub.libgdx.bludbourne.dialog.ConversationGraph
 import com.packtpub.libgdx.bludbourne.dialog.ConversationGraphObserver
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
-import com.sun.awt.SecurityWarning.setPosition
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.packtpub.libgdx.bludbourne.quest.QuestGraph
 
 
@@ -125,6 +123,10 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 mapMgr.clearCurrentSelectedMapEntity()
             }
         })
+    }
+
+    fun mapChanged() {
+        _questUI.mapChanged(mapMgr)
     }
 
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {

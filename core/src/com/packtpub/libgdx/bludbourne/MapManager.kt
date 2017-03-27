@@ -85,6 +85,22 @@ class MapManager : ProfileObserver {
         currentMap!!.setClosestStartPositionFromScaledUnits(position)
     }
 
+    fun addMapEntities(entities: Array<Entity>) {
+        currentMap!!.mapEntities.addAll(entities)
+    }
+
+    fun getQuestItemSpawnPositions(objectName: String, objectTaskID: String): Array<Vector2> {
+        return currentMap!!.getQuestItemSpawnPositions(objectName, objectTaskID)
+    }
+
+    fun getQuestDiscoverLayer(): MapLayer? {
+        return currentMap!!.questDiscoverLayer
+    }
+
+    fun getCurrentMapType(): MapFactory.MapType {
+        return currentMap!!.currentMapType
+    }
+
     fun updateCurrentMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
         currentMap!!.updateMapEntities(mapMgr, batch, delta)
     }
@@ -111,7 +127,7 @@ class MapManager : ProfileObserver {
 
     fun getCurrentTiledMap(): TiledMap {
         if (currentMap == null) loadMap(MapFactory.MapType.TOWN)
-        return currentMap!!.currentTiledMap
+        return currentMap!!.currentMap
     }
 
     fun setMapChanged(hasMapChanged: Boolean) {

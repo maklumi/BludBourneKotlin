@@ -28,17 +28,6 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
       }
     }
 
-    private fun initEntity(config: EntityConfig, position: Vector2): Entity {
-        val entity = EntityFactory.getEntity(EntityFactory.EntityType.NPC)
-        entity.apply {
-            entityConfig = config
-            sendMessage(Component.MESSAGE.LOAD_ANIMATIONS, json.toJson(entity.entityConfig))
-            sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(position))
-            sendMessage(Component.MESSAGE.INIT_STATE, json.toJson(entity.entityConfig.state))
-            sendMessage(Component.MESSAGE.INIT_DIRECTION, json.toJson(entity.entityConfig.direction))
-        }
-        return entity
-    }
 
     private fun initSpecialEntity(entityConfig: EntityConfig): Entity {
         var position = Vector2(0f, 0f)

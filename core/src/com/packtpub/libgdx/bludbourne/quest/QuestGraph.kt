@@ -1,6 +1,10 @@
 package com.packtpub.libgdx.bludbourne.quest
 
+import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
+import com.packtpub.libgdx.bludbourne.Entity
+import com.packtpub.libgdx.bludbourne.Map
+import com.packtpub.libgdx.bludbourne.MapManager
 import java.util.*
 
 class QuestGraph {
@@ -8,6 +12,8 @@ class QuestGraph {
     private var questTaskDependencies: Hashtable<String, ArrayList<QuestTaskDependency>> = Hashtable()
 
     var questTitle: String = ""
+    var questID: String = ""
+    var isQuestComplete: Boolean = false
 
     fun setTasks(questTasks: Hashtable<String, QuestTask>) {
         if (questTasks.size < 0) {
@@ -86,6 +92,57 @@ class QuestGraph {
         val list = questTaskDependencies[id]
 
         return !(list!!.isEmpty() || list.size == 0)
+    }
+
+    fun isQuestTaskAvailable(id: String): Boolean {
+        val task = getQuestTaskByID(id) ?: return false
+        val list = questTaskDependencies[id]
+
+        for (dep in list!!) {
+            val depTask = getQuestTaskByID(dep.destinationId) ?: continue
+            if (dep.sourceId.equals(id, ignoreCase = true) && !depTask.isTaskComplete) {
+                return false
+            }
+        }
+        return true
+    }
+
+    fun update(mapMgr: MapManager) {
+        val allQuestTasks = getAllQuestTasks()
+        abc@ for (questTask in allQuestTasks) {
+            //We first want to make sure the task is available and is relevant to current location
+            if (!isQuestTaskAvailable(questTask.id)) continue
+
+            val taskLocation = questTask.getPropertyValue(QuestTask.QuestTaskPropertyType.TARGET_LOCATION.toString())
+            if (taskLocation == null || taskLocation.isEmpty() ||
+                    !taskLocation.equals(mapMgr.getCurrentMapType().toString(), ignoreCase = true))
+                continue
+
+            when (questTask.questType) {
+                QuestTask.QuestType.FETCH -> {
+                    val entities = Array<Entity>()
+                    val positions = mapMgr.getQuestItemSpawnPositions(questID, questTask.id)
+                    val taskConfig = questTask.getPropertyValue(QuestTask.QuestTaskPropertyType.TARGET_TYPE.toString())
+                    if (taskConfig == null || taskConfig.isEmpty()) continue@abc
+                    for (position in positions) {
+                        entities.add(Map.initEntity(Entity.getEntityConfig(taskConfig), position))
+                    }
+                    mapMgr.addMapEntities(entities)
+                }
+                QuestTask.QuestType.KILL -> {
+                }
+                QuestTask.QuestType.DELIVERY -> {
+                }
+                QuestTask.QuestType.GUARD -> {
+                }
+                QuestTask.QuestType.ESCORT -> {
+                }
+                QuestTask.QuestType.RETURN -> {
+                }
+                QuestTask.QuestType.DISCOVER -> {
+                }
+            }
+        }
     }
 
     override fun toString(): String {

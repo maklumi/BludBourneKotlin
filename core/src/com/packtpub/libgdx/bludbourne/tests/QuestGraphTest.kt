@@ -99,10 +99,14 @@ object QuestGraphTest {
         val q01 = QuestTask()
         q01.id = "1"
         q01.taskPhrase = "Come back to me with the herbs"
+        q01.resetAllProperties()
+
 
         val q02 = QuestTask()
         q02.id = "2"
         q02.taskPhrase = "Please collect 5 herbs for my sick mother"
+        q02.resetAllProperties()
+
 
         _questTasks.put(q01.id, q01)
         _questTasks.put(q02.id, q02)
