@@ -74,7 +74,9 @@ class PlayerPhysicsComponent : PhysicsComponent() {
     }
 
     private fun selectMapEntityCandidate(mapMgr: MapManager) {
-        val currentEntities = mapMgr.getCurrentMapEntities()
+        tempEntities.clear()
+        tempEntities.addAll(mapMgr.getCurrentMapEntities())
+        tempEntities.addAll(mapMgr.getCurrentMapQuestEntities())
 
         //Convert screen coordinates to world coordinates, then to unit scale coordinates
         mapMgr.camera.unproject(mouseSelectCoordinates)
@@ -83,7 +85,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
 
 //        Gdx.app.debug(TAG, "Mouse Coordinates " + "(" + mouseSelectCoordinates.x + "," + mouseSelectCoordinates.y + ")")
 
-        currentEntities.forEach { mapEntity ->
+        tempEntities.forEach { mapEntity ->
             //Don't break, reset all entities
             mapEntity.sendMessage(Component.MESSAGE.ENTITY_DESELECTED)
             val mapEntityBoundingBox = mapEntity.getCurrentBoundingBox()
@@ -102,6 +104,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                 }
             }
         }
+        tempEntities.clear()
     }
 
     private fun updatePortalLayerActivation(mapMgr: MapManager): Boolean {

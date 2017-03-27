@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.Window
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Array
+import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.InventoryItem
 import com.packtpub.libgdx.bludbourne.InventoryItem.ItemUseType.*
 import com.packtpub.libgdx.bludbourne.InventoryItemFactory
@@ -110,6 +111,27 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
         this.pack()
     }
 
+    fun addEntityToInventory(entity: Entity) {
+        val sourceCells = inventorySlotTable.getCells()
+        var counter = 0
+
+        for (index in 0..sourceCells.size - 1) {
+            counter = index
+            val inventorySlot = sourceCells.get(index).getActor() as InventorySlot
+            if (inventorySlot == null) continue
+            val numItems = inventorySlot.getNumItems()
+            if (numItems == 0) {
+                val inventoryItem = InventoryItemFactory.instance.getInventoryItem(InventoryItem.ItemTypeID.valueOf(entity.entityConfig.entityID))
+                inventorySlot.add(inventoryItem)
+                dragAndDrop.addSource(InventorySlotSource(inventorySlot, dragAndDrop))
+                break
+            }
+        }
+        if (counter == sourceCells.size) {
+            //No empty slot available
+            //TODO: ADD MESSAGE HERE THAT INVENTORY IS FULL
+        }
+    }
 
     companion object {
         val numSlots = 50

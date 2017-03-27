@@ -36,7 +36,7 @@ class QuestTask {
                 setPropertyValue(QuestTaskPropertyType.IS_TASK_COMPLETE.toString(), "false")
                 return false
             }
-            return taskProperties[QuestTaskPropertyType.IS_TASK_COMPLETE.toString()] as Boolean
+            return taskProperties[QuestTaskPropertyType.IS_TASK_COMPLETE.toString()].toString().toBoolean()
         }
 
     fun setTaskComplete() {

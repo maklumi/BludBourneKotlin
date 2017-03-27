@@ -7,6 +7,7 @@ class TopWorldMap : Map(MapFactory.MapType.TOP_WORLD, TopWorldMap._mapPath) {
 
     override fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
         mapEntities.forEach { it.update(mapMgr, batch, delta) }
+        mapQuestEntities.forEach { it.update(mapMgr, batch, delta) }
     }
 
     companion object {

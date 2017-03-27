@@ -27,15 +27,16 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected set
     var spawnsLayer: MapLayer
         protected set
-    var questItemSpawnLayer: MapLayer ? = null
+    var questItemSpawnLayer: MapLayer? = null
         protected set
-    var questDiscoverLayer: MapLayer ? = null
+    var questDiscoverLayer: MapLayer? = null
         protected set
 
     protected val npcStartPositions: Array<Vector2>
     protected val specialNPCStartPositions: Hashtable<String, Vector2>
     protected val json = Json()
     var mapEntities: Array<Entity> = Array(10)
+    var mapQuestEntities: Array<Entity> = Array()
 
     init {
         Utility.loadMapAsset(fullMapPath)
@@ -84,8 +85,8 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         return positions
     }
 
-    fun addMapEntities(entities: Array<Entity>) {
-        mapEntities.addAll(entities)
+    fun addMapQuestEntities(entities: Array<Entity>) {
+        mapQuestEntities.addAll(entities)
     }
 
     val playerStartUnitScaled: Vector2

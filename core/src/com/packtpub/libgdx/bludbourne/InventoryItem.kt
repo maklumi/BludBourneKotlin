@@ -24,7 +24,9 @@ class InventoryItem : Image {
         ARMOR_SHIELD(128),
         ARMOR_HELMET(256),
         ARMOR_CHEST(512),
-        ARMOR_FEET(1024)
+        ARMOR_FEET(1024),
+        QUEST_ITEM(2048),
+        ;
     }
 
     enum class ItemTypeID {
@@ -35,7 +37,9 @@ class InventoryItem : Image {
         WANDS01, WANDS02, WANDS03, WANDS04, WANDS05,
         WEAPON01, WEAPON02, WEAPON03, WEAPON04, WEAPON05,
         POTIONS01, POTIONS02, POTIONS03,
-        SCROLL01, SCROLL02, SCROLL03
+        SCROLL01, SCROLL02, SCROLL03,
+        HERB001,
+        ;
     }
 
     var itemAttributes: Int = 0

@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.Ray
+import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.Entity.Companion.FRAME_HEIGHT
 import com.packtpub.libgdx.bludbourne.Entity.Companion.FRAME_WIDTH
@@ -21,6 +22,8 @@ abstract class PhysicsComponent : ComponentSubject(), Component {
     var currentEntityPosition: Vector2 = Vector2(0f, 0f)
     var currentDirection = Entity.Direction.DOWN
     val json = Json()
+
+    val tempEntities = Array<Entity>()
 
     var selectionRay = Ray(Vector3(), Vector3())
     val selectRayMaximumDistance = 32.0f
@@ -49,10 +52,12 @@ abstract class PhysicsComponent : ComponentSubject(), Component {
     }
 
     protected open fun isCollisionWithMapEntities(entity: Entity, mapMgr: MapManager): Boolean {
-        val entities = mapMgr.getCurrentMapEntities()
+        tempEntities.clear()
+        tempEntities.addAll(mapMgr.getCurrentMapEntities())
+        tempEntities.addAll(mapMgr.getCurrentMapQuestEntities())
         var isCollisionWithMapEntities = false
 
-        for (mapEntity in entities) {
+        for (mapEntity in tempEntities) {
             // check for testing against self
             if (mapEntity == entity) continue
 
@@ -62,7 +67,7 @@ abstract class PhysicsComponent : ComponentSubject(), Component {
                 break
             }
         }
-
+        tempEntities.clear()
         return isCollisionWithMapEntities
 
     }

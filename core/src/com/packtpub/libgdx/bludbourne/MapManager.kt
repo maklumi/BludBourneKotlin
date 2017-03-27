@@ -69,16 +69,43 @@ class MapManager : ProfileObserver {
             Gdx.app.debug(TAG, "Map does not exist!")
         }
 
-        // unregister observers
-        if (currentMap != null) {
-            val entities: Array<Entity>? = currentMap?.mapEntities
-            entities?.forEach(Entity::unregisterObservers)
-        }
-
         currentMap = map
         hasMapChanged = true
         clearCurrentSelectedMapEntity()
         Gdx.app.debug(TAG, "Player Start: (" + currentMap?.playerStart?.x + "," + currentMap?.playerStart?.y + ")")
+    }
+
+    fun unregisterCurrentMapEntityObservers() {
+        if (currentMap != null) {
+            val entities = currentMap!!.mapEntities
+            entities.forEach(Entity::unregisterObservers)
+
+            val questEntities = currentMap!!.mapQuestEntities
+            questEntities.forEach(Entity::unregisterObservers)
+        }
+    }
+
+    fun registerCurrentMapEntityObservers(observer: ComponentObserver) {
+        currentMap?.apply {
+            mapEntities.forEach { it.registerObserver(observer) }
+
+            mapQuestEntities.forEach { it.registerObserver(observer) }
+        }
+    }
+
+    fun getCurrentMapQuestEntities(): Array<Entity>? = currentMap?.mapQuestEntities
+
+    fun addMapQuestEntities(entities: Array<Entity>) {
+        currentMap!!.mapQuestEntities.addAll(entities)
+    }
+
+    fun removeMapQuestEntity(entity: Entity) {
+        entity.unregisterObservers()
+        currentMap!!.mapQuestEntities.removeValue(entity, true)
+    }
+
+    fun clearAllMapQuestEntities() {
+        currentMap!!.mapQuestEntities.clear()
     }
 
     fun setClosestStartPositionFromScaledUnits(position: Vector2) {

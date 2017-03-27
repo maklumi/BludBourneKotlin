@@ -99,8 +99,8 @@ class QuestUI : Window("Quest Log", Utility.STATUSUI_SKIN, "solidbackground") {
         _listTasks.selectedIndex = -1
     }
 
-    fun mapChanged(mapMgr: MapManager) {
-        System.out.println("MAP CHANGED TO " + mapMgr.getCurrentMapType().toString())
+    fun updateQuests(mapMgr: MapManager) {
+        mapMgr.clearAllMapQuestEntities()
 
         //populate items if quests have them
         for (quest in _quests) {

@@ -125,8 +125,12 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         })
     }
 
-    fun mapChanged() {
-        _questUI.mapChanged(mapMgr)
+    fun updateEntityObservers() {
+        mapMgr.unregisterCurrentMapEntityObservers()
+
+        _questUI.updateQuests(mapMgr)
+
+        mapMgr.registerCurrentMapEntityObservers(this)
     }
 
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
@@ -234,6 +238,17 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
                 conversationUI.isVisible = false
                 mapMgr.clearCurrentSelectedMapEntity()
+                updateEntityObservers()
+            }
+
+            ConversationGraphObserver.ConversationCommandEvent.ADD_ENTITY_TO_INVENTORY-> {
+                val entity = mapMgr.currentSelectedEntity ?: return
+
+                inventoryUI.addEntityToInventory(entity)
+                mapMgr.clearCurrentSelectedMapEntity()
+                entity.unregisterObservers()
+                mapMgr.removeMapQuestEntity(entity)
+                conversationUI.isVisible = false
             }
 
             ConversationGraphObserver.ConversationCommandEvent.NONE -> {

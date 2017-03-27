@@ -125,9 +125,11 @@ class QuestGraph {
                     val taskConfig = questTask.getPropertyValue(QuestTask.QuestTaskPropertyType.TARGET_TYPE.toString())
                     if (taskConfig == null || taskConfig.isEmpty()) continue@abc
                     for (position in positions) {
-                        entities.add(Map.initEntity(Entity.getEntityConfig(taskConfig), position))
+                        val config = Entity.getEntityConfig(taskConfig)
+                        val entity = Map.initEntity(config, position)
+                        entities.add(entity)
                     }
-                    mapMgr.addMapEntities(entities)
+                    mapMgr.addMapQuestEntities(entities)
                 }
                 QuestTask.QuestType.KILL -> {
                 }

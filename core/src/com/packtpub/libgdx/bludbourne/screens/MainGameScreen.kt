@@ -119,11 +119,7 @@ class MainGameScreen(game: BludBourne) : Screen {
             camera.position.set(mapMgr.getPlayerStartUnitScaled().x, mapMgr.getPlayerStartUnitScaled().y, 0f)
             camera.update()
 
-            // register observers
-            val entities = mapMgr.getCurrentMapEntities()
-            entities.forEach { entity -> entity.registerObserver(playerHUD) }
-
-            playerHUD.mapChanged()
+            playerHUD.updateEntityObservers()
 
             mapMgr.hasMapChanged = false
 

@@ -23,9 +23,12 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
     }
 
     override fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
-      for (i in 0..mapEntities.size-1) {
-          mapEntities[i].update(mapMgr, batch, delta)
-      }
+        for (i in 0..mapEntities.size - 1) {
+            mapEntities[i].update(mapMgr, batch, delta)
+        }
+        for (i in 0..mapQuestEntities.size - 1) {
+            mapQuestEntities[i].update(mapMgr, batch, delta)
+        }
     }
 
 
