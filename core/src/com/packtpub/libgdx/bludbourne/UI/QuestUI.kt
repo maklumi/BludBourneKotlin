@@ -44,7 +44,7 @@ class QuestUI : Window("Quest Log", Utility.STATUSUI_SKIN, "solidbackground") {
         this.add(_tasksLabel).align(Align.left)
         this.row()
         this.defaults().expand().fill()
-        this.add(scrollPane).padRight(5f)
+        this.add(scrollPane).padRight(15f)
         this.add(scrollPaneTasks).padLeft(5f)
 
         //this.debug();

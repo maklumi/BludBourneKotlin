@@ -141,8 +141,31 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
         }
     }
 
+    fun doesInventoryHaveSpace(): Boolean {
+        val sourceCells = inventorySlotTable.cells
+        var index = 0
+
+        while (index < sourceCells.size) {
+            val inventorySlot = sourceCells.get(index).actor
+            if (inventorySlot == null) {
+                index++
+                continue
+            }
+            val numItems = (inventorySlot as InventorySlot).getNumItems()
+            if (numItems == 0) {
+                return true
+            } else {
+                index++
+            }
+            index++
+        }
+        return false
+    }
+
     companion object {
         val numSlots = 50
+        val PLAYER_INVENTORY = "Player_Inventory"
+        val STORE_INVENTORY = "Store_Inventory"
 
         fun clearInventoryItems(targetTable: Table) {
             val cells: Array<Cell<Actor>> = targetTable.cells
@@ -165,7 +188,7 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
             return items
         }
 
-        fun populateInventory(targetTable: Table, inventoryItems: Array<InventoryItemLocation>, dragAndDrop: DragAndDrop) {
+        fun populateInventory(targetTable: Table, inventoryItems: Array<InventoryItemLocation>, dragAndDrop: DragAndDrop, defaultName: String, disableNonDefaultItems: Boolean) {
             clearInventoryItems(targetTable)
 
             val cells: Array<Cell<Actor>> = targetTable.cells
@@ -183,11 +206,19 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
 
                 for (index in 0..itemLocation.numberItemsAtLocation - 1) {
                     val item = InventoryItemFactory.instance.getInventoryItem(itemTypeId)
-                    if (item.name == null) {
-                        item.name = targetTable.name
+                    val itemName = itemLocation.itemNameProperty
+                    if (itemName == null || itemName.isEmpty()) {
+                        item.name = defaultName
+                    } else {
+                        item.name = itemName
                     }
+
                     inventorySlot.add(item)
-                    dragAndDrop.addSource(InventorySlotSource(inventorySlot, dragAndDrop))
+                    if (item.name.equals(defaultName, true)) {
+                        dragAndDrop.addSource(InventorySlotSource(inventorySlot, dragAndDrop))
+                    } else if (!disableNonDefaultItems) {
+                        dragAndDrop.addSource(InventorySlotSource(inventorySlot, dragAndDrop))
+                    }
                 }
             }
         }
@@ -202,7 +233,28 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
                 if (numItems > 0) {
                     items.add(InventoryItemLocation(i,
                             inventorySlot.getTopInventoryItem()!!.itemTypeID.toString(),
-                            numItems))
+                            numItems,
+                            inventorySlot.getTopInventoryItem()!!.name))
+                }
+            }
+            return items
+        }
+
+        fun getInventoryFiltered(targetTable: Table, filterOutName: String): Array<InventoryItemLocation> {
+            val cells = targetTable.cells
+            val items = Array<InventoryItemLocation>()
+            for (i in 0..cells.size - 1) {
+                val inventorySlot = cells.get(i).actor as InventorySlot
+                val numItems = inventorySlot.getNumItems()
+                if (numItems > 0) {
+                    val topItemName = inventorySlot.getTopInventoryItem()!!.name
+                    if (topItemName.equals(filterOutName, ignoreCase = true)) continue
+                    //System.out.println("[i] " + i + " itemtype: " + inventorySlot.getTopInventoryItem().getItemTypeID().toString() + " numItems " + numItems);
+                    items.add(InventoryItemLocation(
+                            i,
+                            inventorySlot.getTopInventoryItem()!!.itemTypeID!!.toString(),
+                            numItems,
+                            inventorySlot.getTopInventoryItem()!!.name))
                 }
             }
             return items
@@ -218,14 +270,15 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
                 if (numItems > 0) {
                     items.add(InventoryItemLocation(i,
                             inventorySlot.getTopInventoryItem()!!.itemTypeID.toString(),
-                            numItems))
+                            numItems,
+                            name))
                 }
             }
             return items
         }
 
-        fun getInventory(sourceTable: Table, targetTable: Table, name: String): Array<InventoryItemLocation> {
-            val items: Array<InventoryItemLocation> = getInventory(targetTable, name)
+        fun getInventoryFiltered(sourceTable: Table, targetTable: Table, filterOutName: String): Array<InventoryItemLocation> {
+            val items: Array<InventoryItemLocation> = getInventoryFiltered(targetTable, filterOutName)
             val sourceCells: Array<Cell<Actor>> = sourceTable.cells
             var counter = 0
             for (item in items) {
@@ -233,7 +286,7 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
                     counter = index
                     val inventorySlot = sourceCells[index].actor ?: continue
                     inventorySlot as InventorySlot
-                    val numItems = inventorySlot.getNumItems(name)
+                    val numItems = inventorySlot.getNumItems()
                     if (numItems == 0) {
                         item.locationIndex = index
 //                        println("[index]: $index itemtype: ${item.itemTypeAtLocation} numItems: $numItems")

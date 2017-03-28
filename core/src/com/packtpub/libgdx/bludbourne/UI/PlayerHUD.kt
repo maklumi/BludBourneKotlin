@@ -4,6 +4,7 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
@@ -29,12 +30,29 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     private val storeInventoryUI: StoreInventoryUI
     private var _questUI: QuestUI
     private val json = Json()
-
+    private val _messageBoxUI: Dialog
+    private val INVENTORY_FULL = "Your inventory is full!"
 
     init {
         viewport = ScreenViewport(camera)
         stage = Stage(viewport)
 //        stage.setDebugAll(true)
+
+        _messageBoxUI = object : Dialog("Message", Utility.STATUSUI_SKIN, "solidbackground") {
+            init {
+                button("OK")
+                text(INVENTORY_FULL)
+            }
+
+            override fun result(`object`: Any?) {
+                cancel()
+                isVisible = false
+            }
+
+        }
+        _messageBoxUI.setVisible(false)
+        _messageBoxUI.pack()
+        _messageBoxUI.setPosition(stage.width / 2 - _messageBoxUI.getWidth() / 2, stage.height / 2 - _messageBoxUI.getHeight() / 2)
 
         statusUI = StatusUI()
         statusUI.isVisible = true
@@ -75,6 +93,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         stage.addActor(inventoryUI)
         stage.addActor(conversationUI)
         stage.addActor(storeInventoryUI)
+        stage.addActor(_messageBoxUI)
 
         //add tooltips to the stage
         val actors = inventoryUI.inventoryActors
@@ -145,19 +164,19 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                     val items: Array<InventoryItem.ItemTypeID> = player.entityConfig.inventory
                     val itemLocations = Array<InventoryItemLocation>()
                     for (i in 0..items.size - 1) {
-                        itemLocations.add(InventoryItemLocation(i, items.get(i).toString(), 1))
+                        itemLocations.add(InventoryItemLocation(i, items.get(i).toString(), 1, InventoryUI.PLAYER_INVENTORY))
                     }
-                    InventoryUI.populateInventory(inventoryUI.inventorySlotTable, itemLocations, inventoryUI.dragAndDrop)
+                    InventoryUI.populateInventory(inventoryUI.inventorySlotTable, itemLocations, inventoryUI.dragAndDrop, InventoryUI.PLAYER_INVENTORY, false)
                     profileManager.setProperty("playerInventory", InventoryUI.getInventory(inventoryUI.inventorySlotTable))
                 }
 
 
                 val inventory = profileManager.getProperty("playerInventory", Array::class.java) as Array<InventoryItemLocation>
-                InventoryUI.populateInventory(inventoryUI.inventorySlotTable, inventory, inventoryUI.dragAndDrop)
+                InventoryUI.populateInventory(inventoryUI.inventorySlotTable, inventory, inventoryUI.dragAndDrop, InventoryUI.PLAYER_INVENTORY, false)
 
                 val equipInventory = profileManager.getProperty("playerEquipInventory", Array::class.java) as Array<InventoryItemLocation>
                 if (equipInventory.size > 0) {
-                    InventoryUI.populateInventory(inventoryUI.equipSlots, equipInventory, inventoryUI.dragAndDrop)
+                    InventoryUI.populateInventory(inventoryUI.equipSlots, equipInventory, inventoryUI.dragAndDrop, InventoryUI.PLAYER_INVENTORY, false)
                 }
 
                 val quests = profileManager.getProperty("playerQuests", Array::class.java)
@@ -215,7 +234,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 val items = selectedEntity.entityConfig.inventory
                 val itemLocations = Array<InventoryItemLocation>()
                 for (i in 0..items.size - 1) {
-                    itemLocations.add(InventoryItemLocation(i, items[i].toString(), 1))
+                    itemLocations.add(InventoryItemLocation(i, items[i].toString(), 1, InventoryUI.PLAYER_INVENTORY))
                 }
 
                 storeInventoryUI.loadStoreInventory(itemLocations)
@@ -267,12 +286,19 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             ConversationGraphObserver.ConversationCommandEvent.ADD_ENTITY_TO_INVENTORY -> {
                 val entity = mapMgr.currentSelectedEntity ?: return
 
-                inventoryUI.addEntityToInventory(entity, entity.entityConfig.currentQuestID)
-                mapMgr.clearCurrentSelectedMapEntity()
-                entity.unregisterObservers()
-                mapMgr.removeMapQuestEntity(entity)
-                conversationUI.isVisible = false
-                _questUI.updateQuests(mapMgr)
+                if (inventoryUI.doesInventoryHaveSpace()) {
+                    inventoryUI.addEntityToInventory(entity, entity.entityConfig.currentQuestID)
+                    mapMgr.clearCurrentSelectedMapEntity()
+                    conversationUI.isVisible = false
+                    entity.unregisterObservers()
+                    mapMgr.removeMapQuestEntity(entity)
+                    _questUI.updateQuests(mapMgr)
+                } else {
+                    mapMgr.clearCurrentSelectedMapEntity()
+                    conversationUI.isVisible = false
+                    _messageBoxUI.isVisible = true
+                }
+
             }
 
             ConversationGraphObserver.ConversationCommandEvent.NONE -> {
@@ -289,7 +315,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
             StoreInventoryObserver.StoreInventoryEvent.PLAYER_INVENTORY_UPDATED -> {
                 val items = json.fromJson(Array::class.java, value) as Array<InventoryItemLocation>
-                InventoryUI.populateInventory(inventoryUI.inventorySlotTable, items, inventoryUI.dragAndDrop)
+                InventoryUI.populateInventory(inventoryUI.inventorySlotTable, items, inventoryUI.dragAndDrop, InventoryUI.PLAYER_INVENTORY, false)
             }
         }
     }

@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
+import com.packtpub.libgdx.bludbourne.UI.InventoryUI.Companion.PLAYER_INVENTORY
+import com.packtpub.libgdx.bludbourne.UI.InventoryUI.Companion.STORE_INVENTORY
 import com.packtpub.libgdx.bludbourne.UI.StoreInventoryObserver.StoreInventoryEvent
 import com.packtpub.libgdx.bludbourne.Utility
 
@@ -181,18 +183,18 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
     }
 
     fun loadPlayerInventory(playerInventoryItems: Array<InventoryItemLocation>) {
-        InventoryUI.populateInventory(_playerInventorySlotTable, playerInventoryItems, _dragAndDrop)
+        InventoryUI.populateInventory(_playerInventorySlotTable, playerInventoryItems, _dragAndDrop, PLAYER_INVENTORY, true)
     }
 
     fun loadStoreInventory(storeInventoryItems: Array<InventoryItemLocation>) {
-        InventoryUI.populateInventory(inventorySlotTable, storeInventoryItems, _dragAndDrop)
+        InventoryUI.populateInventory(inventorySlotTable, storeInventoryItems, _dragAndDrop, STORE_INVENTORY, false)
     }
 
     fun savePlayerInventory() {
-        val playerItemsInPlayerInventory = InventoryUI.getInventory(_playerInventorySlotTable, PLAYER_INVENTORY)
-        val playerItemsInStoreInventory = InventoryUI.getInventory(_playerInventorySlotTable, inventorySlotTable, PLAYER_INVENTORY)
+        val playerItemsInPlayerInventory = InventoryUI.getInventoryFiltered(_playerInventorySlotTable, STORE_INVENTORY)
+        val playerItemsInStoreInventory = InventoryUI.getInventoryFiltered(_playerInventorySlotTable, inventorySlotTable, STORE_INVENTORY)
         playerItemsInPlayerInventory.addAll(playerItemsInStoreInventory)
-        this@StoreInventoryUI.notify(_json.toJson(playerItemsInPlayerInventory), StoreInventoryEvent.PLAYER_INVENTORY_UPDATED);
+        this@StoreInventoryUI.notify(_json.toJson(playerItemsInPlayerInventory), StoreInventoryEvent.PLAYER_INVENTORY_UPDATED)
     }
 
     fun cleanupStoreInventory() {
@@ -278,9 +280,6 @@ class StoreInventoryUI : Window("Store Inventory", Utility.STATUSUI_SKIN, "solid
     }
 
     companion object {
-
-        private val STORE_INVENTORY = "Store_Inventory"
-        private val PLAYER_INVENTORY = "Player_Inventory"
 
         private val SELL = "SELL"
         private val BUY = "BUY"
