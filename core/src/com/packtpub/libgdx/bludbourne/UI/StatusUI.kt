@@ -1,10 +1,10 @@
 package com.packtpub.libgdx.bludbourne.UI
 
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.Utility
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 
 
 class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
@@ -22,9 +22,17 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
     private var _goldVal = -1
     private val hpVal = 50
     private val mpVal = 50
-    private val xpVal = 0
+    private var xpVal = 0
 
-    val goldLabel: Label
+    private var _xpCurrentMax = -1
+
+    val goldVal: Label
+    val xpLabel: Label
+    val xp: Label
+
+
+    private var _barWidth = 0f
+    private var _barHeight = 0f
 
     init {
 
@@ -41,17 +49,20 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
         xpBar = Image(Utility.STATUSUI_TEXTUREATLAS.findRegion("XP_Bar"))
         val bar3 = Image(Utility.STATUSUI_TEXTUREATLAS.findRegion("Bar"))
 
+        _barWidth = hpBar.width
+        _barHeight = hpBar.height
+
         //labels
         val hpLabel = Label(" hp:", Utility.STATUSUI_SKIN)
         val hp = Label(hpVal.toString(), Utility.STATUSUI_SKIN)
         val mpLabel = Label(" mp:", Utility.STATUSUI_SKIN)
         val mp = Label(mpVal.toString(), Utility.STATUSUI_SKIN)
-        val xpLabel = Label(" xp:", Utility.STATUSUI_SKIN)
-        val xp = Label(xpVal.toString(), Utility.STATUSUI_SKIN)
+        xpLabel = Label(" xp:", Utility.STATUSUI_SKIN)
+        xp = Label(xpVal.toString(), Utility.STATUSUI_SKIN)
         val levelLabel = Label(" lv:", Utility.STATUSUI_SKIN)
         val levelVal = Label(levelVal.toString(), Utility.STATUSUI_SKIN)
-        goldLabel = Label(" gp:", Utility.STATUSUI_SKIN)
-        val goldVal = Label(_goldVal.toString(), Utility.STATUSUI_SKIN)
+        val goldLabel = Label(" gp:", Utility.STATUSUI_SKIN)
+        goldVal = Label(_goldVal.toString(), Utility.STATUSUI_SKIN)
 
         //buttons
         inventoryButton = ImageButton(Utility.STATUSUI_SKIN, "inventory-button")
@@ -113,8 +124,51 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
     fun setGoldValue(value: Int) {
         _goldVal = value
-        goldLabel.setText(getGoldValue().toString())
+        goldVal.setText(getGoldValue().toString())
         notify(value, StatusObserver.StatusEvent.UPDATED_GP)
+    }
+
+    fun addGoldValue(goldValue: Int) {
+        this._goldVal += goldValue
+        goldVal.setText(_goldVal.toString())
+        notify(goldValue, StatusObserver.StatusEvent.UPDATED_GP)
+    }
+
+    fun getXPValue(): Int {
+        return xpVal
+    }
+
+    fun addXPValue(xpValue: Int) {
+        this.xpVal += xpValue
+        xp.setText(xpVal.toString())
+
+        updateBar(xpBar, xpVal, _xpCurrentMax)
+
+        notify(xpValue, StatusObserver.StatusEvent.UPDATED_XP)
+    }
+
+    fun setXPValue(xpValue: Int) {
+        this.xpVal = xpValue
+        xp.setText(xpVal.toString())
+
+        updateBar(xpBar, xpVal, _xpCurrentMax)
+
+        notify(xpValue, StatusObserver.StatusEvent.UPDATED_XP)
+    }
+
+    fun setXPValueMax(maxXPValue: Int) {
+        this._xpCurrentMax = maxXPValue
+    }
+
+    fun getXPValueMax(): Int {
+        return _xpCurrentMax
+    }
+
+    fun updateBar(bar: Image, currentVal: Int, maxVal: Int) {
+        val `val` = MathUtils.clamp(currentVal, 0, maxVal)
+        val tempPercent = `val`.toFloat() / maxVal.toFloat()
+        val percentage = MathUtils.clamp(tempPercent, 0f, 100f)
+        bar.setSize(_barWidth * percentage, _barHeight)
     }
 
     override fun addObserver(statusObserver: StatusObserver) {

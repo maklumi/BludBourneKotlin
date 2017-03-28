@@ -17,6 +17,8 @@ class QuestGraph {
     var questTitle: String = ""
     var questID: String = ""
     var isQuestComplete: Boolean = false
+    var goldReward: Int = 0
+    var xpReward: Int = 0
 
     fun areAllTasksComplete(): Boolean {
         val tasks = getAllQuestTasks()

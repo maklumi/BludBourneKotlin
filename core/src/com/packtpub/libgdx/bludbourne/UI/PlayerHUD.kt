@@ -182,12 +182,22 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 val quests = profileManager.getProperty("playerQuests", Array::class.java)
                 _questUI.quests = quests as Array<QuestGraph>
 
+                var xpMaxVal = profileManager.getProperty("currentPlayerXPMax", Int::class.java)
+                var xpVal = profileManager.getProperty("currentPlayerXP", Int::class.java)
+
                 // check gold
                 if (firstTime) {
                     // start the player with some money
                     goldVal = 20
+                    xpMaxVal = 200
                 }
+
+                //set the current max values first
+                statusUI.setXPValueMax(xpMaxVal!!)
+
+                //then add in current values
                 statusUI.setGoldValue(goldVal)
+                statusUI.setXPValue(xpVal!!)
             }
 
             ProfileObserver.ProfileEvent.SAVING_PROFILE -> {
@@ -195,6 +205,8 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 profileManager.setProperty("playerInventory", InventoryUI.getInventory(inventoryUI.inventorySlotTable))
                 profileManager.setProperty("playerEquipInventory", InventoryUI.getInventory(inventoryUI.equipSlots))
                 profileManager.setProperty("currentPlayerGP", statusUI.getGoldValue())
+                profileManager.setProperty("currentPlayerXP", statusUI.getXPValue())
+                profileManager.setProperty("currentPlayerXPMax", statusUI.getXPValueMax())
             }
         }
     }
@@ -272,8 +284,12 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
                 val configReturnProperty = ProfileManager.instance.getProperty(configReturn.entityID, EntityConfig::class.java) ?: return
 
-                if (_questUI.isQuestReadyForReturn(configReturnProperty.currentQuestID)) {
-                    inventoryUI.removeQuestItemFromInventory(configReturnProperty.currentQuestID)
+                val questID = configReturnProperty.currentQuestID
+                if (_questUI.isQuestReadyForReturn(questID)) {
+                    val quest = _questUI.getQuestByID(questID)
+                    statusUI.addXPValue(quest!!.xpReward)
+                    statusUI.addGoldValue(quest.goldReward)
+                    inventoryUI.removeQuestItemFromInventory(questID)
 
                     configReturnProperty.conversationConfigPath = QuestUI.FINISHED_QUEST
                     ProfileManager.instance.setProperty(configReturnProperty.entityID, configReturnProperty)
