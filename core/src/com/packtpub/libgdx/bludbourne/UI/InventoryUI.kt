@@ -112,24 +112,18 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
     }
 
     fun addEntityToInventory(entity: Entity) {
-        val sourceCells = inventorySlotTable.getCells()
-        var counter = 0
+        val sourceCells = inventorySlotTable.cells
 
         for (index in 0..sourceCells.size - 1) {
-            counter = index
-            val inventorySlot = sourceCells.get(index).getActor() as InventorySlot
-            if (inventorySlot == null) continue
+            val inventorySlot = sourceCells.get(index).actor ?: continue
+            inventorySlot as InventorySlot
             val numItems = inventorySlot.getNumItems()
             if (numItems == 0) {
-                val inventoryItem = InventoryItemFactory.instance.getInventoryItem(InventoryItem.ItemTypeID.valueOf(entity.entityConfig.entityID))
+                val inventoryItem = InventoryItemFactory.instance.getInventoryItem(InventoryItem.ItemTypeID.valueOf(entity.entityConfig.itemTypeID))
                 inventorySlot.add(inventoryItem)
                 dragAndDrop.addSource(InventorySlotSource(inventorySlot, dragAndDrop))
                 break
             }
-        }
-        if (counter == sourceCells.size) {
-            //No empty slot available
-            //TODO: ADD MESSAGE HERE THAT INVENTORY IS FULL
         }
     }
 
@@ -140,8 +134,8 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
             val cells: Array<Cell<Actor>> = targetTable.cells
 
             for (i in 0..cells.size - 1) {
-                val inventorySlot = cells[i].actor as InventorySlot
-                if (inventorySlot == null) continue
+                val inventorySlot = cells[i].actor ?: continue
+                inventorySlot as InventorySlot
                 inventorySlot.clearAllInventoryItems(false)
             }
         }
@@ -150,8 +144,8 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
             val cells: Array<Cell<Actor>> = inventoryTable.cells
             val items = Array<InventoryItemLocation>()
             for (i in 0..cells.size - 1) {
-                val inventorySlot = cells.get(i).actor as InventorySlot
-                if (inventorySlot == null) continue
+                val inventorySlot = cells.get(i).actor ?: continue
+                inventorySlot as InventorySlot
                 inventorySlot.removeAllInventoryItemsWithName(name)
             }
             return items
@@ -202,8 +196,8 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
             val cells: Array<Cell<Actor>> = targetTable.cells
             val items: Array<InventoryItemLocation> = Array()
             for (i in 0..cells.size - 1) {
-                val inventorySlot = cells[i].actor as InventorySlot
-                if (inventorySlot == null) continue
+                val inventorySlot = cells[i].actor ?: continue
+                inventorySlot as InventorySlot
                 val numItems = inventorySlot.getNumItems(name)
                 if (numItems > 0) {
                     items.add(InventoryItemLocation(i,
@@ -221,8 +215,8 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
             for (item in items) {
                 for (index in 0..sourceCells.size - 1) {
                     counter = index
-                    val inventorySlot = sourceCells[index].actor as InventorySlot
-                    if (inventorySlot == null) continue
+                    val inventorySlot = sourceCells[index].actor ?: continue
+                    inventorySlot as InventorySlot
                     val numItems = inventorySlot.getNumItems(name)
                     if (numItems == 0) {
                         item.locationIndex = index
@@ -243,8 +237,8 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
         fun setInventoryItemNames(targetTable: Table, name: String) {
             val cells: Array<Cell<Actor>> = targetTable.cells
             for (i in 0..cells.size - 1) {
-                val inventorySlot: InventorySlot = cells[i].actor as InventorySlot
-                if (inventorySlot == null) continue
+                val inventorySlot = cells[i].actor ?: continue
+                inventorySlot as InventorySlot
                 inventorySlot.updateAllInventoryItemNames(name)
             }
         }

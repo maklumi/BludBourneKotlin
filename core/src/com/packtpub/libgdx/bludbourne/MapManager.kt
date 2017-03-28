@@ -101,10 +101,10 @@ class MapManager : ProfileObserver {
 
     fun removeMapQuestEntity(entity: Entity) {
         entity.unregisterObservers()
-        val positions = ProfileManager.instance.getProperty(entity.entityConfig.persistenceKey, Array::class.java) as Array<Vector2>
+        val positions = ProfileManager.instance.getProperty(entity.entityConfig.entityID, Array::class.java)
         if (positions == null) return
 
-        for (position in positions) {
+        for (position in positions as Array<Vector2>) {
             if (position.x == entity.getCurrentPosition().x &&
                     position.y == entity.getCurrentPosition().y) {
                 positions.removeValue(position, true)
@@ -112,7 +112,7 @@ class MapManager : ProfileObserver {
             }
         }
         currentMap!!.mapQuestEntities.removeValue(entity, true)
-        ProfileManager.instance.setProperty(entity.entityConfig.persistenceKey, positions)
+        ProfileManager.instance.setProperty(entity.entityConfig.entityID, positions)
 
     }
 

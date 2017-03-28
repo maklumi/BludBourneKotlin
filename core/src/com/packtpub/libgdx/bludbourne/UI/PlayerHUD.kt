@@ -128,7 +128,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     fun updateEntityObservers() {
         mapMgr.unregisterCurrentMapEntityObservers()
 
-        _questUI.updateQuests(mapMgr)
+        _questUI.initQuests(mapMgr)
 
         mapMgr.registerCurrentMapEntityObservers(this)
     }
@@ -249,6 +249,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 entity.unregisterObservers()
                 mapMgr.removeMapQuestEntity(entity)
                 conversationUI.isVisible = false
+                _questUI.updateQuests(mapMgr)
             }
 
             ConversationGraphObserver.ConversationCommandEvent.NONE -> {

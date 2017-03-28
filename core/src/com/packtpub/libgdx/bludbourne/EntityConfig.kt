@@ -14,7 +14,7 @@ class EntityConfig {
     var entityID = UUID.randomUUID().toString()
     var conversationConfigPath: String = ""
     var questConfigPath = ""
-    var persistenceKey = ""
+    var itemTypeID = ""
 
 
     fun addAnimationConfig(animationConfig: AnimationConfig) {

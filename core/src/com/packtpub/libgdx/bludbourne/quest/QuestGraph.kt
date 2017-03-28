@@ -101,8 +101,9 @@ class QuestGraph {
         val list = questTaskDependencies[id]
 
         for (dep in list!!) {
-            val depTask = getQuestTaskByID(dep.destinationId) ?: continue
-            if (dep.sourceId.equals(id, ignoreCase = true) && !depTask.isTaskComplete) {
+            val depTask = getQuestTaskByID(dep.destinationId)
+            if (depTask == null || depTask.isTaskComplete) continue
+            if (dep.sourceId.equals(id, ignoreCase = true)) {
                 return false
             }
         }
@@ -122,13 +123,76 @@ class QuestGraph {
 
             when (questTask.questType) {
                 QuestTask.QuestType.FETCH -> {
-                    val questEntities = Array<Entity>()
-                    val positions = mapMgr.getQuestItemSpawnPositions(questID, questTask.id)
+//                    val questEntities = Array<Entity>()
+//                    val positions = mapMgr.getQuestItemSpawnPositions(questID, questTask.id)
                     val taskConfig = questTask.getPropertyValue(QuestTask.QuestTaskPropertyType.TARGET_TYPE.toString())
                     if (taskConfig == null || taskConfig.isEmpty()) continue@abc
                     val config = Entity.getEntityConfig(taskConfig)
 
-                    var questItemPositions = ProfileManager.instance.getProperty(config.persistenceKey, Array::class.java)
+                    var questItemPositions = ProfileManager.instance.getProperty(config.entityID, Array::class.java)
+
+                    if (questItemPositions == null) continue@abc
+
+                    // Case where all the items have been picked up
+                    if (questItemPositions.size == 0) {
+                        questTask.setTaskComplete()
+                        System.out.println("TASK : " + questTask.id + " is complete!")
+                    }
+//                    if (questItemPositions == null) {
+//                        questItemPositions = Array<Vector2>()
+//                        for (position in positions) {
+//                            questItemPositions.add(position)
+//                            val entity = Map.initEntity(config, position)
+//                            questEntities.add(entity)
+//                        }
+//                    } else {
+//                        for (questItemPosition in questItemPositions as Array<Vector2>) {
+//                            val entity = Map.initEntity(config, questItemPosition)
+//                            questEntities.add(entity)
+//                        }
+//                    }
+//
+//
+//                    mapMgr.addMapQuestEntities(questEntities)
+//                    ProfileManager.instance.setProperty(config.entityID, questItemPositions)
+                }
+
+                QuestTask.QuestType.KILL -> {
+                }
+                QuestTask.QuestType.DELIVERY -> {
+                }
+                QuestTask.QuestType.GUARD -> {
+                }
+                QuestTask.QuestType.ESCORT -> {
+                }
+                QuestTask.QuestType.RETURN -> {
+                }
+                QuestTask.QuestType.DISCOVER -> {
+                }
+            }
+        }
+    }
+
+    fun init(mapMgr: MapManager) {
+        val allQuestTasks = getAllQuestTasks()
+        def@ for (questTask in allQuestTasks) {
+            //We first want to make sure the task is available and is relevant to current location
+            if (!isQuestTaskAvailable(questTask.id)) continue
+
+            val taskLocation = questTask.getPropertyValue(QuestTask.QuestTaskPropertyType.TARGET_LOCATION.toString())
+            if (taskLocation == null ||
+                    taskLocation.isEmpty() ||
+                    !taskLocation.equals(mapMgr.getCurrentMapType().toString(), true)) continue
+
+            when (questTask.questType) {
+                QuestTask.QuestType.FETCH -> {
+                    val questEntities = Array<Entity>()
+                    val positions = mapMgr.getQuestItemSpawnPositions(questID, questTask.id)
+                    val taskConfig = questTask.getPropertyValue(QuestTask.QuestTaskPropertyType.TARGET_TYPE.toString())
+                    if (taskConfig == null || taskConfig.isEmpty()) continue@def
+                    val config = Entity.getEntityConfig(taskConfig)
+
+                    var questItemPositions = ProfileManager.instance.getProperty(config.entityID, Array::class.java)
 
                     if (questItemPositions == null) {
                         questItemPositions = Array<Vector2>()
@@ -144,8 +208,9 @@ class QuestGraph {
                         }
                     }
 
+
                     mapMgr.addMapQuestEntities(questEntities)
-                    ProfileManager.instance.setProperty(config.persistenceKey, questItemPositions)
+                    ProfileManager.instance.setProperty(config.entityID, questItemPositions)
                 }
 
                 QuestTask.QuestType.KILL -> {
@@ -157,6 +222,7 @@ class QuestGraph {
                 QuestTask.QuestType.ESCORT -> {
                 }
                 QuestTask.QuestType.RETURN -> {
+                    System.out.println("RETURN READY : " + questTask.id)
                 }
                 QuestTask.QuestType.DISCOVER -> {
                 }
