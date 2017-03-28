@@ -14,6 +14,7 @@ import com.packtpub.libgdx.bludbourne.InventoryItem.ItemUseType.*
 import com.packtpub.libgdx.bludbourne.InventoryItemFactory
 import com.packtpub.libgdx.bludbourne.Utility
 
+
 class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground") {
 
     private val _lengthSlotRow = 10
@@ -111,7 +112,7 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
         this.pack()
     }
 
-    fun addEntityToInventory(entity: Entity) {
+    fun addEntityToInventory(entity: Entity, itemName: String) {
         val sourceCells = inventorySlotTable.cells
 
         for (index in 0..sourceCells.size - 1) {
@@ -120,9 +121,22 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
             val numItems = inventorySlot.getNumItems()
             if (numItems == 0) {
                 val inventoryItem = InventoryItemFactory.instance.getInventoryItem(InventoryItem.ItemTypeID.valueOf(entity.entityConfig.itemTypeID))
+                inventoryItem.name = itemName
                 inventorySlot.add(inventoryItem)
                 dragAndDrop.addSource(InventorySlotSource(inventorySlot, dragAndDrop))
                 break
+            }
+        }
+    }
+
+    fun removeQuestItemFromInventory(questID: String) {
+        val sourceCells = inventorySlotTable.cells
+        for (index in 0..sourceCells.size - 1) {
+            val inventorySlot = sourceCells.get(index).actor as InventorySlot
+            val item = inventorySlot.getTopInventoryItem() ?: continue
+            val inventoryItemName = item.name
+            if (inventoryItemName != null && inventoryItemName == questID) {
+                inventorySlot.clearAllInventoryItems(false)
             }
         }
     }
@@ -169,7 +183,9 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
 
                 for (index in 0..itemLocation.numberItemsAtLocation - 1) {
                     val item = InventoryItemFactory.instance.getInventoryItem(itemTypeId)
-                    item.name = targetTable.name
+                    if (item.name == null) {
+                        item.name = targetTable.name
+                    }
                     inventorySlot.add(item)
                     dragAndDrop.addSource(InventorySlotSource(inventorySlot, dragAndDrop))
                 }

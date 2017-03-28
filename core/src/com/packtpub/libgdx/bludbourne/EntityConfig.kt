@@ -14,6 +14,7 @@ class EntityConfig {
     var entityID = UUID.randomUUID().toString()
     var conversationConfigPath: String = ""
     var questConfigPath = ""
+    var currentQuestID = ""
     var itemTypeID = ""
 
 

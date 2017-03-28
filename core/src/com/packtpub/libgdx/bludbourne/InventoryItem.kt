@@ -80,6 +80,6 @@ class InventoryItem : Image {
 
     fun getTradeValue(): Int {
         //For now, we will set the trade in value of items at about one third their original value
-        return MathUtils.floor(itemValue * .33f) + 2
+        if (itemValue >= 0) return MathUtils.floor(itemValue * .33f) + 2 else return 0
     }
 }

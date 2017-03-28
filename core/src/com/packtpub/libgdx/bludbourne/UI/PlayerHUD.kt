@@ -234,11 +234,11 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             ConversationGraphObserver.ConversationCommandEvent.ACCEPT_QUEST -> {
                 val currentlySelectedEntity = mapMgr.currentSelectedEntity ?: return
                 val config = currentlySelectedEntity.entityConfig
-                val questAdded = _questUI.addQuest(config.questConfigPath)
-
-                if (questAdded) {
+                val questGraph = _questUI.loadQuest(config.questConfigPath)
+                if (questGraph != null) {
                     //Update conversation dialog
                     config.conversationConfigPath = QuestUI.RETURN_QUEST
+                    config.currentQuestID = questGraph.questID
                     ProfileManager.instance.setProperty(config.entityID, config)
                     updateEntityObservers()
                 }
@@ -253,8 +253,12 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
                 val configReturnProperty = ProfileManager.instance.getProperty(configReturn.entityID, EntityConfig::class.java) ?: return
 
-                configReturnProperty.conversationConfigPath = QuestUI.FINISHED_QUEST
-                ProfileManager.instance.setProperty(configReturnProperty.entityID, configReturnProperty)
+                if (_questUI.isQuestReadyForReturn(configReturnProperty.currentQuestID)) {
+                    inventoryUI.removeQuestItemFromInventory(configReturnProperty.currentQuestID)
+
+                    configReturnProperty.conversationConfigPath = QuestUI.FINISHED_QUEST
+                    ProfileManager.instance.setProperty(configReturnProperty.entityID, configReturnProperty)
+                }
 
                 conversationUI.isVisible = false
                 mapMgr.clearCurrentSelectedMapEntity()
@@ -263,7 +267,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             ConversationGraphObserver.ConversationCommandEvent.ADD_ENTITY_TO_INVENTORY -> {
                 val entity = mapMgr.currentSelectedEntity ?: return
 
-                inventoryUI.addEntityToInventory(entity)
+                inventoryUI.addEntityToInventory(entity, entity.entityConfig.currentQuestID)
                 mapMgr.clearCurrentSelectedMapEntity()
                 entity.unregisterObservers()
                 mapMgr.removeMapQuestEntity(entity)

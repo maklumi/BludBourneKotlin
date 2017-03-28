@@ -9,6 +9,7 @@ import com.packtpub.libgdx.bludbourne.MapManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import java.util.*
 
+
 class QuestGraph {
     private var questTasks: Hashtable<String, QuestTask> = Hashtable()
     private var questTaskDependencies: Hashtable<String, ArrayList<QuestTaskDependency>> = Hashtable()
@@ -16,6 +17,14 @@ class QuestGraph {
     var questTitle: String = ""
     var questID: String = ""
     var isQuestComplete: Boolean = false
+
+    fun areAllTasksComplete(): Boolean {
+        val tasks = getAllQuestTasks()
+        tasks.forEach { task ->
+            if (!task.isTaskComplete) return false
+        }
+        return true
+    }
 
     fun setTasks(questTasks: Hashtable<String, QuestTask>) {
         if (questTasks.size < 0) {
@@ -96,6 +105,24 @@ class QuestGraph {
         return !(list!!.isEmpty() || list.size == 0)
     }
 
+    fun updateQuestForReturn(): Boolean {
+        val tasks = getAllQuestTasks()
+        var readyTask: QuestTask? = null
+
+        //First, see if all tasks are available, meaning no blocking dependencies
+        for (task in tasks) {
+            if (!isQuestTaskAvailable(task.id)) return false
+            if (!task.isTaskComplete) {
+                if (task.questType == QuestTask.QuestType.RETURN) {
+                    readyTask = task
+                } else return false
+            }
+        }
+        if (readyTask == null) return false
+        readyTask.setTaskComplete()
+        return true
+    }
+
     fun isQuestTaskAvailable(id: String): Boolean {
         val task = getQuestTaskByID(id) ?: return false
         val list = questTaskDependencies[id]
@@ -123,8 +150,6 @@ class QuestGraph {
 
             when (questTask.questType) {
                 QuestTask.QuestType.FETCH -> {
-//                    val questEntities = Array<Entity>()
-//                    val positions = mapMgr.getQuestItemSpawnPositions(questID, questTask.id)
                     val taskConfig = questTask.getPropertyValue(QuestTask.QuestTaskPropertyType.TARGET_TYPE.toString())
                     if (taskConfig == null || taskConfig.isEmpty()) continue@abc
                     val config = Entity.getEntityConfig(taskConfig)
@@ -138,23 +163,6 @@ class QuestGraph {
                         questTask.setTaskComplete()
                         System.out.println("TASK : " + questTask.id + " is complete!")
                     }
-//                    if (questItemPositions == null) {
-//                        questItemPositions = Array<Vector2>()
-//                        for (position in positions) {
-//                            questItemPositions.add(position)
-//                            val entity = Map.initEntity(config, position)
-//                            questEntities.add(entity)
-//                        }
-//                    } else {
-//                        for (questItemPosition in questItemPositions as Array<Vector2>) {
-//                            val entity = Map.initEntity(config, questItemPosition)
-//                            questEntities.add(entity)
-//                        }
-//                    }
-//
-//
-//                    mapMgr.addMapQuestEntities(questEntities)
-//                    ProfileManager.instance.setProperty(config.entityID, questItemPositions)
                 }
 
                 QuestTask.QuestType.KILL -> {
@@ -199,11 +207,13 @@ class QuestGraph {
                         for (position in positions) {
                             questItemPositions.add(position)
                             val entity = Map.initEntity(config, position)
+                            entity.entityConfig.currentQuestID
                             questEntities.add(entity)
                         }
                     } else {
                         for (questItemPosition in questItemPositions as Array<Vector2>) {
                             val entity = Map.initEntity(config, questItemPosition)
+                            entity.entityConfig.currentQuestID
                             questEntities.add(entity)
                         }
                     }

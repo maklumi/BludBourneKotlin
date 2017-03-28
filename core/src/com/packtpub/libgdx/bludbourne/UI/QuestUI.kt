@@ -60,26 +60,53 @@ class QuestUI : Window("Quest Log", Utility.STATUSUI_SKIN, "solidbackground") {
         )
     }
 
-    fun addQuest(questConfigPath: String): Boolean {
+    fun loadQuest(questConfigPath: String): QuestGraph? {
         if (questConfigPath.isEmpty() || !Gdx.files.internal(questConfigPath).exists()) {
             Gdx.app.debug(TAG, "Quest file does not exist!")
-            return false
+            return null
         }
 
         val graph = _json.fromJson(QuestGraph::class.java, Gdx.files.internal(questConfigPath))
-        if (doesQuestAlreadyExist(graph)) {
-            return false
+        if (doesQuestExist(graph.questID)) {
+            return null
         }
 
         clearDialog()
         _quests.add(graph)
         updateQuestsItemList()
+        return graph
+    }
+
+    fun isQuestReadyForReturn(questID: String): Boolean {
+        if (questID.isEmpty()) {
+            Gdx.app.debug(TAG, "Quest ID not valid")
+            return false
+        }
+
+        if (!doesQuestExist(questID)) return false
+
+        val graph = getQuestByID(questID) ?: return false
+
+        if (graph.updateQuestForReturn()) {
+            graph.isQuestComplete = true
+        } else {
+            return false
+        }
         return true
     }
 
-    fun doesQuestAlreadyExist(graph: QuestGraph): Boolean {
+    fun getQuestByID(questGraphID: String): QuestGraph? {
         for (questGraph in _quests) {
-            if (questGraph.questID.equals(graph.questID, ignoreCase = true)) {
+            if (questGraph.questID.equals(questGraphID, ignoreCase = true)) {
+                return questGraph
+            }
+        }
+        return null
+    }
+
+    fun doesQuestExist(questGraphID: String): Boolean {
+        for (questGraph in _quests) {
+            if (questGraph.questID.equals(questGraphID, ignoreCase = true)) {
                 return true
             }
         }
