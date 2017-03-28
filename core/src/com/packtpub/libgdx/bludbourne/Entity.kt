@@ -4,11 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
-import com.packtpub.libgdx.bludbourne.ComponentObserver
 
 class Entity(val inputComponent: InputComponent,
              val physicsComponent: PhysicsComponent,
@@ -95,6 +95,8 @@ class Entity(val inputComponent: InputComponent,
     }
 
     fun getCurrentBoundingBox(): Rectangle = physicsComponent.boundingBox
+
+    fun getCurrentPosition(): Vector2 = graphicsComponent.currentPosition
 
     fun dispose() = components.forEach { it.dispose() }
 

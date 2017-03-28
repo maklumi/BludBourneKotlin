@@ -8,14 +8,13 @@ import com.badlogic.gdx.math.GridPoint2
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
-import com.packtpub.libgdx.bludbourne.ComponentSubject
 import java.util.*
 
 abstract class GraphicsComponent : ComponentSubject(), Component {
 
     abstract fun update(entity: Entity, mapManager: MapManager, batch: Batch, delta: Float)
 
-    protected var currentPosition = Vector2(0f, 0f)
+    internal var currentPosition = Vector2(0f, 0f)
     protected var currentState = Entity.State.WALKING
     protected var currentDirection = Entity.Direction.DOWN
     protected val shapeRenderer = ShapeRenderer()

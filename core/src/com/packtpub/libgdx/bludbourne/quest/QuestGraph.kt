@@ -1,10 +1,12 @@
 package com.packtpub.libgdx.bludbourne.quest
 
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.Map
 import com.packtpub.libgdx.bludbourne.MapManager
+import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import java.util.*
 
 class QuestGraph {
@@ -120,17 +122,32 @@ class QuestGraph {
 
             when (questTask.questType) {
                 QuestTask.QuestType.FETCH -> {
-                    val entities = Array<Entity>()
+                    val questEntities = Array<Entity>()
                     val positions = mapMgr.getQuestItemSpawnPositions(questID, questTask.id)
                     val taskConfig = questTask.getPropertyValue(QuestTask.QuestTaskPropertyType.TARGET_TYPE.toString())
                     if (taskConfig == null || taskConfig.isEmpty()) continue@abc
-                    for (position in positions) {
-                        val config = Entity.getEntityConfig(taskConfig)
-                        val entity = Map.initEntity(config, position)
-                        entities.add(entity)
+                    val config = Entity.getEntityConfig(taskConfig)
+
+                    var questItemPositions = ProfileManager.instance.getProperty(config.persistenceKey, Array::class.java)
+
+                    if (questItemPositions == null) {
+                        questItemPositions = Array<Vector2>()
+                        for (position in positions) {
+                            questItemPositions.add(position)
+                            val entity = Map.initEntity(config, position)
+                            questEntities.add(entity)
+                        }
+                    } else {
+                        for (questItemPosition in questItemPositions as Array<Vector2>) {
+                            val entity = Map.initEntity(config, questItemPosition)
+                            questEntities.add(entity)
+                        }
                     }
-                    mapMgr.addMapQuestEntities(entities)
+
+                    mapMgr.addMapQuestEntities(questEntities)
+                    ProfileManager.instance.setProperty(config.persistenceKey, questItemPositions)
                 }
+
                 QuestTask.QuestType.KILL -> {
                 }
                 QuestTask.QuestType.DELIVERY -> {
