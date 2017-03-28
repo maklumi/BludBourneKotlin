@@ -8,17 +8,17 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
 
     init {
         npcStartPositions.forEach { position ->
-            mapEntities.add(initEntity(Entity.getEntityConfig(townGuardWalking), position))
+            mapEntities.add(initEntity(Entity.loadEntityConfigByPath(townGuardWalking), position))
         }
 
         // Special cases
-        mapEntities.add(initSpecialEntity(Entity.getEntityConfig(townBlacksmith)))
-        mapEntities.add(initSpecialEntity(Entity.getEntityConfig(townMage)))
-        mapEntities.add(initSpecialEntity(Entity.getEntityConfig(townInnKeeper)))
+        mapEntities.add(initSpecialEntity(Entity.loadEntityConfigByPath(townBlacksmith)))
+        mapEntities.add(initSpecialEntity(Entity.loadEntityConfigByPath(townMage)))
+        mapEntities.add(initSpecialEntity(Entity.loadEntityConfigByPath(townInnKeeper)))
 
         // When we have multiple configs in one file
         val configs = Entity.getEntityConfigs(townFolk)
-        configs.forEach { mapEntities.add(initSpecialEntity(it)) }
+        configs.forEach { mapEntities.add(initSpecialEntity(Entity.loadEntityConfig(it))) }
 
     }
 

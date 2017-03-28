@@ -15,6 +15,7 @@ import com.packtpub.libgdx.bludbourne.Utility
 import com.packtpub.libgdx.bludbourne.quest.QuestGraph
 import com.packtpub.libgdx.bludbourne.quest.QuestTask
 
+
 class QuestUI : Window("Quest Log", Utility.STATUSUI_SKIN, "solidbackground") {
 
     private val _listQuests = List<QuestGraph>(Utility.STATUSUI_SKIN)
@@ -59,17 +60,30 @@ class QuestUI : Window("Quest Log", Utility.STATUSUI_SKIN, "solidbackground") {
         )
     }
 
-    fun addQuest(questConfigPath: String) {
+    fun addQuest(questConfigPath: String): Boolean {
         if (questConfigPath.isEmpty() || !Gdx.files.internal(questConfigPath).exists()) {
             Gdx.app.debug(TAG, "Quest file does not exist!")
-            return
+            return false
+        }
+
+        val graph = _json.fromJson(QuestGraph::class.java, Gdx.files.internal(questConfigPath))
+        if (doesQuestAlreadyExist(graph)) {
+            return false
         }
 
         clearDialog()
-
-        val graph = _json.fromJson(QuestGraph::class.java, Gdx.files.internal(questConfigPath))
         _quests.add(graph)
         updateQuestsItemList()
+        return true
+    }
+
+    fun doesQuestAlreadyExist(graph: QuestGraph): Boolean {
+        for (questGraph in _quests) {
+            if (questGraph.questID.equals(graph.questID, ignoreCase = true)) {
+                return true
+            }
+        }
+        return false
     }
 
     var quests: Array<QuestGraph>
@@ -120,6 +134,9 @@ class QuestUI : Window("Quest Log", Utility.STATUSUI_SKIN, "solidbackground") {
 
     companion object {
         private val TAG = QuestUI::class.java.simpleName
+        val RETURN_QUEST = "conversations/return_quest.json"
+        val FINISHED_QUEST = "conversations/quest_finished.json"
+
     }
 
 }

@@ -65,13 +65,11 @@ class MainGameScreen(game: BludBourne) : Screen {
         camera.setToOrtho(false, viewportWidth, viewportHeight)
 
         mapRenderer = OrthogonalTiledMapRenderer(mapMgr.getCurrentTiledMap(), UNIT_SCALE)
-        mapRenderer.setView(camera)
-        mapMgr.camera = camera
-
-        Gdx.app.debug(TAG, "UnitScale value is: " + mapRenderer.unitScale)
 
         player = EntityFactory.getEntity(EntityFactory.EntityType.PLAYER)
         mapMgr.player = player
+        mapMgr.camera = camera
+
 
         hudCamera.setToOrtho(false, physicalWidth, physicalHeight)
         playerHUD = PlayerHUD(hudCamera, player, mapMgr)

@@ -54,7 +54,9 @@ class MapManager : ProfileObserver {
 
             }
             ProfileObserver.ProfileEvent.SAVING_PROFILE -> {
-                profileManager.setProperty("currentMapType", currentMap?.currentMapType.toString())
+                if( currentMap != null ){
+                    profileManager.setProperty("currentMapType", currentMap!!.currentMapType.toString())
+                }
                 profileManager.setProperty("topWorldMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOP_WORLD).playerStart)
                 profileManager.setProperty("castleOfDoomMapStartPosition", MapFactory.getMap(MapFactory.MapType.CASTLE_OF_DOOM).playerStart)
                 profileManager.setProperty("townMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOWN).playerStart)

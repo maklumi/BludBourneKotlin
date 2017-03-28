@@ -9,6 +9,8 @@ import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
+import com.packtpub.libgdx.bludbourne.profile.ProfileManager
+
 
 class Entity(val inputComponent: InputComponent,
              val physicsComponent: PhysicsComponent,
@@ -119,6 +121,23 @@ class Entity(val inputComponent: InputComponent,
             jsonValues.forEach { configs.add(json.readValue(EntityConfig::class.java, it)) }
 
             return configs
+        }
+
+        fun loadEntityConfigByPath(entityConfigPath: String): EntityConfig {
+            val entityConfig = Entity.getEntityConfig(entityConfigPath)
+            val serializedConfig = ProfileManager.instance.getProperty(entityConfig.entityID, EntityConfig::class.java)
+
+            if (serializedConfig == null) return entityConfig else return serializedConfig
+        }
+
+        fun loadEntityConfig(entityConfig: EntityConfig): EntityConfig {
+            val serializedConfig = ProfileManager.instance.getProperty(entityConfig.entityID, EntityConfig::class.java)
+
+            if (serializedConfig == null) {
+                return entityConfig
+            } else {
+                return serializedConfig
+            }
         }
     }
 
