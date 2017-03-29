@@ -31,7 +31,8 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected set
     var questDiscoverLayer: MapLayer? = null
         protected set
-
+    var enemySpawnLayer: MapLayer? = null
+        protected set
     protected val npcStartPositions: Array<Vector2>
     protected val specialNPCStartPositions: Hashtable<String, Vector2>
     protected val json = Json()
@@ -53,7 +54,10 @@ abstract class Map(var currentMapType: MapFactory.MapType,
 
         questItemSpawnLayer = currentMap.layers.get(QUEST_ITEM_SPAWN_LAYER)
         questDiscoverLayer = currentMap.layers.get(QUEST_DISCOVER_LAYER)
-
+        enemySpawnLayer = currentMap.layers.get(ENEMY_SPAWN_LAYER)
+        if (enemySpawnLayer == null) {
+            Gdx.app.debug(TAG, "No enemy layer found!")
+        }
         npcStartPositions = getNPCStartPositions()
         specialNPCStartPositions = getExtraNPCStartPositions()
     }
@@ -194,23 +198,11 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected val PORTAL_LAYER = "MAP_PORTAL_LAYER"
         protected val QUEST_ITEM_SPAWN_LAYER = "MAP_QUEST_ITEM_SPAWN_LAYER"
         protected val QUEST_DISCOVER_LAYER = "MAP_QUEST_DISCOVER_LAYER"
+        protected val ENEMY_SPAWN_LAYER = "MAP_ENEMY_SPAWN_LAYER"
 
         // starting locations
         protected val NPC_START = "NPC_START"
         protected val PLAYER_START = "PLAYER_START"
 
-        fun initEntity(entityConfig: EntityConfig, position: Vector2): Entity {
-            val json = Json()
-            val entity = EntityFactory.getEntity(EntityFactory.EntityType.NPC)
-            entity.entityConfig = entityConfig
-
-            entity.apply {
-                sendMessage(Component.MESSAGE.LOAD_ANIMATIONS, json.toJson(entity.entityConfig))
-                sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(position))
-                sendMessage(Component.MESSAGE.INIT_STATE, json.toJson(entity.entityConfig.state))
-                sendMessage(Component.MESSAGE.INIT_DIRECTION, json.toJson(entity.entityConfig.direction))
-            }
-            return entity
-        }
     }
 }

@@ -54,7 +54,7 @@ class MapManager : ProfileObserver {
 
             }
             ProfileObserver.ProfileEvent.SAVING_PROFILE -> {
-                if( currentMap != null ){
+                if (currentMap != null) {
                     profileManager.setProperty("currentMapType", currentMap!!.currentMapType.toString())
                 }
                 profileManager.setProperty("topWorldMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOP_WORLD).playerStart)
@@ -136,6 +136,10 @@ class MapManager : ProfileObserver {
 
     fun getQuestDiscoverLayer(): MapLayer? {
         return currentMap!!.questDiscoverLayer
+    }
+
+    fun getEnemySpawnLayer(): MapLayer? {
+        return currentMap!!.enemySpawnLayer
     }
 
     fun getCurrentMapType(): MapFactory.MapType {

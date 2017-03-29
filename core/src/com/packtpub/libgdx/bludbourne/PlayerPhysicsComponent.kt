@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 
+
 class PlayerPhysicsComponent : PhysicsComponent() {
     private val TAG = PlayerPhysicsComponent::class.java.simpleName
 
@@ -15,6 +16,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
     private var mouseSelectCoordinates: Vector3 = Vector3.Zero
     private var isMouseSelectEnabled = false
     private var previousDiscovery: String = ""
+    private var previousEnemySpawn: String = ""
 
     init {
         boundingBoxLocation = BoundingBoxLocation.BOTTOM_CENTER
@@ -35,6 +37,8 @@ class PlayerPhysicsComponent : PhysicsComponent() {
             if (string[0].equals(Component.MESSAGE.INIT_START_POSITION.toString(), ignoreCase = true)) {
                 currentEntityPosition = json.fromJson(Vector2::class.java, string[1])
                 nextEntityPosition.set(currentEntityPosition.x, currentEntityPosition.y)
+                previousDiscovery = ""
+                previousEnemySpawn = ""
             } else if (string[0].equals(Component.MESSAGE.CURRENT_STATE.toString(), ignoreCase = true)) {
                 state = json.fromJson(Entity.State::class.java, string[1])
             } else if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION.toString(), ignoreCase = true)) {
@@ -51,6 +55,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
         updateBoundingBoxPosition(nextEntityPosition)
         updatePortalLayerActivation(mapMgr)
         updateDiscoverLayerActivation(mapMgr)
+        updateEnemySpawnLayerActivation(mapMgr)
 
         if (isMouseSelectEnabled) {
             selectMapEntityCandidate(mapMgr)
@@ -136,6 +141,36 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                     notify(json.toJson(`val`), ComponentObserver.ComponentEvent.QUEST_LOCATION_DISCOVERED)
                     Gdx.app.debug(TAG, "Discover Area Activated")
                     return true
+                }
+            }
+        }
+        return false
+    }
+
+    private fun updateEnemySpawnLayerActivation(mapMgr: MapManager): Boolean {
+        val mapDiscoverLayer = mapMgr.getEnemySpawnLayer() ?: return false
+
+        var rectangle: Rectangle? = null
+
+        for (`object` in mapDiscoverLayer.objects) {
+            if (`object` is RectangleMapObject) {
+                rectangle = `object`.rectangle
+
+                if (boundingBox.overlaps(rectangle)) {
+                    val enemySpawnID = `object`.getName() ?: return false
+
+                    if (previousEnemySpawn.equals(enemySpawnID, true)) {
+                        return true
+                    } else {
+                        previousEnemySpawn = enemySpawnID
+                    }
+
+                    notify(enemySpawnID, ComponentObserver.ComponentEvent.ENEMY_SPAWN_LOCATION_CHANGED)
+                    Gdx.app.debug(TAG, "Enemy Spawn Area Activated")
+                    return true
+                } else {
+                    //If no collision, reset the value
+                    previousEnemySpawn = ""
                 }
             }
         }

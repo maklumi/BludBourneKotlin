@@ -16,6 +16,7 @@ import com.packtpub.libgdx.bludbourne.dialog.ConversationGraphObserver
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
 import com.packtpub.libgdx.bludbourne.quest.QuestGraph
+import com.badlogic.gdx.scenes.scene2d.Touchable
 
 
 class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
@@ -29,6 +30,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     private val conversationUI: ConversationUI
     private val storeInventoryUI: StoreInventoryUI
     private var _questUI: QuestUI
+    private val _battleUI: BattleUI
     private val json = Json()
     private val _messageBoxUI: Dialog
     private val INVENTORY_FULL = "Your inventory is full!"
@@ -88,12 +90,20 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         _questUI.width = stage.width
         _questUI.height = stage.height / 2
 
+        _battleUI = BattleUI()
+        _battleUI.setFillParent(true)
+        _battleUI.isVisible = false
+        _battleUI.isMovable = false
+        _battleUI.touchable = Touchable.childrenOnly
+
         stage.addActor(_questUI)
         stage.addActor(statusUI)
         stage.addActor(inventoryUI)
         stage.addActor(conversationUI)
         stage.addActor(storeInventoryUI)
         stage.addActor(_messageBoxUI)
+        stage.addActor(_battleUI)
+        statusUI.toFront()
 
         //add tooltips to the stage
         val actors = inventoryUI.inventoryActors
@@ -239,6 +249,13 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 _questUI.questTaskComplete(questID, questTaskID)
                 updateEntityObservers()
             }
+            ComponentObserver.ComponentEvent.ENEMY_SPAWN_LOCATION_CHANGED -> {
+                val enemyZoneID = value
+                _battleUI.battleZoneTriggered(Integer.valueOf(enemyZoneID))
+                _battleUI.isVisible = true
+                _battleUI.toBack()
+            }
+
         }
 
     }

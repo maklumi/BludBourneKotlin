@@ -8,7 +8,7 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
 
     init {
         npcStartPositions.forEach { position ->
-            mapEntities.add(initEntity(Entity.loadEntityConfigByPath(townGuardWalking), position))
+            mapEntities.add(Entity.initEntity(Entity.loadEntityConfigByPath(townGuardWalking), position))
         }
 
         // Special cases
@@ -38,7 +38,7 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
         if (specialNPCStartPositions.containsKey(entityConfig.entityID)) {
             position = specialNPCStartPositions[entityConfig.entityID]!!
         }
-        return initEntity(entityConfig, position)
+        return Entity.initEntity(entityConfig, position)
     }
 
     companion object {

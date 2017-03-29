@@ -1,7 +1,9 @@
 package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
@@ -10,15 +12,19 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
+import java.util.Hashtable
+import kotlin.collections.ArrayList
+import kotlin.collections.forEach
 
 
-class Entity(val inputComponent: InputComponent,
-             val physicsComponent: PhysicsComponent,
-             val graphicsComponent: GraphicsComponent) {
+class Entity(var inputComponent: InputComponent,
+             var physicsComponent: PhysicsComponent,
+             var graphicsComponent: GraphicsComponent) {
 
     private val TAG = Entity::class.java.simpleName
 
     var entityConfig = EntityConfig()
+    var _json = Json()
 
     enum class State {
         IDLE, WALKING,
@@ -58,12 +64,23 @@ class Entity(val inputComponent: InputComponent,
         IMMOBILE
     }
 
-    private val components = Array<Component>(MAX_COMPONENTS)
+    private var components = Array<Component>(MAX_COMPONENTS)
 
     init {
         components.add(inputComponent)
         components.add(graphicsComponent)
         components.add(physicsComponent)
+    }
+
+    constructor(entity: Entity) : this(entity.inputComponent, entity.physicsComponent, entity.graphicsComponent) {
+        set(entity)
+    }
+
+    private fun set(entity: Entity): Entity {
+        entityConfig = entity.entityConfig
+        components = entity.components
+
+        return this
     }
 
     fun update(mapMgr: MapManager, batch: Batch, delta: Float) {
@@ -102,6 +119,10 @@ class Entity(val inputComponent: InputComponent,
 
     fun dispose() = components.forEach { it.dispose() }
 
+    fun getAnimation(type: Entity.AnimationType): Animation<TextureRegion> {
+        return graphicsComponent.animations[type]!!
+    }
+
     companion object {
         var FRAME_WIDTH = 16
         var FRAME_HEIGHT = 16
@@ -138,6 +159,37 @@ class Entity(val inputComponent: InputComponent,
             } else {
                 return serializedConfig
             }
+        }
+
+        fun initEntity(entityConfig: EntityConfig, position: Vector2): Entity {
+            val json = Json()
+            val entity = EntityFactory.getEntity(EntityFactory.EntityType.NPC)
+            entity.entityConfig = entityConfig
+
+            entity.sendMessage(Component.MESSAGE.LOAD_ANIMATIONS, json.toJson(entity.entityConfig))
+            entity.sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(position))
+            entity.sendMessage(Component.MESSAGE.INIT_STATE, json.toJson(entity.entityConfig.state))
+            entity.sendMessage(Component.MESSAGE.INIT_DIRECTION, json.toJson(entity.entityConfig.direction))
+
+            return entity
+        }
+
+        fun initEntities(configs: Array<EntityConfig>): Hashtable<String, Entity> {
+            val json = Json()
+            val entities = Hashtable<String, Entity>()
+            for (config in configs) {
+                val entity = EntityFactory.getEntity(EntityFactory.EntityType.NPC)
+
+                entity.entityConfig = config
+                entity.sendMessage(Component.MESSAGE.LOAD_ANIMATIONS, json.toJson(entity.entityConfig))
+                entity.sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(Vector2(0f, 0f)))
+                entity.sendMessage(Component.MESSAGE.INIT_STATE, json.toJson(entity.entityConfig.state))
+                entity.sendMessage(Component.MESSAGE.INIT_DIRECTION, json.toJson(entity.entityConfig.direction))
+
+                entities.put(entity.entityConfig.entityID, entity)
+            }
+
+            return entities
         }
     }
 

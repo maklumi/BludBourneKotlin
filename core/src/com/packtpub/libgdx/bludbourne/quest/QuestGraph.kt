@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.Entity
-import com.packtpub.libgdx.bludbourne.Map
 import com.packtpub.libgdx.bludbourne.MapManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import java.util.*
@@ -221,13 +220,13 @@ class QuestGraph {
                         questItemPositions = Array<Vector2>()
                         for (position in positions) {
                             questItemPositions.add(position)
-                            val entity = Map.initEntity(config, position)
+                            val entity = Entity.initEntity(config, position)
                             entity.entityConfig.currentQuestID
                             questEntities.add(entity)
                         }
                     } else {
                         for (questItemPosition in questItemPositions as Array<Vector2>) {
-                            val entity = Map.initEntity(config, questItemPosition)
+                            val entity = Entity.initEntity(config, questItemPosition)
                             entity.entityConfig.currentQuestID
                             questEntities.add(entity)
                         }
