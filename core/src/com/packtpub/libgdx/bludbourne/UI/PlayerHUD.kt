@@ -16,7 +16,6 @@ import com.packtpub.libgdx.bludbourne.dialog.ConversationGraphObserver
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
 import com.packtpub.libgdx.bludbourne.quest.QuestGraph
-import com.badlogic.gdx.scenes.scene2d.Touchable
 
 
 class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
@@ -94,15 +93,17 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         _battleUI.setFillParent(true)
         _battleUI.isVisible = false
         _battleUI.isMovable = false
-        _battleUI.touchable = Touchable.childrenOnly
 
+        //removes all listeners including ones that handle focus
+        _battleUI.clearListeners()
+
+        stage.addActor(_battleUI)
         stage.addActor(_questUI)
+        stage.addActor(storeInventoryUI)
+        stage.addActor(conversationUI)
+        stage.addActor(_messageBoxUI)
         stage.addActor(statusUI)
         stage.addActor(inventoryUI)
-        stage.addActor(conversationUI)
-        stage.addActor(storeInventoryUI)
-        stage.addActor(_messageBoxUI)
-        stage.addActor(_battleUI)
         statusUI.toFront()
 
         //add tooltips to the stage
@@ -121,6 +122,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         player.registerObserver(this)
         statusUI.addObserver(this)
         storeInventoryUI.addObserver(this)
+        inventoryUI.addObserver(_battleUI.battleState)
 
         // Listeners
         val inventoryButton = statusUI.inventoryButton
@@ -251,9 +253,9 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             }
             ComponentObserver.ComponentEvent.ENEMY_SPAWN_LOCATION_CHANGED -> {
                 val enemyZoneID = value
-                _battleUI.battleZoneTriggered(Integer.valueOf(enemyZoneID))
-                _battleUI.isVisible = true
+                _battleUI.battleZoneTriggered(enemyZoneID.toInt())
                 _battleUI.toBack()
+                _battleUI.isVisible = true
             }
 
         }

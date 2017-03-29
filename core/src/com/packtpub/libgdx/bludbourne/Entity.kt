@@ -14,7 +14,6 @@ import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import java.util.Hashtable
 import kotlin.collections.ArrayList
-import kotlin.collections.forEach
 
 
 class Entity(var inputComponent: InputComponent,
@@ -23,7 +22,7 @@ class Entity(var inputComponent: InputComponent,
 
     private val TAG = Entity::class.java.simpleName
 
-    var entityConfig = EntityConfig()
+    lateinit var entityConfig: EntityConfig
     var _json = Json()
 
     enum class State {
@@ -77,8 +76,11 @@ class Entity(var inputComponent: InputComponent,
     }
 
     private fun set(entity: Entity): Entity {
-        entityConfig = entity.entityConfig
+        inputComponent = entity.inputComponent
+        graphicsComponent = entity.graphicsComponent
+        physicsComponent = entity.physicsComponent
         components = entity.components
+        entityConfig = EntityConfig(entity.entityConfig)
 
         return this
     }

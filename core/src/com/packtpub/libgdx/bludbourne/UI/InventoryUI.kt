@@ -13,7 +13,7 @@ import com.packtpub.libgdx.bludbourne.InventoryItemFactory
 import com.packtpub.libgdx.bludbourne.Utility
 
 
-class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"), InventorySlotObserver {
+class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"), InventorySubject, InventorySlotObserver {
 
     private val _lengthSlotRow = 10
     val inventorySlotTable = Table()
@@ -22,6 +22,7 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
     val dragAndDrop = DragAndDrop()
     val inventoryActors = Array<Actor>()
     private val _inventorySlotTooltip = InventorySlotTooltip(Utility.STATUSUI_SKIN)
+    private val _observers: Array<InventoryObserver> = Array()
 
     private val _DPValLabel: Label
     private var _DPVal = 0
@@ -195,9 +196,11 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
                 if (addItem.isInventoryItemOffensive()) {
                     _APVal += addItem.itemUseTypeValue
                     _APValLabel.setText(_APVal.toString())
+                    notify(_APVal.toString(), InventoryObserver.InventoryEvent.UPDATED_AP)
                 } else if (addItem.isInventoryItemDefensive()) {
                     _DPVal += addItem.itemUseTypeValue
                     _DPValLabel.setText(_DPVal.toString())
+                    notify(_DPVal.toString(), InventoryObserver.InventoryEvent.UPDATED_DP)
                 }
             }
             InventorySlotObserver.SlotEvent.REMOVED_ITEM -> {
@@ -205,13 +208,35 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
                 if (removeItem.isInventoryItemOffensive()) {
                     _APVal -= removeItem.itemUseTypeValue
                     _APValLabel.setText(_APVal.toString())
+                    notify(_APVal.toString(), InventoryObserver.InventoryEvent.UPDATED_AP)
                 } else if (removeItem.isInventoryItemDefensive()) {
                     _DPVal -= removeItem.itemUseTypeValue
                     _DPValLabel.setText(_DPVal.toString())
+                    notify(_DPVal.toString(), InventoryObserver.InventoryEvent.UPDATED_DP)
                 }
             }
             else -> {
             }
+        }
+    }
+
+    override fun addObserver(inventoryObserver: InventoryObserver) {
+        _observers.add(inventoryObserver)
+    }
+
+    override fun removeObserver(inventoryObserver: InventoryObserver) {
+        _observers.removeValue(inventoryObserver, true)
+    }
+
+    override fun removeAllObservers() {
+        for (observer in _observers) {
+            _observers.removeValue(observer, true)
+        }
+    }
+
+    override fun notify(value: String, event: InventoryObserver.InventoryEvent) {
+        for (observer in _observers) {
+            observer.onNotify(value, event)
         }
     }
 
