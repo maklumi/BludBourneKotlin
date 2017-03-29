@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 
+
 class InventoryItem : Image {
 
     enum class ItemAttribute constructor(val value: Int) {
@@ -46,18 +47,20 @@ class InventoryItem : Image {
 
     var itemAttributes: Int = 0
     var itemUseType: Int = 0
+    var itemUseTypeValue: Int = 0
     var itemTypeID: ItemTypeID? = null
     var itemShortDescription: String? = null
     var itemValue: Int = 0
 
 
     constructor(textureRegion: TextureRegion, itemAttributes: Int,
-                itemTypeID: ItemTypeID, itemUseType: Int, itemValue: Int)
+                itemTypeID: ItemTypeID, itemUseType: Int, itemUseTypeValue: Int, itemValue: Int)
             : super(textureRegion) {
 
         this.itemTypeID = itemTypeID
         this.itemAttributes = itemAttributes
         this.itemUseType = itemUseType
+        this.itemUseTypeValue = itemUseTypeValue
         this.itemValue = itemValue
     }
 
@@ -82,5 +85,19 @@ class InventoryItem : Image {
     fun getTradeValue(): Int {
         //For now, we will set the trade in value of items at about one third their original value
         if (itemValue >= 0) return MathUtils.floor(itemValue * .33f) + 2 else return 0
+    }
+
+    fun isInventoryItemOffensive(): Boolean {
+        return itemUseType and ItemUseType.WEAPON_ONEHAND.value == ItemUseType.WEAPON_ONEHAND.value ||
+                itemUseType and ItemUseType.WEAPON_TWOHAND.value == ItemUseType.WEAPON_TWOHAND.value ||
+                itemUseType and ItemUseType.WAND_ONEHAND.value == ItemUseType.WAND_ONEHAND.value ||
+                itemUseType and ItemUseType.WAND_TWOHAND.value == ItemUseType.WAND_TWOHAND.value
+    }
+
+    fun isInventoryItemDefensive(): Boolean {
+        return itemUseType and ItemUseType.ARMOR_CHEST.value == ItemUseType.ARMOR_CHEST.value ||
+                itemUseType and ItemUseType.ARMOR_HELMET.value == ItemUseType.ARMOR_HELMET.value ||
+                itemUseType and ItemUseType.ARMOR_FEET.value == ItemUseType.ARMOR_FEET.value ||
+                itemUseType and ItemUseType.ARMOR_SHIELD.value == ItemUseType.ARMOR_SHIELD.value
     }
 }
