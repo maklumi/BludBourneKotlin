@@ -54,10 +54,22 @@ class QuestUI : Window("Quest Log", Utility.STATUSUI_SKIN, "solidbackground") {
         _listQuests.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 val quest = _listQuests.selected
-                populateQuestDialog(quest)
+                populateQuestTaskDialog(quest)
             }
         }
         )
+    }
+
+    fun questTaskComplete(questID: String, questTaskID: String) {
+        for (questGraph in _quests) {
+            if (questGraph.questID.equals(questID, ignoreCase = true)) {
+                if (questGraph.isQuestTaskAvailable(questTaskID)) {
+                    questGraph.setQuestTaskComplete(questTaskID)
+                } else {
+                    return
+                }
+            }
+        }
     }
 
     fun loadQuest(questConfigPath: String): QuestGraph? {
@@ -131,7 +143,7 @@ class QuestUI : Window("Quest Log", Utility.STATUSUI_SKIN, "solidbackground") {
         _listQuests.clearItems()
     }
 
-    private fun populateQuestDialog(graph: QuestGraph) {
+    private fun populateQuestTaskDialog(graph: QuestGraph) {
         _listTasks.clearItems()
 
         val tasks: ArrayList<QuestTask> = graph.getAllQuestTasks()

@@ -3,10 +3,10 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.objects.RectangleMapObject
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.packtpub.libgdx.bludbourne.Component.Companion.MESSAGE_TOKEN
-import com.packtpub.libgdx.bludbourne.ComponentObserver
 
 class PlayerPhysicsComponent : PhysicsComponent() {
     private val TAG = PlayerPhysicsComponent::class.java.simpleName
@@ -14,6 +14,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
     private var state = Entity.State.IDLE
     private var mouseSelectCoordinates: Vector3 = Vector3.Zero
     private var isMouseSelectEnabled = false
+    private var previousDiscovery: String = ""
 
     init {
         boundingBoxLocation = BoundingBoxLocation.BOTTOM_CENTER
@@ -49,6 +50,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
         //We want the hit box to be at the feet for a better feel
         updateBoundingBoxPosition(nextEntityPosition)
         updatePortalLayerActivation(mapMgr)
+        updateDiscoverLayerActivation(mapMgr)
 
         if (isMouseSelectEnabled) {
             selectMapEntityCandidate(mapMgr)
@@ -105,6 +107,39 @@ class PlayerPhysicsComponent : PhysicsComponent() {
             }
         }
         tempEntities.clear()
+    }
+
+    private fun updateDiscoverLayerActivation(mapMgr: MapManager): Boolean {
+        val mapDiscoverLayer = mapMgr.getQuestDiscoverLayer() ?: return false
+
+        var rectangle: Rectangle?
+
+        for (`object` in mapDiscoverLayer.objects) {
+            if (`object` is RectangleMapObject) {
+                rectangle = `object`.rectangle
+
+                if (boundingBox.overlaps(rectangle)) {
+                    val questID = `object`.getName()
+                    val questTaskID = `object`.getProperties().get("taskID") as String
+                    val `val` = questID + MESSAGE_TOKEN + questTaskID
+
+                    if (questID == null) {
+                        return false
+                    }
+
+                    if (previousDiscovery.equals(`val`, true)) {
+                        return true
+                    } else {
+                        previousDiscovery = `val`
+                    }
+
+                    notify(json.toJson(`val`), ComponentObserver.ComponentEvent.QUEST_LOCATION_DISCOVERED)
+                    Gdx.app.debug(TAG, "Discover Area Activated")
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     private fun updatePortalLayerActivation(mapMgr: MapManager): Boolean {

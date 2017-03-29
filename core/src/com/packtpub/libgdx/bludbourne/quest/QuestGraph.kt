@@ -1,5 +1,6 @@
 package com.packtpub.libgdx.bludbourne.quest
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
@@ -139,9 +140,17 @@ class QuestGraph {
         return true
     }
 
+    fun setQuestTaskComplete(id: String) {
+        val task = getQuestTaskByID(id) ?: return
+        task.setTaskComplete()
+    }
+
     fun update(mapMgr: MapManager) {
         val allQuestTasks = getAllQuestTasks()
         abc@ for (questTask in allQuestTasks) {
+
+            if (questTask.isTaskComplete) continue
+
             //We first want to make sure the task is available and is relevant to current location
             if (!isQuestTaskAvailable(questTask.id)) continue
 
@@ -163,7 +172,8 @@ class QuestGraph {
                     // Case where all the items have been picked up
                     if (questItemPositions.size == 0) {
                         questTask.setTaskComplete()
-                        System.out.println("TASK : " + questTask.id + " is complete!")
+                        Gdx.app.debug("QuestGraph", "TASK : " + questTask.id + " is complete!" + questID)
+                        Gdx.app.debug("QuestGraph", "INFO : " + QuestTask.QuestTaskPropertyType.TARGET_TYPE.toString())
                     }
                 }
 
@@ -186,6 +196,9 @@ class QuestGraph {
     fun init(mapMgr: MapManager) {
         val allQuestTasks = getAllQuestTasks()
         def@ for (questTask in allQuestTasks) {
+
+            if (questTask.isTaskComplete) continue
+
             //We first want to make sure the task is available and is relevant to current location
             if (!isQuestTaskAvailable(questTask.id)) continue
 

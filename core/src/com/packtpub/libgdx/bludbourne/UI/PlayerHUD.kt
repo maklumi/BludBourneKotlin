@@ -231,6 +231,14 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                     conversationUI.isVisible = false
                 }
             }
+            ComponentObserver.ComponentEvent.QUEST_LOCATION_DISCOVERED -> {
+                val string = value.split(Component.MESSAGE_TOKEN)
+                val questID = string [0]
+                val questTaskID = string [1]
+
+                _questUI.questTaskComplete(questID, questTaskID)
+                updateEntityObservers()
+            }
         }
 
     }
