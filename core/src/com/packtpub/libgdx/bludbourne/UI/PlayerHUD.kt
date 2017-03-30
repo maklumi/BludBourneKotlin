@@ -213,24 +213,22 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 if (firstTime) {
                     // start the player with some money
                     goldVal = 20
-                    xpMaxVal = 200
-                    hpMaxVal = 50
-                    hpVal = 50
-                    mpMaxVal = 50
-                    mpVal = 50
                     levelVal = 1
-                }
+                    statusUI.setStatusForLevel(levelVal)
+                } else {
 
-                //set the current max values first
-                statusUI.setXPValueMax(xpMaxVal)
-                statusUI.setHPValueMax(hpMaxVal)
-                statusUI.setMPValueMax(mpMaxVal)
+                    //set the current max values first
+                    statusUI.setXPValueMax(xpMaxVal)
+                    statusUI.setHPValueMax(hpMaxVal)
+                    statusUI.setMPValueMax(mpMaxVal)
+
+                    statusUI.setXPValue(xpVal)
+                    statusUI.setHPValue(hpVal)
+                    statusUI.setMPValue(mpVal)
+                }
 
                 //then add in current values
                 statusUI.setGoldValue(goldVal)
-                statusUI.setXPValue(xpVal)
-                statusUI.setHPValue(hpVal)
-                statusUI.setMPValue(mpVal)
                 statusUI.setLevelValue(levelVal)
             }
 

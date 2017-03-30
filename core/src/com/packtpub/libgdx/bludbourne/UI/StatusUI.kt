@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.Utility
+import com.packtpub.libgdx.bludbourne.battle.LevelTable
 
 
 class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
@@ -16,6 +17,11 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
     val questButton: ImageButton
     val observers = Array<StatusObserver>()
 
+    private val _levelTables: Array<LevelTable>
+
+    companion object {
+        private val LEVEL_TABLE_CONFIG = "scripts/level_tables.json"
+    }
 
     //Attributes
     private var levelVal = -1
@@ -39,6 +45,8 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
     private var _barHeight = 0f
 
     init {
+
+        _levelTables = LevelTable.getLevelTables(LEVEL_TABLE_CONFIG)
 
         //groups
         val group = WidgetGroup()
@@ -99,19 +107,19 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
         this.add(inventoryButton).align(Align.right)
         this.row()
 
-        this.add(group).size(bar.width, bar.height)
+        this.add(group).size(bar.width, bar.height).padRight(10f)
         this.add(hpLabel)
         this.add(hpValLabel).align(Align.left)
         this.row()
 
-        this.add(group2).size(bar2.width, bar2.height)
+        this.add(group2).size(bar2.width, bar2.height).padRight(10f)
         this.add(mpLabel)
         this.add(mpValLabel).align(Align.left)
         this.row()
 
-        this.add(group3).size(bar3.width, bar3.height)
+        this.add(group3).size(bar3.width, bar3.height).padRight(10f)
         this.add(xpLabel)
-        this.add(xp).align(Align.left)
+        this.add(xp).align(Align.left).padRight(20f)
         this.row()
 
         this.add(levelLabel).align(Align.left)
@@ -154,6 +162,11 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
     fun addXPValue(xpValue: Int) {
         this.xpVal += xpValue
+
+        if (xpVal > _xpCurrentMax) {
+            updateToNewLevel()
+        }
+
         xp.setText(xpVal.toString())
 
         updateBar(xpBar, xpVal, _xpCurrentMax)
@@ -163,11 +176,53 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
     fun setXPValue(xpValue: Int) {
         this.xpVal = xpValue
+
+        if (xpVal > _xpCurrentMax) {
+            updateToNewLevel()
+        }
+
         xp.setText(xpVal.toString())
 
         updateBar(xpBar, xpVal, _xpCurrentMax)
 
         notify(xpValue, StatusObserver.StatusEvent.UPDATED_XP)
+    }
+
+    fun setStatusForLevel(level: Int) {
+        for (table in _levelTables) {
+            if (Integer.parseInt(table.levelID) == level) {
+                setXPValueMax(table.xpMax)
+
+                setHPValueMax(table.hpMax)
+                setHPValue(table.hpMax)
+
+                setMPValueMax(table.mpMax)
+                setMPValue(table.mpMax)
+
+                setLevelValue(Integer.parseInt(table.levelID))
+                return
+            }
+        }
+    }
+
+    fun updateToNewLevel() {
+        for (table in _levelTables) {
+            //System.out.println("XPVAL " + _xpVal + " table XPMAX " + table.getXpMax() );
+            if (xpVal > table.xpMax) {
+                continue
+            } else {
+                setXPValueMax(table.xpMax)
+
+                setHPValueMax(table.hpMax)
+                setHPValue(table.hpMax)
+
+                setMPValueMax(table.mpMax)
+                setMPValue(table.mpMax)
+
+                setLevelValue(Integer.parseInt(table.levelID))
+                return
+            }
+        }
     }
 
     fun setXPValueMax(maxXPValue: Int) {
