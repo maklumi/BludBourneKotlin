@@ -197,22 +197,40 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 val quests = profileManager.getProperty("playerQuests", Array::class.java)
                 _questUI.quests = quests as Array<QuestGraph>
 
-                var xpMaxVal = profileManager.getProperty("currentPlayerXPMax", Int::class.java)
-                var xpVal = profileManager.getProperty("currentPlayerXP", Int::class.java)
+                var xpMaxVal = profileManager.getProperty("currentPlayerXPMax", Int::class.java) as Int
+                val xpVal = profileManager.getProperty("currentPlayerXP", Int::class.java) as Int
+
+                var hpMaxVal = profileManager.getProperty("currentPlayerHPMax", Int::class.java) as Int
+                var hpVal = profileManager.getProperty("currentPlayerHP", Int::class.java) as Int
+
+                var mpMaxVal = profileManager.getProperty("currentPlayerMPMax", Int::class.java) as Int
+                var mpVal = profileManager.getProperty("currentPlayerMP", Int::class.java) as Int
+
+                var levelVal = profileManager.getProperty("currentPlayerLevel", Int::class.java) as Int
 
                 // check gold
                 if (firstTime) {
                     // start the player with some money
                     goldVal = 20
                     xpMaxVal = 200
+                    hpMaxVal = 50
+                    hpVal = 50
+                    mpMaxVal = 50
+                    mpVal = 50
+                    levelVal = 1
                 }
 
                 //set the current max values first
-                statusUI.setXPValueMax(xpMaxVal!!)
+                statusUI.setXPValueMax(xpMaxVal)
+                statusUI.setHPValueMax(hpMaxVal)
+                statusUI.setMPValueMax(mpMaxVal)
 
                 //then add in current values
                 statusUI.setGoldValue(goldVal)
-                statusUI.setXPValue(xpVal!!)
+                statusUI.setXPValue(xpVal)
+                statusUI.setHPValue(hpVal)
+                statusUI.setMPValue(mpVal)
+                statusUI.setLevelValue(levelVal)
             }
 
             ProfileObserver.ProfileEvent.SAVING_PROFILE -> {
@@ -220,8 +238,13 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 profileManager.setProperty("playerInventory", InventoryUI.getInventory(inventoryUI.inventorySlotTable))
                 profileManager.setProperty("playerEquipInventory", InventoryUI.getInventory(inventoryUI.equipSlots))
                 profileManager.setProperty("currentPlayerGP", statusUI.getGoldValue())
+                profileManager.setProperty("currentPlayerLevel", statusUI.getLevelValue())
                 profileManager.setProperty("currentPlayerXP", statusUI.getXPValue())
                 profileManager.setProperty("currentPlayerXPMax", statusUI.getXPValueMax())
+                profileManager.setProperty("currentPlayerHP", statusUI.getHPValue())
+                profileManager.setProperty("currentPlayerHPMax", statusUI.getHPValueMax())
+                profileManager.setProperty("currentPlayerMP", statusUI.getMPValue())
+                profileManager.setProperty("currentPlayerMPMax", statusUI.getMPValueMax())
             }
         }
     }
@@ -371,6 +394,19 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         when (event) {
             StatusObserver.StatusEvent.UPDATED_GP -> {
                 storeInventoryUI.setPlayerGP(value)
+                ProfileManager.instance.setProperty("currentPlayerGP", statusUI.getGoldValue())
+            }
+            StatusObserver.StatusEvent.UPDATED_HP -> {
+                ProfileManager.instance.setProperty("currentPlayerHP", statusUI.getHPValue())
+            }
+            StatusObserver.StatusEvent.UPDATED_LEVEL -> {
+                ProfileManager.instance.setProperty("currentPlayerLevel", statusUI.getLevelValue())
+            }
+            StatusObserver.StatusEvent.UPDATED_MP -> {
+                ProfileManager.instance.setProperty("currentPlayerMP", statusUI.getMPValue())
+            }
+            StatusObserver.StatusEvent.UPDATED_XP -> {
+                ProfileManager.instance.setProperty("currentPlayerXP", statusUI.getXPValue())
             }
         }
     }
@@ -384,6 +420,11 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             BattleObserver.BattleEvent.PLAYER_RUNNING -> {
                 MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
                 _battleUI.isVisible = false
+            }
+            BattleObserver.BattleEvent.PLAYER_HIT_DAMAGE
+            -> {
+                val hpVal = ProfileManager.instance.getProperty("currentPlayerHP", Int::class.java) as Int
+                statusUI.setHPValue(hpVal)
             }
             else -> {
 

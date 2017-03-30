@@ -59,6 +59,7 @@ class EntityConfig {
         ENTITY_HEALTH_POINTS,
         ENTITY_ATTACK_POINTS,
         ENTITY_DEFENSE_POINTS,
+        ENTITY_HIT_DAMAGE_TOTAL,
         NONE
     }
 }
