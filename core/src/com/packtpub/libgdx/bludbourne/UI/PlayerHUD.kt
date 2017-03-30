@@ -11,16 +11,18 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import com.packtpub.libgdx.bludbourne.*
+import com.packtpub.libgdx.bludbourne.battle.BattleObserver
 import com.packtpub.libgdx.bludbourne.dialog.ConversationGraph
 import com.packtpub.libgdx.bludbourne.dialog.ConversationGraphObserver
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
 import com.packtpub.libgdx.bludbourne.quest.QuestGraph
+import com.packtpub.libgdx.bludbourne.screens.MainGameScreen
 
 
 class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         Screen, ProfileObserver, ComponentObserver, ConversationGraphObserver,
-        StoreInventoryObserver, StatusObserver {
+        StoreInventoryObserver, BattleObserver, StatusObserver {
 
     val stage: Stage
     private val viewport: Viewport
@@ -123,6 +125,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         statusUI.addObserver(this)
         storeInventoryUI.addObserver(this)
         inventoryUI.addObserver(_battleUI.battleState)
+        _battleUI.battleState.addObserver(this)
 
         // Listeners
         val inventoryButton = statusUI.inventoryButton
@@ -255,6 +258,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 val enemyZoneID = value
                 _battleUI.battleZoneTriggered(enemyZoneID.toInt())
                 _battleUI.toBack()
+                MainGameScreen.gameState = MainGameScreen.GameState.PAUSED
                 _battleUI.isVisible = true
             }
 
@@ -367,6 +371,22 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         when (event) {
             StatusObserver.StatusEvent.UPDATED_GP -> {
                 storeInventoryUI.setPlayerGP(value)
+            }
+        }
+    }
+
+    override fun onNotify(enemyEntity: Entity, event: BattleObserver.BattleEvent) {
+        when (event) {
+            BattleObserver.BattleEvent.OPPONENT_DEFEATED -> {
+                MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
+                _battleUI.isVisible = false
+            }
+            BattleObserver.BattleEvent.PLAYER_RUNNING -> {
+                MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
+                _battleUI.isVisible = false
+            }
+            else -> {
+
             }
         }
     }

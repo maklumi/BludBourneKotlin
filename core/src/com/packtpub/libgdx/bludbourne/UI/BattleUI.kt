@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.Utility
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver
-import com.packtpub.libgdx.bludbourne.battle.BattleObserver.BattleEvent.*
+import com.packtpub.libgdx.bludbourne.battle.BattleObserver.BattleEvent.OPPONENT_ADDED
 import com.packtpub.libgdx.bludbourne.battle.BattleState
 
 
@@ -69,8 +69,6 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
     override fun onNotify(entity: Entity, event: BattleObserver.BattleEvent) {
         when (event) {
             OPPONENT_ADDED -> _image.setAnimation(entity.getAnimation(Entity.AnimationType.IMMOBILE))
-            OPPONENT_DEFEATED -> this.isVisible = false
-            PLAYER_RUNNING -> this.isVisible = false
             else -> {
             }
         }

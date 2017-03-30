@@ -33,6 +33,8 @@ class MainGameScreen(game: BludBourne) : Screen {
     private val json = Json()
 
     enum class GameState {
+        SAVING,
+        LOADING,
         RUNNING,
         PAUSED
     }
@@ -45,7 +47,14 @@ class MainGameScreen(game: BludBourne) : Screen {
                 when (gameState) {
                     MainGameScreen.GameState.RUNNING -> {
                         field = GameState.RUNNING
+                    }
+                    GameState.LOADING -> {
+                        field = GameState.RUNNING
                         ProfileManager.instance.loadProfile()
+                    }
+                    GameState.SAVING -> {
+                        ProfileManager.instance.saveProfile()
+                        field = GameState.PAUSED
                     }
                     MainGameScreen.GameState.PAUSED -> if (field == GameState.PAUSED) {
                         field = GameState.RUNNING
@@ -99,6 +108,7 @@ class MainGameScreen(game: BludBourne) : Screen {
     override fun render(delta: Float) {
         if (gameState == GameState.PAUSED) {
             player.updateInput(delta)
+            playerHUD.render(delta)
             return
         }
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
@@ -143,8 +153,7 @@ class MainGameScreen(game: BludBourne) : Screen {
     }
 
     override fun resume() {
-        gameState = GameState.RUNNING
-        ProfileManager.instance.loadProfile()
+        gameState = GameState.LOADING
     }
 
     override fun dispose() {
