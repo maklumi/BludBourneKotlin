@@ -279,9 +279,9 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             }
             ComponentObserver.ComponentEvent.ENEMY_SPAWN_LOCATION_CHANGED -> {
                 val enemyZoneID = value
+                MainGameScreen.gameState = MainGameScreen.GameState.SAVING
                 _battleUI.battleZoneTriggered(enemyZoneID.toInt())
                 _battleUI.toBack()
-                MainGameScreen.gameState = MainGameScreen.GameState.PAUSED
                 _battleUI.isVisible = true
             }
 
@@ -425,6 +425,11 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             -> {
                 val hpVal = ProfileManager.instance.getProperty("currentPlayerHP", Int::class.java) as Int
                 statusUI.setHPValue(hpVal)
+
+                if (hpVal <= 0) {
+                    _battleUI.isVisible = false
+                    MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER
+                }
             }
             else -> {
 

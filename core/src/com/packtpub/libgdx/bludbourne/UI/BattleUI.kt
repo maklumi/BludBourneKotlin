@@ -28,6 +28,8 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
 
     private var _damageValLabel: Label
 
+    private var _currentBattleZone = 0
+
     private var _origDamageValLabelY = 0f
 
     init {
@@ -73,6 +75,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
     }
 
     fun battleZoneTriggered(battleZoneValue: Int) {
+        _currentBattleZone = battleZoneValue
         battleState.setCurrentOpponent(battleZoneValue)
     }
 
@@ -85,6 +88,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
             }
             OPPONENT_ADDED -> {
                 _image.setAnimation(entity.getAnimation(Entity.AnimationType.IMMOBILE))
+                this.titleLabel.setText("Level " + _currentBattleZone + " " + entity.entityConfig.entityID)
             }
             OPPONENT_HIT_DAMAGE -> {
                 val damage = entity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_HIT_DAMAGE_TOTAL.toString()).toInt()

@@ -13,7 +13,7 @@ import com.packtpub.libgdx.bludbourne.UI.PlayerHUD
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
-class MainGameScreen(game: BludBourne) : Screen {
+class MainGameScreen(val game: BludBourne) : Screen {
     private val TAG = MainGameScreen::class.java.simpleName
 
     internal var viewportWidth: Float = 0f
@@ -36,7 +36,8 @@ class MainGameScreen(game: BludBourne) : Screen {
         SAVING,
         LOADING,
         RUNNING,
-        PAUSED
+        PAUSED,
+        GAME_OVER
     }
 
     val multiplexer: InputMultiplexer
@@ -60,6 +61,9 @@ class MainGameScreen(game: BludBourne) : Screen {
                         field = GameState.RUNNING
                     } else if (field == GameState.RUNNING) {
                         field = GameState.PAUSED
+                    }
+                    GameState.GAME_OVER -> {
+                        field = GameState.GAME_OVER
                     }
                     else -> field = GameState.RUNNING
                 }
@@ -101,11 +105,14 @@ class MainGameScreen(game: BludBourne) : Screen {
     }
 
     override fun hide() {
-        gameState = GameState.PAUSED
+        gameState = GameState.LOADING
         Gdx.input.inputProcessor = null
     }
 
     override fun render(delta: Float) {
+        if (gameState == GameState.GAME_OVER) {
+            game.screen = game.getScreenType(BludBourne.ScreenType.GameOver)
+        }
         if (gameState == GameState.PAUSED) {
             player.updateInput(delta)
             playerHUD.render(delta)

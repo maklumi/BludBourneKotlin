@@ -2,10 +2,7 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Screen
-import com.packtpub.libgdx.bludbourne.screens.LoadGameScreen
-import com.packtpub.libgdx.bludbourne.screens.MainGameScreen
-import com.packtpub.libgdx.bludbourne.screens.MainMenuScreen
-import com.packtpub.libgdx.bludbourne.screens.NewGameScreen
+import com.packtpub.libgdx.bludbourne.screens.*
 
 class BludBourne : Game() {
 
@@ -13,12 +10,14 @@ class BludBourne : Game() {
     private lateinit var mainMenuScreen: MainMenuScreen
     private lateinit var loadGameScreen: LoadGameScreen
     private lateinit var newGameScreen: NewGameScreen
+    private lateinit var gameOverScreen: GameOverScreen
 
     override fun create() {
         mainGameScreen = MainGameScreen(this)
         mainMenuScreen = MainMenuScreen(this)
         loadGameScreen = LoadGameScreen(this)
         newGameScreen = NewGameScreen(this)
+        gameOverScreen = GameOverScreen(this)
         setScreen(mainMenuScreen)
     }
 
@@ -27,6 +26,7 @@ class BludBourne : Game() {
         mainMenuScreen.dispose()
         loadGameScreen.dispose()
         newGameScreen.dispose()
+        gameOverScreen.dispose()
     }
 
     fun getScreenType(screenType: ScreenType): Screen {
@@ -35,6 +35,7 @@ class BludBourne : Game() {
             ScreenType.MainGame -> return mainGameScreen
             ScreenType.LoadGame -> return loadGameScreen
             ScreenType.NewGame -> return newGameScreen
+            ScreenType.GameOver -> return gameOverScreen
         }
     }
 
@@ -42,7 +43,8 @@ class BludBourne : Game() {
         MainMenu,
         MainGame,
         LoadGame,
-        NewGame
+        NewGame,
+        GameOver
     }
 
 }
