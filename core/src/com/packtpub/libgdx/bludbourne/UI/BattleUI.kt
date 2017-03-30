@@ -62,7 +62,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
     }
 
     fun battleZoneTriggered(battleZoneValue: Int) {
-        battleState.battleZoneEntered(battleZoneValue)
+        battleState.setCurrentOpponent(battleZoneValue)
     }
 
 

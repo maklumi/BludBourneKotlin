@@ -14,24 +14,27 @@ class BattleState : BattleSubject(), InventoryObserver {
     private var _currentPlayerAP: Int = 0
     private var _currentPlayerDP: Int = 0
 
-    private fun setCurrentOpponent(monsterType: MonsterFactory.MonsterEntityType) {
-        val entity = MonsterFactory.instance.getMonster(monsterType) ?: return
+    fun setCurrentOpponent(battleZoneLevel: Int) {
+        println("Entered BATTLE ZONE: $battleZoneLevel")
+        val entity = MonsterFactory.instance.getRandomMonster(battleZoneLevel)
         this._currentOpponent = entity
-        notify(entity, BattleObserver.BattleEvent.OPPONENT_ADDED)
+        notify(entity!!, BattleObserver.BattleEvent.OPPONENT_ADDED)
     }
 
-    fun battleZoneEntered(battleZoneID: Int) {
-        when (battleZoneID) {
-            1 -> {
-                System.out.print("Entered BATTLE ZONE: " + battleZoneID)
-                setCurrentOpponent(MonsterFactory.MonsterEntityType.MONSTER001)
-            }
-            else -> {
-            }
-        }
-    }
+//    fun battleZoneEntered(battleZoneID: Int) {
+//        when (battleZoneID) {
+//            1 -> {
+//                System.out.print("Entered BATTLE ZONE: " + battleZoneID)
+//                setCurrentOpponent(MonsterFactory.MonsterEntityType.MONSTER001)
+//            }
+//            else -> {
+//            }
+//        }
+//    }
 
     fun playerAttacks() {
+        if (_currentOpponent == null) return
+
         var currentOpponentHP = _currentOpponent!!.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_HEALTH_POINTS.toString()).toInt()
         val currentOpponentDP = _currentOpponent!!.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_DEFENSE_POINTS.toString()).toInt()
 
