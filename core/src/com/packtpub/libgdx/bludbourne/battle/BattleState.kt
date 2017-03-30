@@ -33,6 +33,8 @@ class BattleState : BattleSubject(), InventoryObserver {
 
         val damage = MathUtils.clamp(_currentPlayerAP - currentOpponentDP, 0, _currentPlayerAP)
 
+        println("ENEMY HAS $currentOpponentHP hit with damage: $damage")
+
         currentOpponentHP = MathUtils.clamp(currentOpponentHP - damage, 0, currentOpponentHP)
         _currentOpponent!!.entityConfig.setPropertyValue(EntityConfig.EntityProperties.ENTITY_HEALTH_POINTS.toString(), currentOpponentHP.toString())
         System.out.println("Player attacks " + _currentOpponent!!.entityConfig.entityID + " leaving it with HP: " + currentOpponentHP)

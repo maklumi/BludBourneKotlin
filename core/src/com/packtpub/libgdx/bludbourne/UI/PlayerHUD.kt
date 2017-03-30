@@ -191,6 +191,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
                 val equipInventory = profileManager.getProperty("playerEquipInventory", Array::class.java) as Array<InventoryItemLocation>
                 if (equipInventory.size > 0) {
+                    inventoryUI.resetEquipSlots()
                     InventoryUI.populateInventory(inventoryUI.equipSlots, equipInventory, inventoryUI.dragAndDrop, InventoryUI.PLAYER_INVENTORY, false)
                 }
 
@@ -414,6 +415,10 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     override fun onNotify(enemyEntity: Entity, event: BattleObserver.BattleEvent) {
         when (event) {
             BattleObserver.BattleEvent.OPPONENT_DEFEATED -> {
+                val goldReward = enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_GP_REWARD.toString()).toInt()
+                statusUI.addGoldValue(goldReward)
+                val xpReward = Integer.parseInt(enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_XP_REWARD.toString()));
+                statusUI.addXPValue(xpReward)
                 MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
                 _battleUI.isVisible = false
             }

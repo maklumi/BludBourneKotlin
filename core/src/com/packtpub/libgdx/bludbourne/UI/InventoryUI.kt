@@ -156,6 +156,11 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
         }
     }
 
+    fun resetEquipSlots() {
+        _DPVal = 0
+        _APVal = 0
+    }
+
     fun removeQuestItemFromInventory(questID: String) {
         val sourceCells = inventorySlotTable.cells
         for (index in 0..sourceCells.size - 1) {
