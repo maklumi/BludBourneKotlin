@@ -3,15 +3,13 @@ package com.packtpub.libgdx.bludbourne.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import com.packtpub.libgdx.bludbourne.BludBourne
-import com.packtpub.libgdx.bludbourne.Component
-import com.packtpub.libgdx.bludbourne.Entity
-import com.packtpub.libgdx.bludbourne.EntityFactory
+import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.Map.Companion.UNIT_SCALE
 import com.packtpub.libgdx.bludbourne.UI.AnimatedImage
 
@@ -22,6 +20,7 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
     private val _entity: Entity
     private val _image: Image
     private val _animImage = AnimatedImage()
+    private var _followingActor = Actor().apply { setPosition(0f, 0f) }
 
     init {
         _entity = EntityFactory.getEntity(EntityFactory.EntityType.NPC)
@@ -41,6 +40,7 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
 
         _animImage.addAction(
                 Actions.sequence(
+                        Actions.run { followActor(_animImage) },
                         Actions.run {
                             _animImage.setAnimation(_entity.getAnimation(Entity.AnimationType.WALK_RIGHT))
                             val width = _animImage.width * UNIT_SCALE
@@ -54,10 +54,15 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
                             val height = _animImage.height * UNIT_SCALE
                             _animImage.setSize(width, height)
                         },
-                        Actions.moveTo(10f, 10f, 10f))
+                        Actions.moveTo(10f, 10f, 10f),
+                        Actions.run { mapMgr.loadMap(MapFactory.MapType.CASTLE_OF_DOOM) })
         )
 
         _stage.addActor(_animImage)
+    }
+
+    private fun followActor(actor: Actor) {
+        _followingActor = actor
     }
 
     override fun render(delta: Float) {
@@ -73,11 +78,8 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
 
         mapRenderer.render()
 
-        camera.position.set(_animImage.x, _animImage.y, 0f)
+        camera.position.set(_followingActor.x, _followingActor.y, 0f)
         camera.update()
-
-        //_player.updateInput(delta);
-        //_player.updatePhysics(mapMgr, delta);
 
         _stage.act(delta)
         _stage.draw()
