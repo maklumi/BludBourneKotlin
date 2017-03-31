@@ -5,8 +5,7 @@ import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.EntityConfig
 import com.packtpub.libgdx.bludbourne.UI.InventoryObserver
 import com.packtpub.libgdx.bludbourne.UI.InventoryObserver.InventoryEvent
-import com.packtpub.libgdx.bludbourne.UI.InventoryObserver.InventoryEvent.UPDATED_AP
-import com.packtpub.libgdx.bludbourne.UI.InventoryObserver.InventoryEvent.UPDATED_DP
+import com.packtpub.libgdx.bludbourne.UI.InventoryObserver.InventoryEvent.*
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
@@ -15,6 +14,7 @@ class BattleState : BattleSubject(), InventoryObserver {
     private var _currentPlayerAP: Int = 0
     private var _currentPlayerDP: Int = 0
     private var _currentZoneLevel = 0
+    private var _currentPlayerWandAPPoints = 0
     private var _chanceOfAttack = 25
     private var _chanceOfEscape = 40
     private var _criticalChance = 90
@@ -50,6 +50,16 @@ class BattleState : BattleSubject(), InventoryObserver {
 
     fun playerAttacks() {
         if (_currentOpponent == null) return
+
+        //Check for magic if used in attack; If we don't have enough MP, then return
+        var mpVal = ProfileManager.instance.getProperty("currentPlayerMP", Int::class.java) as Int
+        if (_currentPlayerWandAPPoints > mpVal) {
+            return
+        } else {
+            mpVal -= _currentPlayerWandAPPoints
+            ProfileManager.instance.setProperty("currentPlayerMP", mpVal)
+            notify(_currentOpponent as Entity, BattleObserver.BattleEvent.PLAYER_USED_MAGIC)
+        }
 
         notify(_currentOpponent!!, BattleObserver.BattleEvent.PLAYER_TURN_START)
 
@@ -113,6 +123,14 @@ class BattleState : BattleSubject(), InventoryObserver {
                 val dpVal = Integer.valueOf(value)!!
                 _currentPlayerDP = dpVal
                 System.out.println("DPVAL: " + _currentPlayerDP)
+            }
+            ADD_WAND_AP -> {
+                val wandAP = value.toInt()
+                _currentPlayerWandAPPoints += wandAP
+            }
+            REMOVE_WAND_AP -> {
+                val removeWandAP = value.toInt()
+                _currentPlayerWandAPPoints -= removeWandAP
             }
             else -> {
             }

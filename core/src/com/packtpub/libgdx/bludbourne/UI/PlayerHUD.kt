@@ -442,6 +442,10 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                     MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER
                 }
             }
+            BattleObserver.BattleEvent.PLAYER_USED_MAGIC -> {
+                val mpVal = ProfileManager.instance.getProperty("currentPlayerMP", Int::class.java) as Int
+                statusUI.setMPValue(mpVal)
+            }
             else -> {
 
             }

@@ -16,7 +16,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
     private var mouseSelectCoordinates: Vector3 = Vector3.Zero
     private var isMouseSelectEnabled = false
     private var previousDiscovery: String = ""
-    private var previousEnemySpawn: String = ""
+    private var previousEnemySpawn: String = "0"
 
     init {
         boundingBoxLocation = BoundingBoxLocation.BOTTOM_CENTER
@@ -38,7 +38,8 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                 currentEntityPosition = json.fromJson(Vector2::class.java, string[1])
                 nextEntityPosition.set(currentEntityPosition.x, currentEntityPosition.y)
                 previousDiscovery = ""
-                previousEnemySpawn = ""
+                previousEnemySpawn = "0"
+                notify(previousEnemySpawn, ComponentObserver.ComponentEvent.ENEMY_SPAWN_LOCATION_CHANGED)
             } else if (string[0].equals(Component.MESSAGE.CURRENT_STATE.toString(), ignoreCase = true)) {
                 state = json.fromJson(Entity.State::class.java, string[1])
             } else if (string[0].equals(Component.MESSAGE.CURRENT_DIRECTION.toString(), ignoreCase = true)) {

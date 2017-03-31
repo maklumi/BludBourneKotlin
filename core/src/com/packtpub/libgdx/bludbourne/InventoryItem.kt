@@ -91,6 +91,11 @@ class InventoryItem : Image {
         if (itemValue >= 0) return MathUtils.floor(itemValue * .33f) + 2 else return 0
     }
 
+    fun isInventoryItemOffensiveWand(): Boolean {
+        return (itemUseType and ItemUseType.WAND_ONEHAND.value) == ItemUseType.WAND_ONEHAND.value ||
+                (itemUseType and ItemUseType.WAND_TWOHAND.value) == ItemUseType.WAND_TWOHAND.value
+    }
+
     fun isInventoryItemOffensive(): Boolean {
         return itemUseType and ItemUseType.WEAPON_ONEHAND.value == ItemUseType.WEAPON_ONEHAND.value ||
                 itemUseType and ItemUseType.WEAPON_TWOHAND.value == ItemUseType.WEAPON_TWOHAND.value ||

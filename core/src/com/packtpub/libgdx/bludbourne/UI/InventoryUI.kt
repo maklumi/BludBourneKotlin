@@ -10,6 +10,9 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.InventoryItem.ItemUseType.*
+import com.packtpub.libgdx.bludbourne.UI.InventoryObserver.InventoryEvent.*
+import com.packtpub.libgdx.bludbourne.UI.InventorySlotObserver.SlotEvent.ADDED_ITEM
+import com.packtpub.libgdx.bludbourne.UI.InventorySlotObserver.SlotEvent.REMOVED_ITEM
 
 
 class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"), InventorySubject, InventorySlotObserver {
@@ -213,28 +216,38 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
 
     override fun onNotify(slot: InventorySlot, event: InventorySlotObserver.SlotEvent) {
         when (event) {
-            InventorySlotObserver.SlotEvent.ADDED_ITEM -> {
+            ADDED_ITEM -> {
                 val addItem = slot.getTopInventoryItem() ?: return
                 if (addItem.isInventoryItemOffensive()) {
                     _APVal += addItem.itemUseTypeValue
                     _APValLabel.setText(_APVal.toString())
-                    notify(_APVal.toString(), InventoryObserver.InventoryEvent.UPDATED_AP)
+                    notify(_APVal.toString(), UPDATED_AP)
+
+                    if (addItem.isInventoryItemOffensiveWand()) {
+                        notify(addItem.itemUseTypeValue.toString(), ADD_WAND_AP)
+                    }
+
                 } else if (addItem.isInventoryItemDefensive()) {
                     _DPVal += addItem.itemUseTypeValue
                     _DPValLabel.setText(_DPVal.toString())
-                    notify(_DPVal.toString(), InventoryObserver.InventoryEvent.UPDATED_DP)
+                    notify(_DPVal.toString(), UPDATED_DP)
                 }
             }
-            InventorySlotObserver.SlotEvent.REMOVED_ITEM -> {
+            REMOVED_ITEM -> {
                 val removeItem = slot.getTopInventoryItem() ?: return
                 if (removeItem.isInventoryItemOffensive()) {
                     _APVal -= removeItem.itemUseTypeValue
                     _APValLabel.setText(_APVal.toString())
-                    notify(_APVal.toString(), InventoryObserver.InventoryEvent.UPDATED_AP)
+                    notify(_APVal.toString(), UPDATED_AP)
+
+                    if (removeItem.isInventoryItemOffensiveWand()) {
+                        notify(removeItem.itemUseTypeValue.toString(), REMOVE_WAND_AP)
+                    }
+
                 } else if (removeItem.isInventoryItemDefensive()) {
                     _DPVal -= removeItem.itemUseTypeValue
                     _DPValLabel.setText(_DPVal.toString())
-                    notify(_DPVal.toString(), InventoryObserver.InventoryEvent.UPDATED_DP)
+                    notify(_DPVal.toString(), UPDATED_DP)
                 }
             }
             else -> {
