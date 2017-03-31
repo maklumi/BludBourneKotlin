@@ -139,7 +139,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
     fun setLevelValue(levelValue: Int) {
         this.levelVal = levelValue
         levelValLabel.setText(levelVal.toString())
-        notify(levelValue, StatusObserver.StatusEvent.UPDATED_LEVEL)
+        notify(levelVal, StatusObserver.StatusEvent.UPDATED_LEVEL)
     }
 
     fun getGoldValue(): Int = _goldVal
@@ -147,13 +147,13 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
     fun setGoldValue(value: Int) {
         _goldVal = value
         goldVal.setText(getGoldValue().toString())
-        notify(value, StatusObserver.StatusEvent.UPDATED_GP)
+        notify(_goldVal, StatusObserver.StatusEvent.UPDATED_GP)
     }
 
     fun addGoldValue(goldValue: Int) {
         this._goldVal += goldValue
         goldVal.setText(_goldVal.toString())
-        notify(goldValue, StatusObserver.StatusEvent.UPDATED_GP)
+        notify(_goldVal, StatusObserver.StatusEvent.UPDATED_GP)
     }
 
     fun getXPValue(): Int {
@@ -171,7 +171,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
         updateBar(xpBar, xpVal, _xpCurrentMax)
 
-        notify(xpValue, StatusObserver.StatusEvent.UPDATED_XP)
+        notify(xpVal, StatusObserver.StatusEvent.UPDATED_XP)
     }
 
     fun setXPValue(xpValue: Int) {
@@ -185,13 +185,14 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
         updateBar(xpBar, xpVal, _xpCurrentMax)
 
-        notify(xpValue, StatusObserver.StatusEvent.UPDATED_XP)
+        notify(xpVal, StatusObserver.StatusEvent.UPDATED_XP)
     }
 
     fun setStatusForLevel(level: Int) {
         for (table in _levelTables) {
             if (Integer.parseInt(table.levelID) == level) {
                 setXPValueMax(table.xpMax)
+                setXPValue(xpVal)
 
                 setHPValueMax(table.hpMax)
                 setHPValue(table.hpMax)
@@ -244,7 +245,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
         updateBar(hpBar, hpVal, _hpCurrentMax)
 
-        notify(hpValue, StatusObserver.StatusEvent.UPDATED_HP)
+        notify(hpVal, StatusObserver.StatusEvent.UPDATED_HP)
     }
 
     fun addHPValue(hpValue: Int) {
@@ -253,7 +254,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
         updateBar(hpBar, hpVal, _hpCurrentMax)
 
-        notify(hpValue, StatusObserver.StatusEvent.UPDATED_HP)
+        notify(hpVal, StatusObserver.StatusEvent.UPDATED_HP)
     }
 
     fun setHPValue(hpValue: Int) {
@@ -262,7 +263,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
         updateBar(hpBar, hpVal, _hpCurrentMax)
 
-        notify(hpValue, StatusObserver.StatusEvent.UPDATED_HP)
+        notify(hpVal, StatusObserver.StatusEvent.UPDATED_HP)
     }
 
     fun setHPValueMax(maxHPValue: Int) {
@@ -284,7 +285,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
         updateBar(mpBar, mpVal, _mpCurrentMax)
 
-        notify(mpValue, StatusObserver.StatusEvent.UPDATED_MP)
+        notify(mpVal, StatusObserver.StatusEvent.UPDATED_MP)
     }
 
     fun addMPValue(mpValue: Int) {
@@ -293,7 +294,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
         updateBar(mpBar, mpVal, _mpCurrentMax)
 
-        notify(mpValue, StatusObserver.StatusEvent.UPDATED_MP)
+        notify(mpVal, StatusObserver.StatusEvent.UPDATED_MP)
     }
 
     fun setMPValue(mpValue: Int) {
@@ -302,7 +303,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
 
         updateBar(mpBar, mpVal, _mpCurrentMax)
 
-        notify(mpValue, StatusObserver.StatusEvent.UPDATED_MP)
+        notify(mpVal, StatusObserver.StatusEvent.UPDATED_MP)
     }
 
     fun setMPValueMax(maxMPValue: Int) {

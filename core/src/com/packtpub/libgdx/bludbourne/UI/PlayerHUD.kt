@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.ComponentObserver.ComponentEvent.*
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver
+import com.packtpub.libgdx.bludbourne.battle.BattleObserver.BattleEvent.*
 import com.packtpub.libgdx.bludbourne.dialog.ConversationGraph
 import com.packtpub.libgdx.bludbourne.dialog.ConversationGraphObserver
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
@@ -420,20 +421,19 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
     override fun onNotify(enemyEntity: Entity, event: BattleObserver.BattleEvent) {
         when (event) {
-            BattleObserver.BattleEvent.OPPONENT_DEFEATED -> {
+            OPPONENT_DEFEATED -> {
+                MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
                 val goldReward = enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_GP_REWARD.toString()).toInt()
                 statusUI.addGoldValue(goldReward)
                 val xpReward = Integer.parseInt(enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_XP_REWARD.toString()))
                 statusUI.addXPValue(xpReward)
+                _battleUI.isVisible = false
+            }
+            PLAYER_RUNNING -> {
                 MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
                 _battleUI.isVisible = false
             }
-            BattleObserver.BattleEvent.PLAYER_RUNNING -> {
-                MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
-                _battleUI.isVisible = false
-            }
-            BattleObserver.BattleEvent.PLAYER_HIT_DAMAGE
-            -> {
+            PLAYER_HIT_DAMAGE -> {
                 val hpVal = ProfileManager.instance.getProperty("currentPlayerHP", Int::class.java) as Int
                 statusUI.setHPValue(hpVal)
 
@@ -442,7 +442,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                     MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER
                 }
             }
-            BattleObserver.BattleEvent.PLAYER_USED_MAGIC -> {
+            PLAYER_USED_MAGIC -> {
                 val mpVal = ProfileManager.instance.getProperty("currentPlayerMP", Int::class.java) as Int
                 statusUI.setMPValue(mpVal)
             }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.List
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.Utility
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
@@ -17,6 +18,7 @@ import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 class LoadGameScreen(private val _game: BludBourne) : Screen {
     private val _stage: Stage = Stage()
+    private val _listItems: List<String> = List(Utility.STATUSUI_SKIN, "inventory")
 
     init {
         //create
@@ -25,9 +27,8 @@ class LoadGameScreen(private val _game: BludBourne) : Screen {
 
         ProfileManager.instance.storeAllProfiles()
         val list = ProfileManager.instance.getProfileList()
-        val listItems = List<String>(Utility.STATUSUI_SKIN, "inventory")
-        listItems.setItems(list)
-        val scrollPane = ScrollPane(listItems)
+        _listItems.setItems(list)
+        val scrollPane = ScrollPane(_listItems)
 
         scrollPane.setOverscroll(false, false)
         scrollPane.setFadeScrollBars(false)
@@ -63,7 +64,8 @@ class LoadGameScreen(private val _game: BludBourne) : Screen {
 
         loadButton.addListener(object : InputListener() {
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                val fileName = listItems.selected.toString()
+                if (_listItems.selected == null) return true
+                val fileName = _listItems.selected.toString()
                 val file = ProfileManager.instance.getProfileFile(fileName)
                 if (file != null && !fileName.isEmpty()) {
                     ProfileManager.instance.setCurrentProfile(fileName)
@@ -93,6 +95,8 @@ class LoadGameScreen(private val _game: BludBourne) : Screen {
     }
 
     override fun show() {
+        val list: Array<String> = ProfileManager.instance.getProfileList()
+        _listItems.setItems(list)
         Gdx.input.inputProcessor = _stage
     }
 

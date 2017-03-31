@@ -19,8 +19,8 @@ import com.packtpub.libgdx.bludbourne.battle.BattleState
 class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), BattleObserver {
     private val _image: AnimatedImage
 
-    private val _enemyWidth = 160f
-    private val _enemyHeight = 160f
+    private val _enemyWidth = 96f
+    private val _enemyHeight = 96f
 
     var battleState = BattleState()
     private var _attackButton: TextButton
@@ -124,8 +124,8 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
 
     override fun act(delta: Float) {
         _battleTimer = (_battleTimer + delta) % 60
-        if (_damageValLabel.isVisible) {
-            _damageValLabel.y = _damageValLabel.y + 3
+        if (_damageValLabel.isVisible and (_damageValLabel.y < this.height)) {
+            _damageValLabel.y = _damageValLabel.y + 5
         }
 
         super.act(delta)

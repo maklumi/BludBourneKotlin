@@ -14,18 +14,18 @@ import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 class NewGameScreen(private val _game: BludBourne) : Screen {
 
-    private val _stage: Stage
+    private val _stage: Stage = Stage()
+    private val profileText: TextField
+    private val overwriteDialog: Dialog
 
     init {
-
-        //create
-        _stage = Stage()
-
         val profileName = Label("Enter Profile Name: ", Utility.STATUSUI_SKIN)
-        val profileText = TextField("", Utility.STATUSUI_SKIN, "inventory")
+
+        profileText = TextField("", Utility.STATUSUI_SKIN, "inventory")
         profileText.maxLength = 20
 
-        val overwriteDialog = Dialog("Overwrite?", Utility.STATUSUI_SKIN, "solidbackground")
+
+        overwriteDialog = Dialog("Overwrite?", Utility.STATUSUI_SKIN, "solidbackground")
         val overwriteLabel = Label("Overwrite existing profile name?", Utility.STATUSUI_SKIN)
         val cancelButton = TextButton("Cancel", Utility.STATUSUI_SKIN, "inventory")
 
@@ -134,10 +134,14 @@ class NewGameScreen(private val _game: BludBourne) : Screen {
     }
 
     override fun show() {
+        overwriteDialog.hide()
+        profileText.text = ""
         Gdx.input.inputProcessor = _stage
     }
 
     override fun hide() {
+        overwriteDialog.hide()
+        profileText.text = ""
         Gdx.input.inputProcessor = null
     }
 

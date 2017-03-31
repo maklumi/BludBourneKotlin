@@ -20,20 +20,31 @@ class GameOverScreen(private val _game: BludBourne) : Screen {
 
         //create
         val continueButton = TextButton("Continue", Utility.STATUSUI_SKIN)
+        val mainMenuButton = TextButton("Main Menu", Utility.STATUSUI_SKIN)
         val messageLabel = Label(DEATH_MESSAGE, Utility.STATUSUI_SKIN)
         messageLabel.setWrap(true)
 
         val gameOverLabel = Label(GAMEOVER, Utility.STATUSUI_SKIN)
         gameOverLabel.setAlignment(Align.center)
 
-        val table = Table()
+        val table = Table().apply {
+            // debugAll()
+            setFillParent(true)
+            add(messageLabel).pad(50f, 50f, 50f, 50f).expandX().fillX()
+            row()
+            add(gameOverLabel)
+            row()
+            add(continueButton).pad(50f, 50f, 10f, 50f)
+            row()
+            add(mainMenuButton).pad(10f, 50f, 50f, 50f)
+        }
 
         //Layout
-        table.setFillParent(true)
-        table.add(messageLabel).pad(50f, 50f, 50f, 50f).expandX().fillX().row()
-        table.add(gameOverLabel)
-        table.row()
-        table.add(continueButton).pad(50f, 50f, 50f, 50f)
+//        table.setFillParent(true)
+//        table.add(messageLabel).pad(50f, 50f, 50f, 50f).expandX().fillX().row()
+//        table.add(gameOverLabel)
+//        table.row()
+//        table.add(continueButton).pad(50f, 50f, 10f, 50f)
 
         _stage.addActor(table)
 
@@ -41,6 +52,14 @@ class GameOverScreen(private val _game: BludBourne) : Screen {
         continueButton.addListener(object : InputListener() {
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 _game.screen = _game.getScreenType(BludBourne.ScreenType.LoadGame)
+                return true
+            }
+        }
+        )
+
+        mainMenuButton.addListener(object : InputListener() {
+            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                _game.screen = _game.getScreenType(BludBourne.ScreenType.MainMenu)
                 return true
             }
         }

@@ -43,7 +43,7 @@ class BattleState : BattleSubject(), InventoryObserver {
 
     fun setCurrentOpponent() {
         System.out.print("Entered BATTLE ZONE: " + _currentZoneLevel)
-        val entity = MonsterFactory.instance.getRandomMonster(_currentZoneLevel) ?: return
+        val entity = MonsterFactory.getRandomMonster(_currentZoneLevel) ?: return
         this._currentOpponent = entity
         notify(entity, BattleObserver.BattleEvent.OPPONENT_ADDED)
     }
