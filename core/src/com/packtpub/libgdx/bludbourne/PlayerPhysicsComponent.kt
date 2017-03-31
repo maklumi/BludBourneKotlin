@@ -148,11 +148,11 @@ class PlayerPhysicsComponent : PhysicsComponent() {
     }
 
     private fun updateEnemySpawnLayerActivation(mapMgr: MapManager): Boolean {
-        val mapDiscoverLayer = mapMgr.getEnemySpawnLayer() ?: return false
+        val mapEnemySpawnLayer = mapMgr.getEnemySpawnLayer() ?: return false
 
         var rectangle: Rectangle?
 
-        for (mapObject in mapDiscoverLayer.objects) {
+        for (mapObject in mapEnemySpawnLayer.objects) {
             if (mapObject is RectangleMapObject) {
                 rectangle = mapObject.rectangle
 
@@ -162,21 +162,22 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                     if (previousEnemySpawn.equals(enemySpawnID, true)) {
                         return true
                     } else {
+                        Gdx.app.debug(TAG, "Enemy Spawn Area $enemySpawnID Activated with previous Spawn value: $previousEnemySpawn")
                         previousEnemySpawn = enemySpawnID
                     }
 
                     notify(enemySpawnID, ComponentObserver.ComponentEvent.ENEMY_SPAWN_LOCATION_CHANGED)
                     Gdx.app.debug(TAG, "Enemy Spawn Area Activated")
                     return true
-                } else {
-                    //If no collision, reset the value
-                    if (!previousEnemySpawn.equals("0", true)) {
-                        previousEnemySpawn = "0"
-                        notify(previousEnemySpawn, ComponentObserver.ComponentEvent.ENEMY_SPAWN_LOCATION_CHANGED)
-                        Gdx.app.debug(TAG, "Enemy Spawn Area RESET")
-                    }
                 }
             }
+        }
+        
+        //If no collision, reset the value
+        if (!previousEnemySpawn.equals("0", true)) {
+            previousEnemySpawn = "0"
+            notify(previousEnemySpawn, ComponentObserver.ComponentEvent.ENEMY_SPAWN_LOCATION_CHANGED)
+            Gdx.app.debug(TAG, "Enemy Spawn Area RESET with previous value " + previousEnemySpawn)
         }
         return false
     }
