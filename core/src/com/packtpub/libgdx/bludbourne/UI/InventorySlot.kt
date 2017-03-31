@@ -136,6 +136,18 @@ class InventorySlot constructor() : Stack(), InventorySlotSubject {
         return actor
     }
 
+    fun remove(actor: Actor) {
+        super.removeActor(actor)
+
+        if (numItemsLabel == null) {
+            return
+        }
+
+        if (actor != _defaultBackground && actor != numItemsLabel) {
+            decrementItemCount(true)
+        }
+    }
+
     fun add(array: Array<Actor>) {
         for (actor in array) {
             super.add(actor)

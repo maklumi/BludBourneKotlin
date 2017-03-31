@@ -2,15 +2,14 @@ package com.packtpub.libgdx.bludbourne.UI
 
 import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Array
-import com.packtpub.libgdx.bludbourne.Entity
-import com.packtpub.libgdx.bludbourne.InventoryItem
+import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.InventoryItem.ItemUseType.*
-import com.packtpub.libgdx.bludbourne.InventoryItemFactory
-import com.packtpub.libgdx.bludbourne.Utility
 
 
 class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"), InventorySubject, InventorySlotObserver {
@@ -112,6 +111,24 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
             dragAndDrop.addTarget(InventorySlotTarget(inventorySlot))
 
             inventorySlotTable.add(inventorySlot).size(_slotWidth.toFloat(), _slotHeight.toFloat())
+
+            inventorySlot.addListener(object : ClickListener() {
+                override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                    super.touchUp(event, x, y, pointer, button)
+                    if (tapCount == 2) {
+                        val slot = event.listenerActor as InventorySlot
+                        if (slot.hasItem()) {
+                            val item = slot.getTopInventoryItem()
+                            if (item!!.isConsumable()) {
+                                val itemInfo = item.itemUseType.toString() + Component.MESSAGE_TOKEN + item.itemUseTypeValue
+                                this@InventoryUI.notify(itemInfo, InventoryObserver.InventoryEvent.ITEM_CONSUMED)
+                                slot.remove(item)
+                            }
+                        }
+                    }
+                }
+            }
+            )
 
             if (i % _lengthSlotRow == 0) inventorySlotTable.row()
         }

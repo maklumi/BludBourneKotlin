@@ -78,6 +78,10 @@ class InventoryItem : Image {
         get() = itemAttributes and ItemAttribute.STACKABLE.value ==
                 ItemAttribute.STACKABLE.value
 
+    fun isConsumable(): Boolean {
+        return itemAttributes and ItemAttribute.CONSUMABLE.value == ItemAttribute.CONSUMABLE.value
+    }
+
     fun isSameItemType(candidateInventoryItem: InventoryItem): Boolean {
         return itemTypeID == candidateInventoryItem.itemTypeID
     }
@@ -99,5 +103,17 @@ class InventoryItem : Image {
                 itemUseType and ItemUseType.ARMOR_HELMET.value == ItemUseType.ARMOR_HELMET.value ||
                 itemUseType and ItemUseType.ARMOR_FEET.value == ItemUseType.ARMOR_FEET.value ||
                 itemUseType and ItemUseType.ARMOR_SHIELD.value == ItemUseType.ARMOR_SHIELD.value
+    }
+
+    companion object {
+
+        fun doesRestoreHP(itemUseType: Int): Boolean {
+            return itemUseType and ItemUseType.ITEM_RESTORE_HEALTH.value == ItemUseType.ITEM_RESTORE_HEALTH.value
+        }
+
+        fun doesRestoreMP(itemUseType: Int): Boolean {
+            return itemUseType and ItemUseType.ITEM_RESTORE_MP.value == ItemUseType.ITEM_RESTORE_MP.value
+        }
+
     }
 }

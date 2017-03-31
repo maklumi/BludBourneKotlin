@@ -23,7 +23,8 @@ import com.packtpub.libgdx.bludbourne.screens.MainGameScreen
 
 class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         Screen, ProfileObserver, ComponentObserver, ConversationGraphObserver,
-        StoreInventoryObserver, BattleObserver, StatusObserver {
+        StoreInventoryObserver, BattleObserver, InventoryObserver,
+        StatusObserver {
 
     val stage: Stage
     private val viewport: Viewport
@@ -126,6 +127,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         statusUI.addObserver(this)
         storeInventoryUI.addObserver(this)
         inventoryUI.addObserver(_battleUI.battleState)
+        inventoryUI.addObserver(this)
         _battleUI.battleState.addObserver(this)
 
         // Listeners
@@ -442,6 +444,26 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             }
             else -> {
 
+            }
+        }
+    }
+
+    override fun onNotify(value: String, event: InventoryObserver.InventoryEvent) {
+        when (event) {
+            InventoryObserver.InventoryEvent.ITEM_CONSUMED -> {
+                val strings = value.split(Component.MESSAGE_TOKEN.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                if (strings.size != 2) return
+
+                val type = strings[0].toInt()
+                val typeValue = strings[1].toInt()
+
+                if (InventoryItem.doesRestoreHP(type)) {
+                    statusUI.addHPValue(typeValue)
+                } else if (InventoryItem.doesRestoreMP(type)) {
+                    statusUI.addMPValue(typeValue)
+                }
+            }
+            else -> {
             }
         }
     }

@@ -172,7 +172,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                 }
             }
         }
-        
+
         //If no collision, reset the value
         if (!previousEnemySpawn.equals("0", true)) {
             previousEnemySpawn = "0"
