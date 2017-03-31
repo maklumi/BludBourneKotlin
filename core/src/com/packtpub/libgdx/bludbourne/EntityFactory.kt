@@ -10,7 +10,7 @@ object EntityFactory {
     }
 
     private val json = Json()
-    private val PLAYER_CONFIG = "scripts/player.json"
+    val PLAYER_CONFIG = "scripts/player.json"
 
     fun getEntity(entityType: EntityType): Entity {
         when (entityType) {

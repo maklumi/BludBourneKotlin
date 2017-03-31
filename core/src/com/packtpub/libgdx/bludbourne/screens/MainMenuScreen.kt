@@ -18,21 +18,22 @@ class MainMenuScreen(private val _game: BludBourne) : Screen {
     private val _stage: Stage = Stage()
 
     init {
-        //creation
-        val table = Table()
-        table.setFillParent(true)
-
         val title = Image(Utility.STATUSUI_TEXTUREATLAS.findRegion("bludbourne_title"))
         val newGameButton = TextButton("New Game", Utility.STATUSUI_SKIN)
         val loadGameButton = TextButton("Load Game", Utility.STATUSUI_SKIN)
+        val watchIntroButton = TextButton("Watch Intro", Utility.STATUSUI_SKIN)
         val exitButton = TextButton("Exit", Utility.STATUSUI_SKIN)
 
 
         //Layout
-        table.add(title).spaceBottom(75f).row()
-        table.add(newGameButton).spaceBottom(10f).row()
-        table.add(loadGameButton).spaceBottom(10f).row()
-        table.add(exitButton).spaceBottom(10f).row()
+        val table = Table().apply {
+            setFillParent(true)
+            add(title).spaceBottom(75f).row()
+            add(newGameButton).spaceBottom(10f).row()
+            add(loadGameButton).spaceBottom(10f).row()
+            add(watchIntroButton).spaceBottom(10f).row()
+            add(exitButton).spaceBottom(10f).row()
+        }
 
         _stage.addActor(table)
 
@@ -73,6 +74,18 @@ class MainMenuScreen(private val _game: BludBourne) : Screen {
         }
         )
 
+        watchIntroButton.addListener(object : ClickListener() {
+
+            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+                _game.screen = _game.getScreenType(ScreenType.WatchIntro)
+            }
+
+        }
+        )
 
     }
 

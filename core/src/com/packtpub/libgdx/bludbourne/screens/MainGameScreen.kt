@@ -13,7 +13,7 @@ import com.packtpub.libgdx.bludbourne.UI.PlayerHUD
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
-class MainGameScreen(val game: BludBourne) : Screen {
+open class MainGameScreen(val game: BludBourne) : Screen {
     private val TAG = MainGameScreen::class.java.simpleName
 
     internal var viewportWidth: Float = 0f
@@ -26,9 +26,9 @@ class MainGameScreen(val game: BludBourne) : Screen {
 
     private var player: Entity
     private var playerHUD: PlayerHUD
-    private var mapMgr: MapManager
-    private var mapRenderer: OrthogonalTiledMapRenderer
-    private val camera: OrthographicCamera = OrthographicCamera()
+    var mapMgr: MapManager
+    var mapRenderer: OrthogonalTiledMapRenderer
+    val camera: OrthographicCamera = OrthographicCamera()
     private val hudCamera: OrthographicCamera = OrthographicCamera()
     private val json = Json()
 

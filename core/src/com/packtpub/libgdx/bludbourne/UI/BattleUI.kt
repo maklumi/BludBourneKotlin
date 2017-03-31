@@ -96,6 +96,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
             }
             OPPONENT_ADDED -> {
                 _image.setAnimation(entity.getAnimation(Entity.AnimationType.IMMOBILE))
+                _image.setSize(_enemyWidth, _enemyHeight)
                 this.titleLabel.setText("Level " + battleState.getCurrentZoneLevel() + " " + entity.entityConfig.entityID)
             }
             OPPONENT_HIT_DAMAGE -> {

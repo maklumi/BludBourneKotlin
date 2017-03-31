@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.utils.Align.center
+import com.badlogic.gdx.utils.Scaling.stretch
 
 class AnimatedImage : Image {
     var _animation: Animation<TextureRegion>? = null
@@ -17,8 +19,13 @@ class AnimatedImage : Image {
     }
 
     fun setAnimation(animation: Animation<TextureRegion>) {
-        super.setDrawable(TextureRegionDrawable(animation.getKeyFrame(0f)))
-        this._animation = animation
+        this.apply {
+            drawable = TextureRegionDrawable(animation.getKeyFrame(0f))
+            setScaling(stretch)
+            setAlign(center)
+            setSize(prefWidth, prefHeight)
+            _animation = animation
+        }
     }
 
     override fun act(delta: Float) {
