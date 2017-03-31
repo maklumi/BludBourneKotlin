@@ -4,12 +4,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.List
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.Utility
@@ -54,17 +54,24 @@ class LoadGameScreen(private val _game: BludBourne) : Screen {
         _stage.addActor(bottomTable)
 
         //Listeners
-        backButton.addListener(object : InputListener() {
+        backButton.addListener(object : ClickListener() {
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                _game.screen = _game.getScreenType(BludBourne.ScreenType.MainMenu)
                 return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+                _game.screen = _game.getScreenType(BludBourne.ScreenType.MainMenu)
             }
         }
         )
 
-        loadButton.addListener(object : InputListener() {
+        loadButton.addListener(object : ClickListener() {
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                if (_listItems.selected == null) return true
+                return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+                if (_listItems.selected == null) return
                 val fileName = _listItems.selected.toString()
                 val file = ProfileManager.instance.getProfileFile(fileName)
                 if (file != null && !fileName.isEmpty()) {
@@ -72,8 +79,6 @@ class LoadGameScreen(private val _game: BludBourne) : Screen {
                     ProfileManager.instance.loadProfile()
                     _game.screen = _game.getScreenType(BludBourne.ScreenType.MainGame)
                 }
-
-                return true
             }
         }
         )

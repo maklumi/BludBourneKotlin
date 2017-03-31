@@ -4,11 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.BludBourne.ScreenType
 import com.packtpub.libgdx.bludbourne.Utility
@@ -37,28 +37,37 @@ class MainMenuScreen(private val _game: BludBourne) : Screen {
         _stage.addActor(table)
 
         //Listeners
-        newGameButton.addListener(object : InputListener() {
+        newGameButton.addListener(object : ClickListener() {
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
                 _game.screen = _game.getScreenType(ScreenType.NewGame)
-                return true
             }
         }
         )
 
-        loadGameButton.addListener(object : InputListener() {
+        loadGameButton.addListener(object : ClickListener() {
 
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
                 _game.screen = _game.getScreenType(ScreenType.LoadGame)
-                return true
             }
         }
         )
 
-        exitButton.addListener(object : InputListener() {
+        exitButton.addListener(object : ClickListener() {
 
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                Gdx.app.exit()
                 return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+                Gdx.app.exit()
             }
 
         }

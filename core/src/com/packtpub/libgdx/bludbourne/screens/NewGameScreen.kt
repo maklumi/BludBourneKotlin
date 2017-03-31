@@ -4,9 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.BludBourne.ScreenType
 import com.packtpub.libgdx.bludbourne.Utility
@@ -59,32 +59,42 @@ class NewGameScreen(private val _game: BludBourne) : Screen {
         _stage.addActor(bottomTable)
 
         //Listeners
-        cancelButton.addListener(object : InputListener() {
+        cancelButton.addListener(object : ClickListener() {
 
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                overwriteDialog.hide()
                 return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+                overwriteDialog.hide()
             }
         }
         )
 
-        overwriteButton.addListener(object : InputListener() {
+        overwriteButton.addListener(object : ClickListener() {
 
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
                 val messageText = profileText.text
                 ProfileManager.instance.writeProfileToStorage(messageText, "", true)
                 ProfileManager.instance.setCurrentProfile(messageText)
                 ProfileManager.instance.saveProfile()
                 ProfileManager.instance.loadProfile()
                 _game.screen = _game.getScreenType(ScreenType.MainGame)
-                return true
             }
         }
         )
 
-        startButton.addListener(object : InputListener() {
+        startButton.addListener(object : ClickListener() {
 
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
                 val messageText = profileText.text
                 //check to see if the current profile matches one that already exists
                 var exists = false
@@ -101,17 +111,18 @@ class NewGameScreen(private val _game: BludBourne) : Screen {
                     ProfileManager.instance.loadProfile()
                     _game.screen = _game.getScreenType(ScreenType.MainGame)
                 }
-
-                return true
             }
         }
         )
 
-        backButton.addListener(object : InputListener() {
+        backButton.addListener(object : ClickListener() {
 
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                _game.screen = _game.getScreenType(ScreenType.MainMenu)
                 return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+                _game.screen = _game.getScreenType(ScreenType.MainMenu)
             }
         }
         )

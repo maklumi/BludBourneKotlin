@@ -4,11 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.Utility
@@ -27,6 +27,7 @@ class GameOverScreen(private val _game: BludBourne) : Screen {
         val gameOverLabel = Label(GAMEOVER, Utility.STATUSUI_SKIN)
         gameOverLabel.setAlignment(Align.center)
 
+        // Layout
         val table = Table().apply {
             // debugAll()
             setFillParent(true)
@@ -39,27 +40,26 @@ class GameOverScreen(private val _game: BludBourne) : Screen {
             add(mainMenuButton).pad(10f, 50f, 50f, 50f)
         }
 
-        //Layout
-//        table.setFillParent(true)
-//        table.add(messageLabel).pad(50f, 50f, 50f, 50f).expandX().fillX().row()
-//        table.add(gameOverLabel)
-//        table.row()
-//        table.add(continueButton).pad(50f, 50f, 10f, 50f)
-
         _stage.addActor(table)
 
         //Listeners
-        continueButton.addListener(object : InputListener() {
-            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+        continueButton.addListener(object : ClickListener() {
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
                 _game.screen = _game.getScreenType(BludBourne.ScreenType.LoadGame)
+            }
+
+            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 return true
             }
         }
         )
 
-        mainMenuButton.addListener(object : InputListener() {
-            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+        mainMenuButton.addListener(object : ClickListener() {
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
                 _game.screen = _game.getScreenType(BludBourne.ScreenType.MainMenu)
+            }
+
+            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 return true
             }
         }
