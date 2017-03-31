@@ -150,14 +150,14 @@ class PlayerPhysicsComponent : PhysicsComponent() {
     private fun updateEnemySpawnLayerActivation(mapMgr: MapManager): Boolean {
         val mapDiscoverLayer = mapMgr.getEnemySpawnLayer() ?: return false
 
-        var rectangle: Rectangle? = null
+        var rectangle: Rectangle?
 
-        for (`object` in mapDiscoverLayer.objects) {
-            if (`object` is RectangleMapObject) {
-                rectangle = `object`.rectangle
+        for (mapObject in mapDiscoverLayer.objects) {
+            if (mapObject is RectangleMapObject) {
+                rectangle = mapObject.rectangle
 
                 if (boundingBox.overlaps(rectangle)) {
-                    val enemySpawnID = `object`.getName() ?: return false
+                    val enemySpawnID = mapObject.getName() ?: return false
 
                     if (previousEnemySpawn.equals(enemySpawnID, true)) {
                         return true
@@ -170,7 +170,11 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                     return true
                 } else {
                     //If no collision, reset the value
-                    previousEnemySpawn = ""
+                    if (!previousEnemySpawn.equals("0", true)) {
+                        previousEnemySpawn = "0"
+                        notify(previousEnemySpawn, ComponentObserver.ComponentEvent.ENEMY_SPAWN_LOCATION_CHANGED)
+                        Gdx.app.debug(TAG, "Enemy Spawn Area RESET")
+                    }
                 }
             }
         }

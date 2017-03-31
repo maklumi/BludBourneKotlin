@@ -13,9 +13,18 @@ class PlayerGraphicsComponent : GraphicsComponent() {
 
     private val TAG = GraphicsComponent::class.java.simpleName
 
+    private var _previousPosition = Vector2.Zero
+
     override fun update(entity: Entity, mapMgr: MapManager, batch: Batch, delta: Float) {
 
         updateAnimations(delta)
+
+        //Player has moved
+        if (_previousPosition.x != currentPosition.x ||
+                _previousPosition.y != currentPosition.y) {
+            notify("", ComponentObserver.ComponentEvent.PLAYER_HAS_MOVED)
+            _previousPosition = currentPosition.cpy()
+        }
 
         val camera = mapMgr.camera
         camera.position.set(currentPosition.x, currentPosition.y, 0f)

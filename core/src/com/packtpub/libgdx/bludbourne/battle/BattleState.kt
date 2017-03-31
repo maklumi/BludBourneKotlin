@@ -14,14 +14,39 @@ class BattleState : BattleSubject(), InventoryObserver {
     private var _currentOpponent: Entity? = null
     private var _currentPlayerAP: Int = 0
     private var _currentPlayerDP: Int = 0
+    private var _currentZoneLevel = 0
+    private var _chanceOfAttack = 25
+    private var _chanceOfEscape = 40
+    private var _criticalChance = 90
 
-    fun setCurrentOpponent(battleZoneLevel: Int) {
-        println("Entered BATTLE ZONE: $battleZoneLevel")
-        val entity = MonsterFactory.instance.getRandomMonster(battleZoneLevel)
-        this._currentOpponent = entity
-        notify(entity!!, BattleObserver.BattleEvent.OPPONENT_ADDED)
+    fun setCurrentZoneLevel(zoneLevel: Int) {
+        _currentZoneLevel = zoneLevel
     }
 
+    fun getCurrentZoneLevel(): Int {
+        return _currentZoneLevel
+    }
+
+    fun isOpponentReady(): Boolean {
+        if (_currentZoneLevel == 0) return false
+        val randomVal = MathUtils.random(1, 100)
+
+        //System.out.println("CHANGE OF ATTACK: " + _chanceOfAttack + " randomval: " + randomVal);
+
+        if (_chanceOfAttack > randomVal) {
+            setCurrentOpponent()
+            return true
+        } else {
+            return false
+        }
+    }
+
+    fun setCurrentOpponent() {
+        System.out.print("Entered BATTLE ZONE: " + _currentZoneLevel)
+        val entity = MonsterFactory.instance.getRandomMonster(_currentZoneLevel) ?: return
+        this._currentOpponent = entity
+        notify(entity, BattleObserver.BattleEvent.OPPONENT_ADDED)
+    }
 
     fun playerAttacks() {
         if (_currentOpponent == null) return
@@ -67,8 +92,14 @@ class BattleState : BattleSubject(), InventoryObserver {
     }
 
     fun playerRuns() {
-        //TODO FINISH
-        notify(_currentOpponent as Entity, BattleObserver.BattleEvent.PLAYER_RUNNING)
+        val randomVal = MathUtils.random(1, 100)
+        if (_chanceOfEscape > randomVal) {
+            notify(_currentOpponent!!, BattleObserver.BattleEvent.PLAYER_RUNNING)
+        } else if (randomVal > _criticalChance) {
+            opponentAttacks()
+        } else {
+            return
+        }
     }
 
     override fun onNotify(value: String, event: InventoryEvent) {

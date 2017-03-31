@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import com.packtpub.libgdx.bludbourne.*
+import com.packtpub.libgdx.bludbourne.ComponentObserver.ComponentEvent.*
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver
 import com.packtpub.libgdx.bludbourne.dialog.ConversationGraph
 import com.packtpub.libgdx.bludbourne.dialog.ConversationGraphObserver
@@ -251,24 +252,24 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     override fun onNotify(value: String, event: ComponentObserver.ComponentEvent) {
 
         when (event) {
-            ComponentObserver.ComponentEvent.LOAD_CONVERSATION -> {
+            LOAD_CONVERSATION -> {
                 val config = json.fromJson(EntityConfig::class.java, value)
                 conversationUI.loadConversation(config)
                 conversationUI.getCurrentConversationGraph().addObserver(this)
             }
-            ComponentObserver.ComponentEvent.SHOW_CONVERSATION -> {
+            SHOW_CONVERSATION -> {
                 val configShow = json.fromJson(EntityConfig::class.java, value)
                 if (configShow.entityID.equals(conversationUI.currentEntityID, true)) {
                     conversationUI.isVisible = true
                 }
             }
-            ComponentObserver.ComponentEvent.HIDE_CONVERSATION -> {
+            HIDE_CONVERSATION -> {
                 val configHide = json.fromJson(EntityConfig::class.java, value)
                 if (configHide.entityID.equals(conversationUI.currentEntityID, true)) {
                     conversationUI.isVisible = false
                 }
             }
-            ComponentObserver.ComponentEvent.QUEST_LOCATION_DISCOVERED -> {
+            QUEST_LOCATION_DISCOVERED -> {
                 val string = value.split(Component.MESSAGE_TOKEN)
                 val questID = string [0]
                 val questTaskID = string [1]
@@ -276,12 +277,17 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 _questUI.questTaskComplete(questID, questTaskID)
                 updateEntityObservers()
             }
-            ComponentObserver.ComponentEvent.ENEMY_SPAWN_LOCATION_CHANGED -> {
+            ENEMY_SPAWN_LOCATION_CHANGED -> {
                 val enemyZoneID = value
-                MainGameScreen.gameState = MainGameScreen.GameState.SAVING
                 _battleUI.battleZoneTriggered(enemyZoneID.toInt())
-                _battleUI.toBack()
-                _battleUI.isVisible = true
+            }
+            PLAYER_HAS_MOVED -> {
+                //System.out.println("Player has moved!!!");
+                if (_battleUI.isBattleReady()) {
+                    MainGameScreen.gameState = MainGameScreen.GameState.SAVING
+                    _battleUI.toBack()
+                    _battleUI.isVisible = true
+                }
             }
 
         }
@@ -415,7 +421,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             BattleObserver.BattleEvent.OPPONENT_DEFEATED -> {
                 val goldReward = enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_GP_REWARD.toString()).toInt()
                 statusUI.addGoldValue(goldReward)
-                val xpReward = Integer.parseInt(enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_XP_REWARD.toString()));
+                val xpReward = Integer.parseInt(enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_XP_REWARD.toString()))
                 statusUI.addXPValue(xpReward)
                 MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
                 _battleUI.isVisible = false

@@ -28,7 +28,8 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
 
     private var _damageValLabel: Label
 
-    private var _currentBattleZone = 0
+    private var _battleTimer = 0f
+    private val _checkTimer = 1f
 
     private var _origDamageValLabelY = 0f
 
@@ -75,10 +76,17 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
     }
 
     fun battleZoneTriggered(battleZoneValue: Int) {
-        _currentBattleZone = battleZoneValue
-        battleState.setCurrentOpponent(battleZoneValue)
+        battleState.setCurrentZoneLevel(battleZoneValue);
     }
 
+    fun isBattleReady(): Boolean {
+        if (_battleTimer > _checkTimer) {
+            _battleTimer = 0f
+            return battleState.isOpponentReady()
+        } else {
+            return false
+        }
+    }
 
     override fun onNotify(entity: Entity, event: BattleObserver.BattleEvent) {
         when (event) {
@@ -88,7 +96,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
             }
             OPPONENT_ADDED -> {
                 _image.setAnimation(entity.getAnimation(Entity.AnimationType.IMMOBILE))
-                this.titleLabel.setText("Level " + _currentBattleZone + " " + entity.entityConfig.entityID)
+                this.titleLabel.setText("Level " + battleState.getCurrentZoneLevel() + " " + entity.entityConfig.entityID)
             }
             OPPONENT_HIT_DAMAGE -> {
                 val damage = entity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_HIT_DAMAGE_TOTAL.toString()).toInt()
@@ -115,6 +123,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
     }
 
     override fun act(delta: Float) {
+        _battleTimer = (_battleTimer + delta) % 60
         if (_damageValLabel.isVisible) {
             _damageValLabel.y = _damageValLabel.y + 3
         }
