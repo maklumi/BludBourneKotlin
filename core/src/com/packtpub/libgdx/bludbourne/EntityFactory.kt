@@ -19,7 +19,8 @@ object EntityFactory {
         TOWN_INNKEEPER,
         TOWN_FOLK1, TOWN_FOLK2, TOWN_FOLK3, TOWN_FOLK4, TOWN_FOLK5,
         TOWN_FOLK6, TOWN_FOLK7, TOWN_FOLK8, TOWN_FOLK9, TOWN_FOLK10,
-        TOWN_FOLK11, TOWN_FOLK12, TOWN_FOLK13, TOWN_FOLK14, TOWN_FOLK15
+        TOWN_FOLK11, TOWN_FOLK12, TOWN_FOLK13, TOWN_FOLK14, TOWN_FOLK15,
+        FIRE
     }
 
     private val json = Json()
@@ -29,12 +30,18 @@ object EntityFactory {
     val TOWN_MAGE_CONFIG = "scripts/town_mage.json"
     val TOWN_INNKEEPER_CONFIG = "scripts/town_innkeeper.json"
     val TOWN_FOLK_CONFIGS = "scripts/town_folk.json"
+    val ENVIRONMENTAL_ENTITY_CONFIGS = "scripts/environmental_entities.json"
 
     private val _entities = Hashtable<String, EntityConfig>()
 
     init {
         val townFolkConfigs: Array<EntityConfig> = Entity.getEntityConfigs(TOWN_FOLK_CONFIGS)
         for (config in townFolkConfigs) {
+            _entities.put(config.entityID, config)
+        }
+
+        val environmentalEntityConfigs = Entity.getEntityConfigs(ENVIRONMENTAL_ENTITY_CONFIGS)
+        for (config in environmentalEntityConfigs) {
             _entities.put(config.entityID, config)
         }
 
