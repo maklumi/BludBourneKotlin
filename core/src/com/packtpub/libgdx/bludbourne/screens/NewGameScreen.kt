@@ -81,8 +81,7 @@ class NewGameScreen(private val _game: BludBourne) : Screen {
                 val messageText = profileText.text
                 ProfileManager.instance.writeProfileToStorage(messageText, "", true)
                 ProfileManager.instance.setCurrentProfile(messageText)
-                ProfileManager.instance.saveProfile()
-                ProfileManager.instance.loadProfile()
+                ProfileManager.instance.isNewProfile = true
                 _game.screen = _game.getScreenType(ScreenType.MainGame)
             }
         }
@@ -107,8 +106,7 @@ class NewGameScreen(private val _game: BludBourne) : Screen {
                 } else {
                     ProfileManager.instance.writeProfileToStorage(messageText, "", false)
                     ProfileManager.instance.setCurrentProfile(messageText)
-                    ProfileManager.instance.saveProfile()
-                    ProfileManager.instance.loadProfile()
+                    ProfileManager.instance.isNewProfile = true
                     _game.screen = _game.getScreenType(ScreenType.MainGame)
                 }
             }

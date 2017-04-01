@@ -12,6 +12,7 @@ class ProfileManager private constructor() : ProfileSubject() {
     private var _profiles = Hashtable<String, FileHandle>()
     private var _profileProperties = ObjectMap<String, Any>()
     private var _profileName: String = DEFAULT_PROFILE
+    var isNewProfile = false
 
     init {
         _profiles.clear()
@@ -96,6 +97,10 @@ class ProfileManager private constructor() : ProfileSubject() {
     }
 
     fun loadProfile() {
+        if (isNewProfile) {
+            saveProfile()
+            isNewProfile = false
+        }
         val fullProfileFileName = _profileName + SAVEGAME_SUFFIX
         val doesProfileFileExist = Gdx.files.internal(fullProfileFileName).exists()
 

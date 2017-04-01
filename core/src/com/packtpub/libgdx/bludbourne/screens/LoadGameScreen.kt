@@ -76,7 +76,6 @@ class LoadGameScreen(private val _game: BludBourne) : Screen {
                 val file = ProfileManager.instance.getProfileFile(fileName)
                 if (file != null && !fileName.isEmpty()) {
                     ProfileManager.instance.setCurrentProfile(fileName)
-                    ProfileManager.instance.loadProfile()
                     _game.screen = _game.getScreenType(BludBourne.ScreenType.MainGame)
                 }
             }

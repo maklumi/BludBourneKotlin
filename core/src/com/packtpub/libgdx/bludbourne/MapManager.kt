@@ -19,10 +19,6 @@ class MapManager : ProfileObserver {
     private var currentMap: Map? = null
     var currentSelectedEntity: Entity? = null
 
-    init {
-        ProfileManager.instance.addObserver(this)
-    }
-
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
         when (event) {
             ProfileObserver.ProfileEvent.PROFILE_LOADED -> {

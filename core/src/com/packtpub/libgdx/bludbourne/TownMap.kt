@@ -8,20 +8,87 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
 
     init {
         npcStartPositions.forEach { position ->
-            mapEntities.add(Entity.initEntity(Entity.loadEntityConfigByPath(townGuardWalking), position))
+            val entity = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_GUARD_WALKING)
+            entity.sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(position))
+            mapEntities.add(entity)
         }
 
         // Special cases
-        mapEntities.add(initSpecialEntity(Entity.loadEntityConfigByPath(townBlacksmith)))
-        mapEntities.add(initSpecialEntity(Entity.loadEntityConfigByPath(townMage)))
-        mapEntities.add(initSpecialEntity(Entity.loadEntityConfigByPath(townInnKeeper)))
+        val blackSmith = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_BLACKSMITH)
+        initSpecialEntityPosition(blackSmith)
+        mapEntities.add(blackSmith)
 
-        // When we have multiple configs in one file
-        val configs = Entity.getEntityConfigs(townFolk)
-        configs.forEach { mapEntities.add(initSpecialEntity(Entity.loadEntityConfig(it))) }
+        val mage = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_MAGE)
+        initSpecialEntityPosition(mage)
+        mapEntities.add(mage)
+
+
+        val innKeeper = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_INNKEEPER)
+        initSpecialEntityPosition(innKeeper)
+        mapEntities.add(innKeeper)
+
+        val townFolk1 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK1)
+        initSpecialEntityPosition(townFolk1)
+        mapEntities.add(townFolk1)
+
+        val townFolk2 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK2)
+        initSpecialEntityPosition(townFolk2)
+        mapEntities.add(townFolk2)
+
+        val townFolk3 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK3)
+        initSpecialEntityPosition(townFolk3)
+        mapEntities.add(townFolk3)
+
+        val townFolk4 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK4)
+        initSpecialEntityPosition(townFolk4)
+        mapEntities.add(townFolk4)
+
+        val townFolk5 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK5)
+        initSpecialEntityPosition(townFolk5)
+        mapEntities.add(townFolk5)
+
+        val townFolk6 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK6)
+        initSpecialEntityPosition(townFolk6)
+        mapEntities.add(townFolk6)
+
+        val townFolk7 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK7)
+        initSpecialEntityPosition(townFolk7)
+        mapEntities.add(townFolk7)
+
+        val townFolk8 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK8)
+        initSpecialEntityPosition(townFolk8)
+        mapEntities.add(townFolk8)
+
+        val townFolk9 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK9)
+        initSpecialEntityPosition(townFolk9)
+        mapEntities.add(townFolk9)
+
+        val townFolk10 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK10)
+        initSpecialEntityPosition(townFolk10)
+        mapEntities.add(townFolk10)
+
+        val townFolk11 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK11)
+        initSpecialEntityPosition(townFolk11)
+        mapEntities.add(townFolk11)
+
+        val townFolk12 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK12)
+        initSpecialEntityPosition(townFolk12)
+        mapEntities.add(townFolk12)
+
+        val townFolk13 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK13)
+        initSpecialEntityPosition(townFolk13)
+        mapEntities.add(townFolk13)
+
+        val townFolk14 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK14)
+        initSpecialEntityPosition(townFolk14)
+        mapEntities.add(townFolk14)
+
+        val townFolk15 = EntityFactory.getEntityByName(EntityFactory.EntityName.TOWN_FOLK15)
+        initSpecialEntityPosition(townFolk15)
+        mapEntities.add(townFolk15)
 
     }
-
+    
     override fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
         for (i in 0..mapEntities.size - 1) {
             mapEntities[i].update(mapMgr, batch, delta)
@@ -32,21 +99,16 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
     }
 
 
-    private fun initSpecialEntity(entityConfig: EntityConfig): Entity {
+    private fun initSpecialEntityPosition(entity: Entity) {
         var position = Vector2(0f, 0f)
 
-        if (specialNPCStartPositions.containsKey(entityConfig.entityID)) {
-            position = specialNPCStartPositions[entityConfig.entityID]!!
+        if (specialNPCStartPositions.containsKey(entity.entityConfig.entityID)) {
+            position = specialNPCStartPositions[entity.entityConfig.entityID]!!
         }
-        return Entity.initEntity(entityConfig, position)
+        entity.sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(position))
     }
 
     companion object {
         private val mapPath = "maps/town.tmx"
-        private val townGuardWalking = "scripts/town_guard_walking.json"
-        private val townBlacksmith = "scripts/town_blacksmith.json"
-        private val townMage = "scripts/town_mage.json"
-        private val townInnKeeper = "scripts/town_innkeeper.json"
-        private val townFolk = "scripts/town_folk.json"
     }
 }

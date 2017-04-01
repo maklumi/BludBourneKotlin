@@ -79,7 +79,10 @@ class Entity(var inputComponent: InputComponent,
         inputComponent = entity.inputComponent
         graphicsComponent = entity.graphicsComponent
         physicsComponent = entity.physicsComponent
-        components = entity.components
+        components.clear()
+        components.add(inputComponent)
+        components.add(physicsComponent)
+        components.add(graphicsComponent)
         entityConfig = EntityConfig(entity.entityConfig)
 
         return this
@@ -192,6 +195,19 @@ class Entity(var inputComponent: InputComponent,
             }
 
             return entities
+        }
+
+        fun initEntity(entityConfig: EntityConfig): Entity {
+            val json = Json()
+            val entity = EntityFactory.getEntity(EntityFactory.EntityType.NPC)
+            entity.entityConfig = entityConfig
+
+            entity.sendMessage(Component.MESSAGE.LOAD_ANIMATIONS, json.toJson(entity.entityConfig))
+            entity.sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(Vector2.Zero))
+            entity.sendMessage(Component.MESSAGE.INIT_STATE, json.toJson(entity.entityConfig.state))
+            entity.sendMessage(Component.MESSAGE.INIT_DIRECTION, json.toJson(entity.entityConfig.direction))
+
+            return entity
         }
     }
 

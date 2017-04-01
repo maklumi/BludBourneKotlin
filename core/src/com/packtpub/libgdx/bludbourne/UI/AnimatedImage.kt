@@ -1,37 +1,41 @@
 package com.packtpub.libgdx.bludbourne.UI
 
 
-import com.badlogic.gdx.graphics.g2d.Animation
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align.center
 import com.badlogic.gdx.utils.Scaling.stretch
+import com.packtpub.libgdx.bludbourne.Entity
 
-class AnimatedImage : Image {
-    var _animation: Animation<TextureRegion>? = null
+class AnimatedImage : Image() {
+    //    var _animation: Animation<TextureRegion>? = null
     private var _frameTime = 0f
+    private var _entity: Entity? = null
+    private var _currentAnimationType = Entity.AnimationType.IDLE
 
-    constructor() : super()
-
-    constructor(animation: Animation<TextureRegion>) : super(animation.getKeyFrame(0f)) {
-        this._animation = animation
+    fun setEntity(entity: Entity) {
+        _entity = entity
+        // set default
+        setCurrentAnimation(Entity.AnimationType.IDLE)
     }
 
-    fun setAnimation(animation: Animation<TextureRegion>) {
+    fun setCurrentAnimation(animationType: Entity.AnimationType) {
+        val animation = _entity!!.getAnimation(animationType)
+
         this.apply {
+            _currentAnimationType = animationType
             drawable = TextureRegionDrawable(animation.getKeyFrame(0f))
             setScaling(stretch)
             setAlign(center)
             setSize(prefWidth, prefHeight)
-            _animation = animation
         }
     }
 
     override fun act(delta: Float) {
         val drawable = this.drawable ?: return
         _frameTime = (_frameTime + delta) % 5
-        (drawable as TextureRegionDrawable).region = _animation!!.getKeyFrame(_frameTime, true)
+        val region = _entity!!.getAnimation(_currentAnimationType).getKeyFrame(_frameTime, true)
+        (drawable as TextureRegionDrawable).region = region
         super.act(delta)
     }
 

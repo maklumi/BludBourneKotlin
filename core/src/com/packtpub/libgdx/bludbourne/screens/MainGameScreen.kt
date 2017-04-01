@@ -50,8 +50,8 @@ open class MainGameScreen(val game: BludBourne) : Screen {
                         field = GameState.RUNNING
                     }
                     GameState.LOADING -> {
-                        field = GameState.RUNNING
                         ProfileManager.instance.loadProfile()
+                        field = GameState.RUNNING
                     }
                     GameState.SAVING -> {
                         ProfileManager.instance.saveProfile()
@@ -100,12 +100,14 @@ open class MainGameScreen(val game: BludBourne) : Screen {
     }
 
     override fun show() {
-        gameState = GameState.RUNNING
+        ProfileManager.instance.addObserver(mapMgr)
+        ProfileManager.instance.addObserver(playerHUD)
+        gameState = GameState.LOADING
         Gdx.input.inputProcessor = multiplexer
     }
 
     override fun hide() {
-        gameState = GameState.LOADING
+        gameState = GameState.SAVING
         Gdx.input.inputProcessor = null
     }
 

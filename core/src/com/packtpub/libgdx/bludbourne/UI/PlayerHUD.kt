@@ -123,7 +123,6 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         }
 
         // Observers
-        ProfileManager.instance.addObserver(this)
         player.registerObserver(this)
         statusUI.addObserver(this)
         storeInventoryUI.addObserver(this)

@@ -14,6 +14,10 @@ open class ProfileSubject {
         _observers.removeValue(profileObserver, true)
     }
 
+    fun removeAllObservers() {
+        _observers.removeAll(_observers, true)
+    }
+
     protected fun notify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
         for (observer in _observers) {
             observer.onNotify(profileManager, event)
