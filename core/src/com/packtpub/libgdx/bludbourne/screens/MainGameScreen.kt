@@ -29,7 +29,7 @@ open class MainGameScreen(val game: BludBourne) : Screen {
     var mapMgr: MapManager
     var mapRenderer: OrthogonalTiledMapRenderer
     val camera: OrthographicCamera = OrthographicCamera()
-    private val hudCamera: OrthographicCamera = OrthographicCamera()
+    val hudCamera: OrthographicCamera = OrthographicCamera()
     private val json = Json()
 
     enum class GameState {
