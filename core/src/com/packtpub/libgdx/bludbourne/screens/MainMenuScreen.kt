@@ -9,13 +9,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.BludBourne.ScreenType
 import com.packtpub.libgdx.bludbourne.Utility
+import com.packtpub.libgdx.bludbourne.audio.AudioManager
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver
+import com.packtpub.libgdx.bludbourne.audio.AudioSubject
 
-class MainMenuScreen(private val _game: BludBourne) : Screen {
+class MainMenuScreen(private val _game: BludBourne) : Screen, AudioSubject {
 
     private val _stage: Stage = Stage()
+    private val _observers = Array<AudioObserver>()
+
 
     init {
         val title = Image(Utility.STATUSUI_TEXTUREATLAS.findRegion("bludbourne_title"))
@@ -87,6 +93,9 @@ class MainMenuScreen(private val _game: BludBourne) : Screen {
         }
         )
 
+        //Observers
+        this.addObserver(AudioManager)
+        notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_TITLE)
     }
 
     override fun render(delta: Float) {
@@ -102,10 +111,12 @@ class MainMenuScreen(private val _game: BludBourne) : Screen {
     }
 
     override fun show() {
+        notify(AudioObserver.AudioCommand.MUSIC_PLAY_LOOP, AudioObserver.AudioTypeEvent.MUSIC_TITLE)
         Gdx.input.inputProcessor = _stage
     }
 
     override fun hide() {
+        notify(AudioObserver.AudioCommand.MUSIC_STOP, AudioObserver.AudioTypeEvent.MUSIC_TITLE)
         Gdx.input.inputProcessor = null
     }
 
@@ -117,6 +128,23 @@ class MainMenuScreen(private val _game: BludBourne) : Screen {
         _stage.dispose()
     }
 
+    override fun addObserver(audioObserver: AudioObserver) {
+        _observers.add(audioObserver)
+    }
+
+    override fun removeObserver(audioObserver: AudioObserver) {
+        _observers.removeValue(audioObserver, true)
+    }
+
+    override fun removeAllObservers() {
+        _observers.removeAll(_observers, true)
+    }
+
+    override fun notify(command: AudioObserver.AudioCommand, event: AudioObserver.AudioTypeEvent) {
+        for (observer in _observers) {
+            observer.onNotify(command, event)
+        }
+    }
 }
 
 

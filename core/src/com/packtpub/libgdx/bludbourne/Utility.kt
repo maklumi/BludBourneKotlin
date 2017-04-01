@@ -2,8 +2,12 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.MusicLoader
+import com.badlogic.gdx.assets.loaders.SoundLoader
 import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
+import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
@@ -12,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 
 object Utility {
     private val TAG = Utility::class.java.simpleName
+    private val filePathResolver = InternalFileHandleResolver()
     val STATUSUI_TEXTURE_ATLAS_PATH = "skins/statusui.atlas"
     val STATUSUI_SKIN_PATH = "skins/statusui.json"
     val ITEMS_TEXTURE_ATLAS_PATH = "skins/items.atlas"
@@ -41,7 +46,6 @@ object Utility {
 
     fun loadMapAsset(mapFilenamePath: String) {
         if (assetManager.isLoaded(mapFilenamePath)) return
-        val filePathResolver = InternalFileHandleResolver()
         if (filePathResolver.resolve(mapFilenamePath).exists()) {
             assetManager.setLoader(TiledMap::class.java, TmxMapLoader(filePathResolver))
             assetManager.load(mapFilenamePath, TiledMap::class.java)
@@ -63,7 +67,6 @@ object Utility {
         }
     }
 
-
     fun loadTextureAsset(textureFilenamePath: String) {
         if (assetManager.isLoaded(textureFilenamePath)) return
         val filePathResolver = InternalFileHandleResolver()
@@ -80,5 +83,65 @@ object Utility {
         return assetManager.get(textureFilenamePath, Texture::class.java)
     }
 
+
+    fun loadSoundAsset(soundFilenamePath: String) {
+        if (soundFilenamePath.isEmpty()) return
+
+        if (assetManager.isLoaded(soundFilenamePath)) return
+
+        //load asset
+        if (filePathResolver.resolve(soundFilenamePath).exists()) {
+            assetManager.setLoader(Sound::class.java, SoundLoader(filePathResolver))
+            assetManager.load(soundFilenamePath, Sound::class.java)
+            //Until we add loading screen, just block until we load the map
+            assetManager.finishLoadingAsset(soundFilenamePath)
+            Gdx.app.debug(TAG, "Sound loaded!: " + soundFilenamePath)
+        } else {
+            Gdx.app.debug(TAG, "Sound doesn't exist!: " + soundFilenamePath)
+        }
+    }
+
+    fun getSoundAsset(soundFilenamePath: String): Sound? {
+        var sound: Sound? = null
+
+        // once the asset manager is done loading
+        if (assetManager.isLoaded(soundFilenamePath)) {
+            sound = assetManager.get(soundFilenamePath, Sound::class.java)
+        } else {
+            Gdx.app.debug(TAG, "Sound is not loaded: " + soundFilenamePath)
+        }
+
+        return sound
+    }
+
+    fun loadMusicAsset(musicFilenamePath: String) {
+        if (musicFilenamePath.isEmpty()) return
+
+        if (assetManager.isLoaded(musicFilenamePath)) return
+
+        //load asset
+        if (filePathResolver.resolve(musicFilenamePath).exists()) {
+            assetManager.setLoader(Music::class.java, MusicLoader(filePathResolver))
+            assetManager.load(musicFilenamePath, Music::class.java)
+            //Until we add loading screen, just block until we load the map
+            assetManager.finishLoadingAsset(musicFilenamePath)
+            Gdx.app.debug(TAG, "Music loaded!: " + musicFilenamePath)
+        } else {
+            Gdx.app.debug(TAG, "Music doesn't exist!: " + musicFilenamePath);
+        }
+    }
+
+    fun getMusicAsset(musicFilenamePath: String): Music? {
+        var music: Music? = null
+
+        // once the asset manager is done loading
+        if (assetManager.isLoaded(musicFilenamePath)) {
+            music = assetManager.get(musicFilenamePath, Music::class.java)
+        } else {
+            Gdx.app.debug(TAG, "Music is not loaded: " + musicFilenamePath)
+        }
+
+        return music
+    }
 
 }
