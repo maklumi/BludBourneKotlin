@@ -2,6 +2,7 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector2
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver
 
 
 class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
@@ -88,7 +89,7 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
         mapEntities.add(townFolk15)
 
     }
-    
+
     override fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
         for (i in 0..mapEntities.size - 1) {
             mapEntities[i].update(mapMgr, batch, delta)
@@ -106,6 +107,15 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
             position = specialNPCStartPositions[entity.entityConfig.entityID]!!
         }
         entity.sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(position))
+    }
+
+    override fun unloadMusic() {
+        notify(AudioObserver.AudioCommand.MUSIC_STOP, AudioObserver.AudioTypeEvent.MUSIC_TOWN)
+    }
+
+    override fun loadMusic() {
+        notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_TOWN)
+        notify(AudioObserver.AudioCommand.MUSIC_PLAY_LOOP, AudioObserver.AudioTypeEvent.MUSIC_TOWN)
     }
 
     companion object {

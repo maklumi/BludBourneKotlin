@@ -1,7 +1,6 @@
 package com.packtpub.libgdx.bludbourne.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -12,8 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.Utility
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver
 
-class GameOverScreen(private val _game: BludBourne) : Screen {
+class GameOverScreen(private val _game: BludBourne) : GameScreen() {
     private val _stage: Stage = Stage()
 
     init {
@@ -65,6 +65,7 @@ class GameOverScreen(private val _game: BludBourne) : Screen {
         }
         )
 
+        notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_TITLE)
     }
 
     override fun render(delta: Float) {
@@ -84,6 +85,7 @@ class GameOverScreen(private val _game: BludBourne) : Screen {
 
     override fun show() {
         Gdx.input.inputProcessor = _stage
+        notify(AudioObserver.AudioCommand.MUSIC_PLAY_LOOP, AudioObserver.AudioTypeEvent.MUSIC_TITLE)
     }
 
     override fun hide() {

@@ -9,11 +9,15 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Json
+import com.packtpub.libgdx.bludbourne.audio.AudioManager
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver
+import com.packtpub.libgdx.bludbourne.audio.AudioSubject
 import java.util.*
 
 abstract class Map(var currentMapType: MapFactory.MapType,
-                   fullMapPath: String) {
+                   fullMapPath: String) : AudioSubject {
 
+    private val _observers = Array<AudioObserver>()
     protected var playerStartPositionRect: Vector2 = Vector2(0f, 0f)
     protected var closestPlayerStartPosition: Vector2 = Vector2(0f, 0f)
     protected var convertedUnits: Vector2 = Vector2(0f, 0f)
@@ -60,6 +64,9 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         }
         npcStartPositions = getNPCStartPositions()
         specialNPCStartPositions = getExtraNPCStartPositions()
+
+        // Observers
+        this.addObserver(AudioManager)
     }
 
     fun getQuestItemSpawnPositions(objectName: String, objectTaskID: String): Array<Vector2> {
@@ -185,6 +192,25 @@ abstract class Map(var currentMapType: MapFactory.MapType,
 
         }
         return positionsTable
+    }
+
+    abstract fun unloadMusic()
+    abstract fun loadMusic()
+
+    override fun addObserver(audioObserver: AudioObserver) {
+        _observers.add(audioObserver)
+    }
+
+    override fun removeObserver(audioObserver: AudioObserver) {
+        _observers.removeValue(audioObserver, true)
+    }
+
+    override fun removeAllObservers() {
+        _observers.removeAll(_observers, true)
+    }
+
+    override fun notify(command: AudioObserver.AudioCommand, event: AudioObserver.AudioTypeEvent) {
+        _observers.forEach { it.onNotify(command, event) }
     }
 
     companion object {

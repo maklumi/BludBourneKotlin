@@ -10,6 +10,12 @@ class TopWorldMap : Map(MapFactory.MapType.TOP_WORLD, TopWorldMap._mapPath) {
         mapQuestEntities.forEach { it.update(mapMgr, batch, delta) }
     }
 
+    override fun unloadMusic() {
+    }
+
+    override fun loadMusic() {
+    }
+
     companion object {
         private val _mapPath = "maps/topworld.tmx"
     }

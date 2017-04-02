@@ -192,7 +192,7 @@ class PlayerPhysicsComponent : PhysicsComponent() {
                 val mapName = it.getName() ?: return false
                 // cache position in pixels just in case we need to return later
                 mapMgr.setClosestStartPositionFromScaledUnits(currentEntityPosition)
-                mapMgr.loadMap(MapFactory.MapType.valueOf(mapName))
+                mapMgr.loadMap(true, MapFactory.MapType.valueOf(mapName))
                 currentEntityPosition.x = mapMgr.getPlayerStartUnitScaled().x
                 currentEntityPosition.y = mapMgr.getPlayerStartUnitScaled().y
                 nextEntityPosition.x = mapMgr.getPlayerStartUnitScaled().x

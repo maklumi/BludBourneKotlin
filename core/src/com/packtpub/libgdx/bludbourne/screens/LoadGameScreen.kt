@@ -1,7 +1,6 @@
 package com.packtpub.libgdx.bludbourne.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -16,7 +15,7 @@ import com.packtpub.libgdx.bludbourne.Utility
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
-class LoadGameScreen(private val _game: BludBourne) : Screen {
+class LoadGameScreen(private val _game: BludBourne) : GameScreen() {
     private val _stage: Stage = Stage()
     private val _listItems: List<String> = List(Utility.STATUSUI_SKIN, "inventory")
 
@@ -76,6 +75,7 @@ class LoadGameScreen(private val _game: BludBourne) : Screen {
                 val file = ProfileManager.instance.getProfileFile(fileName)
                 if (file != null && !fileName.isEmpty()) {
                     ProfileManager.instance.setCurrentProfile(fileName)
+                    this@LoadGameScreen.notify(com.packtpub.libgdx.bludbourne.audio.AudioObserver.AudioCommand.MUSIC_STOP, com.packtpub.libgdx.bludbourne.audio.AudioObserver.AudioTypeEvent.MUSIC_TITLE)
                     _game.screen = _game.getScreenType(BludBourne.ScreenType.MainGame)
                 }
             }

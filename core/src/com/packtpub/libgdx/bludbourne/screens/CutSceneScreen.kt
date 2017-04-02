@@ -12,9 +12,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import com.packtpub.libgdx.bludbourne.*
+import com.packtpub.libgdx.bludbourne.BludBourne
+import com.packtpub.libgdx.bludbourne.EntityFactory
 import com.packtpub.libgdx.bludbourne.Map.Companion.UNIT_SCALE
+import com.packtpub.libgdx.bludbourne.MapFactory
 import com.packtpub.libgdx.bludbourne.UI.AnimatedImage
+import com.packtpub.libgdx.bludbourne.Utility
 import com.packtpub.libgdx.bludbourne.battle.MonsterFactory
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
@@ -99,7 +102,7 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
         _stage.addAction(
                 Actions.sequence(
                         Actions.run {
-                            mapMgr.loadMap(MapFactory.MapType.TOWN)
+                            mapMgr.loadMap(false, MapFactory.MapType.TOWN)
                             setCameraPosition(10f, 16f)
                             showMessage("BLACKSMITH: We have planned this long enough. The time is now! I have had enough talk...")
 
@@ -117,7 +120,7 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
                         Actions.delay(3f),
                         Actions.run {
                             hideMessage()
-                            mapMgr.loadMap(MapFactory.MapType.TOP_WORLD)
+                            mapMgr.loadMap(false, MapFactory.MapType.TOP_WORLD)
                             setCameraPosition(50f, 30f)
                             animBlackSmith.setPosition(50f, 30f)
                             animInnKeeper.setPosition(52f, 30f)
@@ -180,7 +183,7 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
                             animMage.isVisible = false
                             animFire.isVisible = false
 
-                            mapMgr.loadMap(MapFactory.MapType.TOP_WORLD)
+                            mapMgr.loadMap(false, MapFactory.MapType.TOP_WORLD)
 
                             animDemon.isVisible = true
                             animDemon.setScale(1f, 1f)
@@ -201,7 +204,7 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
                             animInnKeeper.isVisible = false
                             animMage.isVisible = false
                             animFire.isVisible = false
-                            mapMgr.loadMap(MapFactory.MapType.CASTLE_OF_DOOM)
+                            mapMgr.loadMap(false, MapFactory.MapType.CASTLE_OF_DOOM)
                             followActor(animDemon)
                             animDemon.isVisible = true
                             animDemon.setPosition(15f, 1f)

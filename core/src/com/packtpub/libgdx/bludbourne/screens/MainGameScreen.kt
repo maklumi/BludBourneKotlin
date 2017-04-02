@@ -13,7 +13,7 @@ import com.packtpub.libgdx.bludbourne.UI.PlayerHUD
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
-open class MainGameScreen(val game: BludBourne) : Screen {
+open class MainGameScreen(val game: BludBourne) : GameScreen() {
     private val TAG = MainGameScreen::class.java.simpleName
 
     internal var viewportWidth: Float = 0f

@@ -30,7 +30,7 @@ class MapManager : ProfileObserver {
                     mapType = MapFactory.MapType.valueOf(currentMap)
                 }
 
-                loadMap(mapType)
+                loadMap(true, mapType)
 
                 // Persisted the closest player position values for different maps
                 val topWorldMapStartPosition = profileManager.getProperty("topWorldMapStartPosition", Vector2::class.java)
@@ -60,12 +60,16 @@ class MapManager : ProfileObserver {
         }
     }
 
-    fun loadMap(mapType: MapFactory.MapType) {
+    fun loadMap(playMusic: Boolean, mapType: MapFactory.MapType) {
         val map = MapFactory.getMap(mapType)
 
         if (map == null) {
             Gdx.app.debug(TAG, "Map does not exist!")
         }
+
+        currentMap?.unloadMusic()
+
+        if (playMusic) map.loadMusic()
 
         currentMap = map
         hasMapChanged = true
@@ -167,7 +171,7 @@ class MapManager : ProfileObserver {
     }
 
     fun getCurrentTiledMap(): TiledMap {
-        if (currentMap == null) loadMap(MapFactory.MapType.TOWN)
+        if (currentMap == null) loadMap(true, MapFactory.MapType.TOWN)
         return currentMap!!.currentMap
     }
 

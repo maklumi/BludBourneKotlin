@@ -1,7 +1,6 @@
 package com.packtpub.libgdx.bludbourne.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -10,9 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.BludBourne.ScreenType
 import com.packtpub.libgdx.bludbourne.Utility
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver.*
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
-class NewGameScreen(private val _game: BludBourne) : Screen {
+class NewGameScreen(private val _game: BludBourne) : GameScreen() {
 
     private val _stage: Stage = Stage()
     private val profileText: TextField
@@ -82,6 +82,8 @@ class NewGameScreen(private val _game: BludBourne) : Screen {
                 ProfileManager.instance.writeProfileToStorage(messageText, "", true)
                 ProfileManager.instance.setCurrentProfile(messageText)
                 ProfileManager.instance.isNewProfile = true
+                overwriteDialog.hide()
+                this@NewGameScreen.notify(AudioCommand.MUSIC_STOP, AudioTypeEvent.MUSIC_TITLE)
                 _game.screen = _game.getScreenType(ScreenType.MainGame)
             }
         }
@@ -107,6 +109,7 @@ class NewGameScreen(private val _game: BludBourne) : Screen {
                     ProfileManager.instance.writeProfileToStorage(messageText, "", false)
                     ProfileManager.instance.setCurrentProfile(messageText)
                     ProfileManager.instance.isNewProfile = true
+                    this@NewGameScreen.notify(AudioCommand.MUSIC_STOP, AudioTypeEvent.MUSIC_TITLE)
                     _game.screen = _game.getScreenType(ScreenType.MainGame)
                 }
             }

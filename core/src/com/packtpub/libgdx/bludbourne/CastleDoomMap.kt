@@ -9,6 +9,12 @@ class CastleDoomMap : Map(MapFactory.MapType.CASTLE_OF_DOOM, CastleDoomMap.mapPa
         mapQuestEntities.forEach { it.update(mapMgr, batch, delta) }
     }
 
+    override fun unloadMusic() {
+    }
+
+    override fun loadMusic() {
+    }
+
     companion object {
         private val mapPath = "maps/castle_of_doom.tmx"
     }
