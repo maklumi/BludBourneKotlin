@@ -36,11 +36,15 @@ object AudioManager : AudioObserver {
     }
 
     private fun playMusic(isLooping: Boolean, fullFilePath: String) {
-        if (Utility.isAssetLoaded(fullFilePath)) {
-            val music = Utility.getMusicAsset(fullFilePath)
-            music?.isLooping = isLooping
-            music?.play()
-            _queuedMusic.put(fullFilePath, music)
+        val music = _queuedMusic.get(fullFilePath)
+        if (music != null) {
+            music.isLooping = isLooping
+            music.play()
+        } else if (Utility.isAssetLoaded(fullFilePath)) {
+            val asset = Utility.getMusicAsset(fullFilePath)
+            asset?.isLooping = true
+            asset?.play()
+            _queuedMusic.put(fullFilePath, asset)
         } else {
             Gdx.app.debug(TAG, "Music not loaded")
             return
@@ -48,11 +52,15 @@ object AudioManager : AudioObserver {
     }
 
     private fun playSound(isLooping: Boolean, fullFilePath: String) {
-        if (Utility.isAssetLoaded(fullFilePath)) {
-            val sound = Utility.getSoundAsset(fullFilePath)
-            val soundId = sound?.play() ?: 1L
-            sound?.setLooping(soundId, isLooping)
-            _queuedSounds.put(fullFilePath, sound)
+        val sound = _queuedSounds.get(fullFilePath)
+        if (sound != null) {
+            val soundId = sound.play()
+            sound.setLooping(soundId, isLooping)
+        } else if (Utility.isAssetLoaded(fullFilePath)) {
+            val asset = Utility.getSoundAsset(fullFilePath)
+            val soundId = asset!!.play()
+            asset.setLooping(soundId, isLooping)
+            _queuedSounds.put(fullFilePath, asset)
         } else {
             Gdx.app.debug(TAG, "Sound not loaded")
             return

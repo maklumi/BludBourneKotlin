@@ -102,7 +102,8 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
         _stage.addAction(
                 Actions.sequence(
                         Actions.run {
-                            mapMgr.loadMap(false, MapFactory.MapType.TOWN)
+                            mapMgr.loadMap(MapFactory.MapType.TOWN)
+                            mapMgr.disableCurrentmapMusic()
                             setCameraPosition(10f, 16f)
                             showMessage("BLACKSMITH: We have planned this long enough. The time is now! I have had enough talk...")
 
@@ -120,7 +121,8 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
                         Actions.delay(3f),
                         Actions.run {
                             hideMessage()
-                            mapMgr.loadMap(false, MapFactory.MapType.TOP_WORLD)
+                            mapMgr.loadMap(MapFactory.MapType.TOP_WORLD)
+                            mapMgr.disableCurrentmapMusic()
                             setCameraPosition(50f, 30f)
                             animBlackSmith.setPosition(50f, 30f)
                             animInnKeeper.setPosition(52f, 30f)
@@ -183,7 +185,8 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
                             animMage.isVisible = false
                             animFire.isVisible = false
 
-                            mapMgr.loadMap(false, MapFactory.MapType.TOP_WORLD)
+                            mapMgr.loadMap(MapFactory.MapType.TOP_WORLD)
+                            mapMgr.disableCurrentmapMusic()
 
                             animDemon.isVisible = true
                             animDemon.setScale(1f, 1f)
@@ -204,7 +207,8 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
                             animInnKeeper.isVisible = false
                             animMage.isVisible = false
                             animFire.isVisible = false
-                            mapMgr.loadMap(false, MapFactory.MapType.CASTLE_OF_DOOM)
+                            mapMgr.loadMap(MapFactory.MapType.CASTLE_OF_DOOM)
+                            mapMgr.disableCurrentmapMusic()
                             followActor(animDemon)
                             animDemon.isVisible = true
                             animDemon.setPosition(15f, 1f)

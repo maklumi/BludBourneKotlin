@@ -30,7 +30,7 @@ class MapManager : ProfileObserver {
                     mapType = MapFactory.MapType.valueOf(currentMap)
                 }
 
-                loadMap(true, mapType)
+                loadMap(mapType)
 
                 // Persisted the closest player position values for different maps
                 val topWorldMapStartPosition = profileManager.getProperty("topWorldMapStartPosition", Vector2::class.java)
@@ -60,7 +60,7 @@ class MapManager : ProfileObserver {
         }
     }
 
-    fun loadMap(playMusic: Boolean, mapType: MapFactory.MapType) {
+    fun loadMap(mapType: MapFactory.MapType) {
         val map = MapFactory.getMap(mapType)
 
         if (map == null) {
@@ -69,7 +69,7 @@ class MapManager : ProfileObserver {
 
         currentMap?.unloadMusic()
 
-        if (playMusic) map.loadMusic()
+        map.loadMusic()
 
         currentMap = map
         hasMapChanged = true
@@ -122,6 +122,10 @@ class MapManager : ProfileObserver {
         currentMap!!.mapQuestEntities.clear()
     }
 
+    fun disableCurrentmapMusic() = currentMap?.unloadMusic()
+
+    fun enableCurrentmapMusic() = currentMap?.loadMusic()
+
     fun setClosestStartPositionFromScaledUnits(position: Vector2) {
         currentMap!!.setClosestStartPositionFromScaledUnits(position)
     }
@@ -171,7 +175,7 @@ class MapManager : ProfileObserver {
     }
 
     fun getCurrentTiledMap(): TiledMap {
-        if (currentMap == null) loadMap(true, MapFactory.MapType.TOWN)
+        if (currentMap == null) loadMap(MapFactory.MapType.TOWN)
         return currentMap!!.currentMap
     }
 

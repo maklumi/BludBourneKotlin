@@ -12,6 +12,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.ComponentObserver.ComponentEvent.*
+import com.packtpub.libgdx.bludbourne.audio.AudioManager
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver
+import com.packtpub.libgdx.bludbourne.audio.AudioSubject
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver.BattleEvent.*
 import com.packtpub.libgdx.bludbourne.dialog.ConversationGraph
@@ -25,7 +28,10 @@ import com.packtpub.libgdx.bludbourne.screens.MainGameScreen
 class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         Screen, ProfileObserver, ComponentObserver, ConversationGraphObserver,
         StoreInventoryObserver, BattleObserver, InventoryObserver,
-        StatusObserver {
+        StatusObserver,
+        AudioSubject {
+
+    private val _observers = Array<AudioObserver>()
 
     val stage: Stage
     private val viewport: Viewport
@@ -129,6 +135,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         inventoryUI.addObserver(_battleUI.battleState)
         inventoryUI.addObserver(this)
         _battleUI.battleState.addObserver(this)
+        this.addObserver(AudioManager)
 
         // Listeners
         val inventoryButton = statusUI.inventoryButton
@@ -287,6 +294,9 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 //System.out.println("Player has moved!!!");
                 if (_battleUI.isBattleReady()) {
                     MainGameScreen.gameState = MainGameScreen.GameState.SAVING
+                    mapMgr.disableCurrentmapMusic()
+                    notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
+                    notify(AudioObserver.AudioCommand.MUSIC_PLAY_LOOP, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
                     _battleUI.toBack()
                     _battleUI.isVisible = true
                 }
@@ -426,10 +436,14 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 statusUI.addGoldValue(goldReward)
                 val xpReward = Integer.parseInt(enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_XP_REWARD.toString()))
                 statusUI.addXPValue(xpReward)
+                notify(AudioObserver.AudioCommand.MUSIC_STOP, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
+                mapMgr.enableCurrentmapMusic()
                 _battleUI.isVisible = false
             }
             PLAYER_RUNNING -> {
                 MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
+                notify(AudioObserver.AudioCommand.MUSIC_STOP, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
+                mapMgr.enableCurrentmapMusic()
                 _battleUI.isVisible = false
             }
             PLAYER_HIT_DAMAGE -> {
@@ -437,6 +451,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 statusUI.setHPValue(hpVal)
 
                 if (hpVal <= 0) {
+                    notify(AudioObserver.AudioCommand.MUSIC_STOP, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
                     _battleUI.isVisible = false
                     MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER
                 }
@@ -496,5 +511,24 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
     override fun dispose() {
         stage.dispose()
+    }
+
+    override fun addObserver(audioObserver: AudioObserver) {
+        _observers.add(audioObserver)
+
+    }
+
+    override fun removeObserver(audioObserver: AudioObserver) {
+        _observers.removeValue(audioObserver, true)
+
+    }
+
+    override fun removeAllObservers() {
+        _observers.removeAll(_observers, true)
+
+    }
+
+    override fun notify(command: AudioObserver.AudioCommand, event: AudioObserver.AudioTypeEvent) {
+        _observers.forEach { it.onNotify(command, event) }
     }
 }
