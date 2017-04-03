@@ -2,7 +2,6 @@ package com.packtpub.libgdx.bludbourne.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
@@ -107,7 +106,9 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
     }
 
     override fun hide() {
-        gameState = GameState.SAVING
+        if (gameState != GameState.GAME_OVER) {
+            gameState = GameState.SAVING
+        }
         Gdx.input.inputProcessor = null
     }
 

@@ -167,6 +167,11 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 mapMgr.clearCurrentSelectedMapEntity()
             }
         })
+
+        //Music/Sound loading
+        notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
+        notify(AudioObserver.AudioCommand.SOUND_LOAD, AudioObserver.AudioTypeEvent.SOUND_COIN_RUSTLE)
+        notify(AudioObserver.AudioCommand.SOUND_LOAD, AudioObserver.AudioTypeEvent.SOUND_CREATURE_PAIN)
     }
 
     fun updateEntityObservers() {
@@ -295,7 +300,6 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 if (_battleUI.isBattleReady()) {
                     MainGameScreen.gameState = MainGameScreen.GameState.SAVING
                     mapMgr.disableCurrentmapMusic()
-                    notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
                     notify(AudioObserver.AudioCommand.MUSIC_PLAY_LOOP, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
                     _battleUI.toBack()
                     _battleUI.isVisible = true
@@ -398,6 +402,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         when (event) {
             StoreInventoryObserver.StoreInventoryEvent.PLAYER_GP_TOTAL_UPDATED -> {
                 statusUI.setGoldValue(value.toInt())
+                notify(AudioObserver.AudioCommand.SOUND_PLAY_ONCE, AudioObserver.AudioTypeEvent.SOUND_COIN_RUSTLE)
             }
 
             StoreInventoryObserver.StoreInventoryEvent.PLAYER_INVENTORY_UPDATED -> {
@@ -430,6 +435,10 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
     override fun onNotify(enemyEntity: Entity, event: BattleObserver.BattleEvent) {
         when (event) {
+            OPPONENT_HIT_DAMAGE -> {
+                notify(AudioObserver.AudioCommand.SOUND_PLAY_ONCE, AudioObserver.AudioTypeEvent.SOUND_CREATURE_PAIN)
+            }
+            
             OPPONENT_DEFEATED -> {
                 MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
                 val goldReward = enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_GP_REWARD.toString()).toInt()
