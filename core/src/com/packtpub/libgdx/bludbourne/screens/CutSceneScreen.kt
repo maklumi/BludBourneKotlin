@@ -1,7 +1,11 @@
 package com.packtpub.libgdx.bludbourne.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Action
@@ -11,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.packtpub.libgdx.bludbourne.BludBourne
 import com.packtpub.libgdx.bludbourne.EntityFactory
@@ -18,6 +23,7 @@ import com.packtpub.libgdx.bludbourne.Map.Companion.UNIT_SCALE
 import com.packtpub.libgdx.bludbourne.MapFactory
 import com.packtpub.libgdx.bludbourne.UI.AnimatedImage
 import com.packtpub.libgdx.bludbourne.Utility
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver
 import com.packtpub.libgdx.bludbourne.battle.MonsterFactory
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
@@ -37,6 +43,14 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
 
     init {
 
+        notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_INTRO_CUTSCENE)
+
+        val pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888).apply {
+            setColor(Color.BLACK)
+            fill()
+        }
+        val drawable = TextureRegionDrawable(TextureRegion(Texture(pixmap)))
+
         _messageBoxUI.apply {
             isVisible = false
             contentTable.add(_label).width(_stage.width / 2).pad(10f, 10f, 10f, 0f)
@@ -46,7 +60,7 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
 
         _transitionImage.apply {
             setFillParent(true)
-            drawable = drawable
+            setDrawable(drawable)
             addAction(Actions.sequence(Actions.alpha(0f)))
         }
 
@@ -287,6 +301,7 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
     }
 
     override fun show() {
+        notify(AudioObserver.AudioCommand.MUSIC_PLAY_LOOP, AudioObserver.AudioTypeEvent.MUSIC_INTRO_CUTSCENE)
 //        ProfileManager.instance.removeAllObservers()
         if (mapRenderer == null) {
             mapRenderer = OrthogonalTiledMapRenderer(mapMgr.getCurrentTiledMap(), UNIT_SCALE)
@@ -294,6 +309,7 @@ class CutSceneScreen(game: BludBourne) : MainGameScreen(game) {
     }
 
     override fun hide() {
+        notify(AudioObserver.AudioCommand.MUSIC_STOP, AudioObserver.AudioTypeEvent.MUSIC_INTRO_CUTSCENE)
         ProfileManager.instance.removeAllObservers()
         Gdx.input.inputProcessor = null
     }
