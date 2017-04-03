@@ -7,6 +7,7 @@ import com.packtpub.libgdx.bludbourne.EntityConfig
 import com.packtpub.libgdx.bludbourne.UI.InventoryObserver
 import com.packtpub.libgdx.bludbourne.UI.InventoryObserver.InventoryEvent
 import com.packtpub.libgdx.bludbourne.UI.InventoryObserver.InventoryEvent.*
+import com.packtpub.libgdx.bludbourne.battle.BattleObserver.BattleEvent
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
@@ -19,8 +20,11 @@ class BattleState : BattleSubject(), InventoryObserver {
     private var _chanceOfAttack = 25
     private var _chanceOfEscape = 40
     private var _criticalChance = 90
-    private var _timer = 0f
-    private var _checkTimer = 0f
+    //    private var _timer = 0f
+//    private var _checkTimer = 0f
+    private val _playerAttackCalculations: Timer.Task = getPlayerAttackCalculationTimer()
+    private val _opponentAttackCalculations: Timer.Task = getOpponentAttackCalculationTimer()
+    private val _checkPlayerMagicUse: Timer.Task = getPlayerMagicUseCheckTimer()
 
     fun setCurrentZoneLevel(zoneLevel: Int) {
         _currentZoneLevel = zoneLevel
@@ -48,7 +52,7 @@ class BattleState : BattleSubject(), InventoryObserver {
         System.out.print("Entered BATTLE ZONE: " + _currentZoneLevel)
         val entity = MonsterFactory.getRandomMonster(_currentZoneLevel) ?: return
         this._currentOpponent = entity
-        notify(entity, BattleObserver.BattleEvent.OPPONENT_ADDED)
+        notify(entity, BattleEvent.OPPONENT_ADDED)
     }
 
     fun playerAttacks() {
@@ -56,20 +60,31 @@ class BattleState : BattleSubject(), InventoryObserver {
 
         //Check for magic if used in attack; If we don't have enough MP, then return
         var mpVal = ProfileManager.instance.getProperty("currentPlayerMP", Int::class.java) as Int
-        if (_currentPlayerWandAPPoints > mpVal) {
+        notify(_currentOpponent as Entity, BattleEvent.PLAYER_TURN_START)
+
+        if (_currentPlayerWandAPPoints == 0) {
+            Timer.schedule(_playerAttackCalculations, 1f)
+        } else if (_currentPlayerWandAPPoints > mpVal) {
+            this@BattleState.notify(_currentOpponent as Entity, BattleEvent.PLAYER_TURN_DONE)
             return
         } else {
-            mpVal -= _currentPlayerWandAPPoints
-            ProfileManager.instance.setProperty("currentPlayerMP", mpVal)
-            notify(_currentOpponent as Entity, BattleObserver.BattleEvent.PLAYER_USED_MAGIC)
+            Timer.schedule(_checkPlayerMagicUse, .5f)
+            Timer.schedule(_playerAttackCalculations, 1f)
         }
-
-        notify(_currentOpponent!!, BattleObserver.BattleEvent.PLAYER_TURN_START)
-
-        Timer.schedule(playerAttackCalculations(), 1f)
     }
 
-    private fun playerAttackCalculations(): Timer.Task {
+    private fun getPlayerMagicUseCheckTimer(): Timer.Task {
+        return object : Timer.Task() {
+            override fun run() {
+                var mpVal = ProfileManager.instance.getProperty("currentPlayerMP", Int::class.java) as Int
+                mpVal -= _currentPlayerWandAPPoints
+                ProfileManager.instance.setProperty("currentPlayerMP", mpVal)
+                this@BattleState.notify(_currentOpponent as Entity, BattleEvent.PLAYER_USED_MAGIC)
+            }
+        }
+    }
+
+    private fun getPlayerAttackCalculationTimer(): Timer.Task {
         return object : Timer.Task() {
             override fun run() {
                 var currentOpponentHP = Integer.parseInt(_currentOpponent!!.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_HEALTH_POINTS.toString()))
@@ -82,17 +97,19 @@ class BattleState : BattleSubject(), InventoryObserver {
                 currentOpponentHP = MathUtils.clamp(currentOpponentHP - damage, 0, currentOpponentHP)
                 _currentOpponent!!.entityConfig.setPropertyValue(EntityConfig.EntityProperties.ENTITY_HEALTH_POINTS.toString(), currentOpponentHP.toString())
 
-                System.out.println("Player attacks " + _currentOpponent!!.entityConfig.entityID + " leaving it with HP: " + currentOpponentHP)
+                println("Player attacks " + _currentOpponent!!.entityConfig.entityID + " leaving it with HP: " + currentOpponentHP)
 
                 _currentOpponent!!.entityConfig.setPropertyValue(EntityConfig.EntityProperties.ENTITY_HIT_DAMAGE_TOTAL.toString(), damage.toString())
-                this@BattleState.notify(_currentOpponent as Entity, BattleObserver.BattleEvent.OPPONENT_HIT_DAMAGE)
 
-
-                if (currentOpponentHP == 0) {
-                    this@BattleState.notify(_currentOpponent as Entity, BattleObserver.BattleEvent.OPPONENT_DEFEATED)
+                if (damage > 0) {
+                    this@BattleState.notify(_currentOpponent as Entity, BattleEvent.OPPONENT_HIT_DAMAGE)
                 }
 
-                this@BattleState.notify(_currentOpponent as Entity, BattleObserver.BattleEvent.PLAYER_TURN_DONE)
+                if (currentOpponentHP == 0) {
+                    this@BattleState.notify(_currentOpponent as Entity, BattleEvent.OPPONENT_DEFEATED)
+                }
+
+                this@BattleState.notify(_currentOpponent as Entity, BattleEvent.PLAYER_TURN_DONE)
             }
         }
     }
@@ -103,16 +120,16 @@ class BattleState : BattleSubject(), InventoryObserver {
             return
         }
 
-        Timer.schedule(opponentAttackCalculations(), 1f)
+        Timer.schedule(_opponentAttackCalculations, 1f)
     }
 
-    private fun opponentAttackCalculations(): Timer.Task {
+    private fun getOpponentAttackCalculationTimer(): Timer.Task {
         return object : Timer.Task() {
             override fun run() {
                 val currentOpponentHP = Integer.parseInt(_currentOpponent!!.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_HEALTH_POINTS.toString()))
 
                 if (currentOpponentHP <= 0) {
-                    this@BattleState.notify(_currentOpponent as Entity, BattleObserver.BattleEvent.OPPONENT_TURN_DONE)
+                    this@BattleState.notify(_currentOpponent as Entity, BattleEvent.OPPONENT_TURN_DONE)
                     return
                 }
 
@@ -121,11 +138,15 @@ class BattleState : BattleSubject(), InventoryObserver {
                 var hpVal = ProfileManager.instance.getProperty("currentPlayerHP", Int::class.java) as Int
                 hpVal = MathUtils.clamp(hpVal - damage, 0, hpVal)
                 ProfileManager.instance.setProperty("currentPlayerHP", hpVal)
-                this@BattleState.notify(_currentOpponent as Entity, BattleObserver.BattleEvent.PLAYER_HIT_DAMAGE)
+                this@BattleState.notify(_currentOpponent as Entity, BattleEvent.PLAYER_HIT_DAMAGE)
+
+                if (damage > 0) {
+                    this@BattleState.notify(_currentOpponent as Entity, BattleEvent.PLAYER_HIT_DAMAGE)
+                }
 
                 println("Player HIT for " + damage + " BY " + _currentOpponent!!.entityConfig.entityID + " leaving player with HP: " + hpVal)
 
-                this@BattleState.notify(_currentOpponent as Entity, BattleObserver.BattleEvent.OPPONENT_TURN_DONE)
+                this@BattleState.notify(_currentOpponent as Entity, BattleEvent.OPPONENT_TURN_DONE)
             }
         }
     }
@@ -133,7 +154,7 @@ class BattleState : BattleSubject(), InventoryObserver {
     fun playerRuns() {
         val randomVal = MathUtils.random(1, 100)
         if (_chanceOfEscape > randomVal) {
-            notify(_currentOpponent!!, BattleObserver.BattleEvent.PLAYER_RUNNING)
+            notify(_currentOpponent!!, BattleEvent.PLAYER_RUNNING)
         } else if (randomVal > _criticalChance) {
             opponentAttacks()
         } else {

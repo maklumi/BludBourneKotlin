@@ -14,6 +14,8 @@ import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.ComponentObserver.ComponentEvent.*
 import com.packtpub.libgdx.bludbourne.audio.AudioManager
 import com.packtpub.libgdx.bludbourne.audio.AudioObserver
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver.AudioCommand
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver.AudioTypeEvent
 import com.packtpub.libgdx.bludbourne.audio.AudioSubject
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver.BattleEvent.*
@@ -169,10 +171,11 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         })
 
         //Music/Sound loading
-        notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
-        notify(AudioObserver.AudioCommand.SOUND_LOAD, AudioObserver.AudioTypeEvent.SOUND_COIN_RUSTLE)
-        notify(AudioObserver.AudioCommand.SOUND_LOAD, AudioObserver.AudioTypeEvent.SOUND_CREATURE_PAIN)
-        notify(AudioObserver.AudioCommand.SOUND_LOAD, AudioObserver.AudioTypeEvent.SOUND_PLAYER_PAIN)
+        notify(AudioCommand.MUSIC_LOAD, AudioTypeEvent.MUSIC_BATTLE)
+        notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_COIN_RUSTLE)
+        notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_CREATURE_PAIN)
+        notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_PLAYER_PAIN)
+        notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_PLAYER_WAND_ATTACK)
     }
 
     fun updateEntityObservers() {
@@ -301,7 +304,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 if (_battleUI.isBattleReady()) {
                     MainGameScreen.gameState = MainGameScreen.GameState.SAVING
                     mapMgr.disableCurrentmapMusic()
-                    notify(AudioObserver.AudioCommand.MUSIC_PLAY_LOOP, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
+                    notify(AudioCommand.MUSIC_PLAY_LOOP, AudioTypeEvent.MUSIC_BATTLE)
                     _battleUI.toBack()
                     _battleUI.isVisible = true
                 }
@@ -403,7 +406,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         when (event) {
             StoreInventoryObserver.StoreInventoryEvent.PLAYER_GP_TOTAL_UPDATED -> {
                 statusUI.setGoldValue(value.toInt())
-                notify(AudioObserver.AudioCommand.SOUND_PLAY_ONCE, AudioObserver.AudioTypeEvent.SOUND_COIN_RUSTLE)
+                notify(AudioCommand.SOUND_PLAY_ONCE, AudioTypeEvent.SOUND_COIN_RUSTLE)
             }
 
             StoreInventoryObserver.StoreInventoryEvent.PLAYER_INVENTORY_UPDATED -> {
@@ -437,7 +440,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     override fun onNotify(enemyEntity: Entity, event: BattleObserver.BattleEvent) {
         when (event) {
             OPPONENT_HIT_DAMAGE -> {
-                notify(AudioObserver.AudioCommand.SOUND_PLAY_ONCE, AudioObserver.AudioTypeEvent.SOUND_CREATURE_PAIN)
+                notify(AudioCommand.SOUND_PLAY_ONCE, AudioTypeEvent.SOUND_CREATURE_PAIN)
             }
 
             OPPONENT_DEFEATED -> {
@@ -446,28 +449,29 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 statusUI.addGoldValue(goldReward)
                 val xpReward = Integer.parseInt(enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_XP_REWARD.toString()))
                 statusUI.addXPValue(xpReward)
-                notify(AudioObserver.AudioCommand.MUSIC_STOP, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
+                notify(AudioCommand.MUSIC_STOP, AudioTypeEvent.MUSIC_BATTLE)
                 mapMgr.enableCurrentmapMusic()
                 _battleUI.isVisible = false
             }
             PLAYER_RUNNING -> {
                 MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
-                notify(AudioObserver.AudioCommand.MUSIC_STOP, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
+                notify(AudioCommand.MUSIC_STOP, AudioTypeEvent.MUSIC_BATTLE)
                 mapMgr.enableCurrentmapMusic()
                 _battleUI.isVisible = false
             }
             PLAYER_HIT_DAMAGE -> {
-                notify(AudioObserver.AudioCommand.SOUND_PLAY_ONCE, AudioObserver.AudioTypeEvent.SOUND_PLAYER_PAIN)
+                notify(AudioCommand.SOUND_PLAY_ONCE, AudioTypeEvent.SOUND_PLAYER_PAIN)
                 val hpVal = ProfileManager.instance.getProperty("currentPlayerHP", Int::class.java) as Int
                 statusUI.setHPValue(hpVal)
 
                 if (hpVal <= 0) {
-                    notify(AudioObserver.AudioCommand.MUSIC_STOP, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
+                    notify(AudioCommand.MUSIC_STOP, AudioTypeEvent.MUSIC_BATTLE)
                     _battleUI.isVisible = false
                     MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER
                 }
             }
             PLAYER_USED_MAGIC -> {
+                notify(AudioCommand.SOUND_PLAY_ONCE, AudioTypeEvent.SOUND_PLAYER_WAND_ATTACK)
                 val mpVal = ProfileManager.instance.getProperty("currentPlayerMP", Int::class.java) as Int
                 statusUI.setMPValue(mpVal)
             }
