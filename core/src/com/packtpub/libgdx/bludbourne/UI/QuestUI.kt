@@ -141,6 +141,7 @@ class QuestUI : Window("Quest Log", Utility.STATUSUI_SKIN, "solidbackground") {
 
     private fun clearDialog() {
         _listQuests.clearItems()
+        _listTasks.clearItems()
     }
 
     private fun populateQuestTaskDialog(graph: QuestGraph) {

@@ -31,4 +31,8 @@ object MapFactory {
         }
         return map
     }
+
+    fun clearCache() {
+        mapTable.clear()
+    }
 }

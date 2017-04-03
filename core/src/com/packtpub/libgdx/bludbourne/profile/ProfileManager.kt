@@ -58,7 +58,7 @@ class ProfileManager private constructor() : ProfileSubject() {
     fun writeProfileToStorage(profileName: String, fileData: String, overwrite: Boolean) {
         val fullFilename = profileName + SAVEGAME_SUFFIX
 
-        val localFileExists = Gdx.files.internal(fullFilename).exists()
+        val localFileExists = Gdx.files.local(fullFilename).exists()
 
         //If we cannot overwrite and the file exists, exit
         if (localFileExists && !overwrite) {
@@ -98,11 +98,11 @@ class ProfileManager private constructor() : ProfileSubject() {
 
     fun loadProfile() {
         if (isNewProfile) {
+            notify(this, ProfileObserver.ProfileEvent.CLEAR_CURRENT_PROFILE)
             saveProfile()
-            isNewProfile = false
         }
         val fullProfileFileName = _profileName + SAVEGAME_SUFFIX
-        val doesProfileFileExist = Gdx.files.internal(fullProfileFileName).exists()
+        val doesProfileFileExist = Gdx.files.local(fullProfileFileName).exists()
 
         if (!doesProfileFileExist) {
             println("File doesn't exist!")
@@ -111,6 +111,7 @@ class ProfileManager private constructor() : ProfileSubject() {
 
         _profileProperties = _json.fromJson(ObjectMap::class.java, _profiles!![_profileName]) as ObjectMap<String, Any>
         notify(this, ProfileObserver.ProfileEvent.PROFILE_LOADED)
+        isNewProfile = false
     }
 
     companion object {

@@ -57,6 +57,16 @@ class MapManager : ProfileObserver {
                 profileManager.setProperty("castleOfDoomMapStartPosition", MapFactory.getMap(MapFactory.MapType.CASTLE_OF_DOOM).playerStart)
                 profileManager.setProperty("townMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOWN).playerStart)
             }
+            ProfileObserver.ProfileEvent.CLEAR_CURRENT_PROFILE -> {
+                currentMap = null
+                profileManager.setProperty("currentMapType", MapFactory.MapType.TOWN.toString())
+
+                MapFactory.clearCache()
+
+                profileManager.setProperty("topWorldMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOP_WORLD).playerStart)
+                profileManager.setProperty("castleOfDoomMapStartPosition", MapFactory.getMap(MapFactory.MapType.CASTLE_OF_DOOM).playerStart)
+                profileManager.setProperty("townMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOWN).playerStart)
+            }
         }
     }
 

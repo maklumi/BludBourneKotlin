@@ -179,6 +179,12 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
     fun resetEquipSlots() {
         _DPVal = 0
         _APVal = 0
+
+        _DPValLabel.setText(_DPVal.toString())
+        notify(_DPVal.toString(), UPDATED_DP)
+
+        _APValLabel.setText(_APVal.toString())
+        notify(_APVal.toString(), UPDATED_AP)
     }
 
     fun removeQuestItemFromInventory(questID: String) {

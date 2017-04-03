@@ -14,7 +14,9 @@ import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.ComponentObserver.ComponentEvent.*
 import com.packtpub.libgdx.bludbourne.audio.AudioManager
 import com.packtpub.libgdx.bludbourne.audio.AudioObserver
-import com.packtpub.libgdx.bludbourne.audio.AudioObserver.*
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver.AudioCommand
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver.AudioTypeEvent
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver.AudioTypeEvent.MUSIC_LEVEL_UP_FANFARE
 import com.packtpub.libgdx.bludbourne.audio.AudioSubject
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver.BattleEvent.*
@@ -171,6 +173,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
         //Music/Sound loading
         notify(AudioCommand.MUSIC_LOAD, AudioTypeEvent.MUSIC_BATTLE)
+        notify(AudioCommand.MUSIC_LOAD, MUSIC_LEVEL_UP_FANFARE)
         notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_COIN_RUSTLE)
         notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_CREATURE_PAIN)
         notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_PLAYER_PAIN)
@@ -190,11 +193,15 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
         when (event) {
             ProfileObserver.ProfileEvent.PROFILE_LOADED -> {
-                //if goldval is negative, this is our first save
-                var goldVal = profileManager.getProperty("currentPlayerGP", Int::class.java) as Int
-                val firstTime = goldVal < 0
+                val firstTime = profileManager.isNewProfile
 
                 if (firstTime) {
+                    InventoryUI.clearInventoryItems(inventoryUI.inventorySlotTable)
+                    InventoryUI.clearInventoryItems(inventoryUI.equipSlots)
+                    inventoryUI.resetEquipSlots()
+
+                    _questUI.quests = Array<QuestGraph>()
+
                     //add default items if first time
                     val items: Array<InventoryItem.ItemTypeID> = player.entityConfig.inventory
                     val itemLocations = Array<InventoryItemLocation>()
@@ -203,39 +210,37 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                     }
                     InventoryUI.populateInventory(inventoryUI.inventorySlotTable, itemLocations, inventoryUI.dragAndDrop, InventoryUI.PLAYER_INVENTORY, false)
                     profileManager.setProperty("playerInventory", InventoryUI.getInventory(inventoryUI.inventorySlotTable))
-                }
 
-
-                val inventory = profileManager.getProperty("playerInventory", Array::class.java) as Array<InventoryItemLocation>
-                InventoryUI.populateInventory(inventoryUI.inventorySlotTable, inventory, inventoryUI.dragAndDrop, InventoryUI.PLAYER_INVENTORY, false)
-
-                val equipInventory = profileManager.getProperty("playerEquipInventory", Array::class.java) as Array<InventoryItemLocation>
-                if (equipInventory.size > 0) {
-                    inventoryUI.resetEquipSlots()
-                    InventoryUI.populateInventory(inventoryUI.equipSlots, equipInventory, inventoryUI.dragAndDrop, InventoryUI.PLAYER_INVENTORY, false)
-                }
-
-                val quests = profileManager.getProperty("playerQuests", Array::class.java)
-                _questUI.quests = quests as Array<QuestGraph>
-
-                var xpMaxVal = profileManager.getProperty("currentPlayerXPMax", Int::class.java) as Int
-                val xpVal = profileManager.getProperty("currentPlayerXP", Int::class.java) as Int
-
-                var hpMaxVal = profileManager.getProperty("currentPlayerHPMax", Int::class.java) as Int
-                var hpVal = profileManager.getProperty("currentPlayerHP", Int::class.java) as Int
-
-                var mpMaxVal = profileManager.getProperty("currentPlayerMPMax", Int::class.java) as Int
-                var mpVal = profileManager.getProperty("currentPlayerMP", Int::class.java) as Int
-
-                var levelVal = profileManager.getProperty("currentPlayerLevel", Int::class.java) as Int
-
-                // check gold
-                if (firstTime) {
-                    // start the player with some money
-                    goldVal = 20
-                    levelVal = 1
-                    statusUI.setStatusForLevel(levelVal)
+                    //start the player with some money
+                    statusUI.setGoldValue(20)
+                    statusUI.setStatusForLevel(1)
                 } else {
+                    var goldVal = profileManager.getProperty("currentPlayerGP", Int::class.java) as Int
+
+
+                    val inventory = profileManager.getProperty("playerInventory", Array::class.java) as Array<InventoryItemLocation>
+                    InventoryUI.populateInventory(inventoryUI.inventorySlotTable, inventory, inventoryUI.dragAndDrop, InventoryUI.PLAYER_INVENTORY, false)
+
+                    val equipInventory = profileManager.getProperty("playerEquipInventory", Array::class.java) as Array<InventoryItemLocation>
+                    if (equipInventory.size > 0) {
+                        inventoryUI.resetEquipSlots()
+                        InventoryUI.populateInventory(inventoryUI.equipSlots, equipInventory, inventoryUI.dragAndDrop, InventoryUI.PLAYER_INVENTORY, false)
+                    }
+
+                    val quests = profileManager.getProperty("playerQuests", Array::class.java)
+                    _questUI.quests = quests as Array<QuestGraph>
+
+                    val xpMaxVal = profileManager.getProperty("currentPlayerXPMax", Int::class.java) as Int
+                    val xpVal = profileManager.getProperty("currentPlayerXP", Int::class.java) as Int
+
+                    val hpMaxVal = profileManager.getProperty("currentPlayerHPMax", Int::class.java) as Int
+                    val hpVal = profileManager.getProperty("currentPlayerHP", Int::class.java) as Int
+
+                    val mpMaxVal = profileManager.getProperty("currentPlayerMPMax", Int::class.java) as Int
+                    val mpVal = profileManager.getProperty("currentPlayerMP", Int::class.java) as Int
+
+                    var levelVal = profileManager.getProperty("currentPlayerLevel", Int::class.java) as Int
+
 
                     //set the current max values first
                     statusUI.setXPValueMax(xpMaxVal)
@@ -245,11 +250,12 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                     statusUI.setXPValue(xpVal)
                     statusUI.setHPValue(hpVal)
                     statusUI.setMPValue(mpVal)
-                }
 
-                //then add in current values
-                statusUI.setGoldValue(goldVal)
-                statusUI.setLevelValue(levelVal)
+
+                    //then add in current values
+                    statusUI.setGoldValue(goldVal)
+                    statusUI.setLevelValue(levelVal)
+                }
             }
 
             ProfileObserver.ProfileEvent.SAVING_PROFILE -> {
@@ -265,6 +271,21 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 profileManager.setProperty("currentPlayerMP", statusUI.getMPValue())
                 profileManager.setProperty("currentPlayerMPMax", statusUI.getMPValueMax())
             }
+
+            ProfileObserver.ProfileEvent.CLEAR_CURRENT_PROFILE -> {
+                profileManager.setProperty("playerQuests", Array<QuestGraph>())
+                profileManager.setProperty("playerInventory", Array<InventoryItemLocation>())
+                profileManager.setProperty("playerEquipInventory", Array<InventoryItemLocation>())
+                profileManager.setProperty("currentPlayerGP", 0)
+                profileManager.setProperty("currentPlayerLevel", 0)
+                profileManager.setProperty("currentPlayerXP", 0)
+                profileManager.setProperty("currentPlayerXPMax", 0)
+                profileManager.setProperty("currentPlayerHP", 0)
+                profileManager.setProperty("currentPlayerHPMax", 0)
+                profileManager.setProperty("currentPlayerMP", 0)
+                profileManager.setProperty("currentPlayerMPMax", 0)
+            }
+
         }
     }
 
@@ -427,6 +448,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 ProfileManager.instance.setProperty("currentPlayerHP", statusUI.getHPValue())
             }
             StatusObserver.StatusEvent.UPDATED_LEVEL -> {
+                notify(AudioCommand.MUSIC_PLAY_ONCE, MUSIC_LEVEL_UP_FANFARE)
                 ProfileManager.instance.setProperty("currentPlayerLevel", statusUI.getLevelValue())
             }
             StatusObserver.StatusEvent.UPDATED_MP -> {

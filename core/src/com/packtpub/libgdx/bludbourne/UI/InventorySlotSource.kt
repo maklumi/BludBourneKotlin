@@ -9,14 +9,15 @@ class InventorySlotSource(internal var sourceSlot: InventorySlot,
                           internal var dragAndDrop: DragAndDrop) :
         Source(sourceSlot.getTopInventoryItem()) {
 
-    override fun dragStart(event: InputEvent, x: Float, y: Float, pointer: Int): Payload {
+    override fun dragStart(event: InputEvent, x: Float, y: Float, pointer: Int): Payload? {
         val payload = Payload()
 
         sourceSlot = actor.parent as InventorySlot
+        if (sourceSlot == null) return null
         sourceSlot.decrementItemCount(true)
 
         payload.dragActor = actor
-        dragAndDrop.setDragActorPosition(-x+actor.width, -y)
+        dragAndDrop.setDragActorPosition(-x + actor.width, -y)
 
         return payload
     }

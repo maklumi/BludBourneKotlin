@@ -192,7 +192,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
         for (table in _levelTables) {
             if (Integer.parseInt(table.levelID) == level) {
                 setXPValueMax(table.xpMax)
-                setXPValue(xpVal)
+                setXPValue(0)
 
                 setHPValueMax(table.hpMax)
                 setHPValue(table.hpMax)
