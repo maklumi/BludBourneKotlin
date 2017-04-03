@@ -14,8 +14,7 @@ import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.ComponentObserver.ComponentEvent.*
 import com.packtpub.libgdx.bludbourne.audio.AudioManager
 import com.packtpub.libgdx.bludbourne.audio.AudioObserver
-import com.packtpub.libgdx.bludbourne.audio.AudioObserver.AudioCommand
-import com.packtpub.libgdx.bludbourne.audio.AudioObserver.AudioTypeEvent
+import com.packtpub.libgdx.bludbourne.audio.AudioObserver.*
 import com.packtpub.libgdx.bludbourne.audio.AudioSubject
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver.BattleEvent.*
@@ -176,6 +175,8 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_CREATURE_PAIN)
         notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_PLAYER_PAIN)
         notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_PLAYER_WAND_ATTACK)
+        notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_EATING)
+        notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_DRINKING)
     }
 
     fun updateEntityObservers() {
