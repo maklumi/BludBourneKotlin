@@ -35,36 +35,44 @@ object AudioManager : AudioObserver {
         }
     }
 
-    private fun playMusic(isLooping: Boolean, fullFilePath: String) {
-        val music = _queuedMusic.get(fullFilePath)
+    private fun playMusic(isLooping: Boolean, fullFilePath: String): Music? {
+        var music = _queuedMusic.get(fullFilePath)
         if (music != null) {
             music.isLooping = isLooping
             music.play()
         } else if (Utility.isAssetLoaded(fullFilePath)) {
-            val asset = Utility.getMusicAsset(fullFilePath)
-            asset?.isLooping = true
-            asset?.play()
-            _queuedMusic.put(fullFilePath, asset)
+            music = Utility.getMusicAsset(fullFilePath)
+            music?.isLooping = isLooping
+            music?.play()
+            _queuedMusic.put(fullFilePath, music)
         } else {
             Gdx.app.debug(TAG, "Music not loaded")
-            return
+            return null
         }
+        return music
     }
 
-    private fun playSound(isLooping: Boolean, fullFilePath: String) {
-        val sound = _queuedSounds.get(fullFilePath)
+    private fun playSound(isLooping: Boolean, fullFilePath: String): Sound? {
+        var sound = _queuedSounds.get(fullFilePath)
         if (sound != null) {
             val soundId = sound.play()
             sound.setLooping(soundId, isLooping)
         } else if (Utility.isAssetLoaded(fullFilePath)) {
-            val asset = Utility.getSoundAsset(fullFilePath)
-            val soundId = asset!!.play()
-            asset.setLooping(soundId, isLooping)
-            _queuedSounds.put(fullFilePath, asset)
+            sound = Utility.getSoundAsset(fullFilePath)
+            val soundId = sound!!.play()
+            sound.setLooping(soundId, isLooping)
+            _queuedSounds.put(fullFilePath, sound)
         } else {
             Gdx.app.debug(TAG, "Sound not loaded")
-            return
+            return null
         }
+        return sound
+    }
+
+    fun dispose() {
+        _queuedMusic.values.forEach { it.dispose() }
+
+        _queuedSounds.values.forEach { it.dispose() }
     }
 
 }

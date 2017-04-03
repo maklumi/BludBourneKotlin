@@ -172,6 +172,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_BATTLE)
         notify(AudioObserver.AudioCommand.SOUND_LOAD, AudioObserver.AudioTypeEvent.SOUND_COIN_RUSTLE)
         notify(AudioObserver.AudioCommand.SOUND_LOAD, AudioObserver.AudioTypeEvent.SOUND_CREATURE_PAIN)
+        notify(AudioObserver.AudioCommand.SOUND_LOAD, AudioObserver.AudioTypeEvent.SOUND_PLAYER_PAIN)
     }
 
     fun updateEntityObservers() {
@@ -438,7 +439,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             OPPONENT_HIT_DAMAGE -> {
                 notify(AudioObserver.AudioCommand.SOUND_PLAY_ONCE, AudioObserver.AudioTypeEvent.SOUND_CREATURE_PAIN)
             }
-            
+
             OPPONENT_DEFEATED -> {
                 MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
                 val goldReward = enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_GP_REWARD.toString()).toInt()
@@ -456,6 +457,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 _battleUI.isVisible = false
             }
             PLAYER_HIT_DAMAGE -> {
+                notify(AudioObserver.AudioCommand.SOUND_PLAY_ONCE, AudioObserver.AudioTypeEvent.SOUND_PLAYER_PAIN)
                 val hpVal = ProfileManager.instance.getProperty("currentPlayerHP", Int::class.java) as Int
                 statusUI.setHPValue(hpVal)
 

@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.Map.Companion.UNIT_SCALE
 import com.packtpub.libgdx.bludbourne.UI.PlayerHUD
+import com.packtpub.libgdx.bludbourne.audio.AudioManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
@@ -170,6 +171,7 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
         player.unregisterObservers()
         player.dispose()
         mapRenderer.dispose()
+        AudioManager.dispose()
     }
 
     private fun setupViewport(width: Int, height: Int) {
