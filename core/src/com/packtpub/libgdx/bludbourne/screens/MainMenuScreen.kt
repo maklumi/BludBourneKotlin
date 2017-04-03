@@ -22,6 +22,7 @@ class MainMenuScreen(private val _game: BludBourne) : GameScreen() {
         val newGameButton = TextButton("New Game", Utility.STATUSUI_SKIN)
         val loadGameButton = TextButton("Load Game", Utility.STATUSUI_SKIN)
         val watchIntroButton = TextButton("Watch Intro", Utility.STATUSUI_SKIN)
+        val creditsButton = TextButton("Credits", Utility.STATUSUI_SKIN)
         val exitButton = TextButton("Exit", Utility.STATUSUI_SKIN)
 
 
@@ -32,6 +33,7 @@ class MainMenuScreen(private val _game: BludBourne) : GameScreen() {
             add(newGameButton).spaceBottom(10f).row()
             add(loadGameButton).spaceBottom(10f).row()
             add(watchIntroButton).spaceBottom(10f).row()
+            add(creditsButton).spaceBottom(10f).row()
             add(exitButton).spaceBottom(10f).row()
         }
 
@@ -88,6 +90,17 @@ class MainMenuScreen(private val _game: BludBourne) : GameScreen() {
         }
         )
 
+        creditsButton.addListener(object : ClickListener() {
+            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                return true
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+                _game.screen = _game.getScreenType(ScreenType.Credits)
+            }
+
+        }
+        )
 
         notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_TITLE)
     }

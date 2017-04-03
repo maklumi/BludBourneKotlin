@@ -12,6 +12,7 @@ class BludBourne : Game() {
     private lateinit var newGameScreen: NewGameScreen
     private lateinit var gameOverScreen: GameOverScreen
     private lateinit var cutSceneScreen: CutSceneScreen
+    private lateinit var creditScreen: CreditScreen
 
     override fun create() {
         mainGameScreen = MainGameScreen(this)
@@ -20,6 +21,7 @@ class BludBourne : Game() {
         newGameScreen = NewGameScreen(this)
         gameOverScreen = GameOverScreen(this)
         cutSceneScreen = CutSceneScreen(this)
+        creditScreen = CreditScreen(this)
         setScreen(mainMenuScreen)
     }
 
@@ -30,6 +32,7 @@ class BludBourne : Game() {
         newGameScreen.dispose()
         gameOverScreen.dispose()
         cutSceneScreen.dispose()
+        creditScreen.dispose()
     }
 
     fun getScreenType(screenType: ScreenType): Screen {
@@ -40,6 +43,7 @@ class BludBourne : Game() {
             ScreenType.NewGame -> return newGameScreen
             ScreenType.GameOver -> return gameOverScreen
             ScreenType.WatchIntro -> return cutSceneScreen
+            ScreenType.Credits -> return creditScreen
         }
     }
 
@@ -49,7 +53,8 @@ class BludBourne : Game() {
         LoadGame,
         NewGame,
         GameOver,
-        WatchIntro
+        WatchIntro,
+        Credits
     }
 
 }
