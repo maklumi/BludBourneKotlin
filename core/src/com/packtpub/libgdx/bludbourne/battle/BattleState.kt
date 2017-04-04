@@ -63,13 +63,17 @@ class BattleState : BattleSubject(), InventoryObserver {
         notify(_currentOpponent as Entity, BattleEvent.PLAYER_TURN_START)
 
         if (_currentPlayerWandAPPoints == 0) {
-            Timer.schedule(_playerAttackCalculations, 1f)
+            if (!_playerAttackCalculations.isScheduled) {
+                Timer.schedule(_playerAttackCalculations, 1f)
+            }
         } else if (_currentPlayerWandAPPoints > mpVal) {
             this@BattleState.notify(_currentOpponent as Entity, BattleEvent.PLAYER_TURN_DONE)
             return
         } else {
-            Timer.schedule(_checkPlayerMagicUse, .5f)
-            Timer.schedule(_playerAttackCalculations, 1f)
+            if (!_checkPlayerMagicUse.isScheduled && !_playerAttackCalculations.isScheduled) {
+                Timer.schedule(_checkPlayerMagicUse, .5f)
+                Timer.schedule(_playerAttackCalculations, 1f)
+            }
         }
     }
 
@@ -120,7 +124,9 @@ class BattleState : BattleSubject(), InventoryObserver {
             return
         }
 
-        Timer.schedule(_opponentAttackCalculations, 1f)
+        if (!_opponentAttackCalculations.isScheduled) {
+            Timer.schedule(_opponentAttackCalculations, 1f)
+        }
     }
 
     private fun getOpponentAttackCalculationTimer(): Timer.Task {

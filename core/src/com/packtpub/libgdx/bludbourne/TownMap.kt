@@ -3,6 +3,7 @@ package com.packtpub.libgdx.bludbourne
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector2
 import com.packtpub.libgdx.bludbourne.audio.AudioObserver
+import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
 class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
@@ -107,6 +108,13 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
             position = specialNPCStartPositions[entity.entityConfig.entityID]!!
         }
         entity.sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(position))
+
+        //Overwrite default if special config is found
+        val entityConfig = ProfileManager.instance.getProperty(entity.entityConfig.entityID, EntityConfig::class.java)
+        if (entityConfig != null) {
+            entity.entityConfig = entityConfig
+        }
+
     }
 
     override fun unloadMusic() {

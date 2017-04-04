@@ -46,7 +46,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
 
         val table = Table()
         _attackButton = TextButton("Attack", Utility.STATUSUI_SKIN, "inventory")
-        _runButton = TextButton("Run", Utility.STATUSUI_SKIN)
+        _runButton = TextButton("Run", Utility.STATUSUI_SKIN, "inventory")
         table.add(_attackButton).pad(20f, 20f, 20f, 20f)
         table.row()
         table.add(_runButton).pad(20f, 20f, 20f, 20f)
@@ -91,6 +91,8 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
     override fun onNotify(entity: Entity, event: BattleObserver.BattleEvent) {
         when (event) {
             PLAYER_TURN_START -> {
+                _runButton.isDisabled = true
+                _runButton.touchable = Touchable.disabled
                 _attackButton.isDisabled = true
                 _attackButton.touchable = Touchable.disabled
             }
@@ -115,6 +117,8 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
             OPPONENT_TURN_DONE -> {
                 _attackButton.isDisabled = false
                 _attackButton.touchable = Touchable.enabled
+                _runButton.isDisabled = false
+                _runButton.touchable = Touchable.enabled
             }
             PLAYER_TURN_DONE -> {
                 battleState.opponentAttacks()
