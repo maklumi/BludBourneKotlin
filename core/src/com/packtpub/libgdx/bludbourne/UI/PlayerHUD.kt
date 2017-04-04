@@ -4,6 +4,7 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Array
@@ -26,6 +27,8 @@ import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
 import com.packtpub.libgdx.bludbourne.quest.QuestGraph
 import com.packtpub.libgdx.bludbourne.screens.MainGameScreen
+import com.packtpub.libgdx.bludbourne.sfx.ScreenTransitionAction
+import com.packtpub.libgdx.bludbourne.sfx.ScreenTransitionActor
 
 
 class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
@@ -35,6 +38,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         AudioSubject {
 
     private val _observers = Array<AudioObserver>()
+    private val _transitionActor = ScreenTransitionActor()
 
     val stage: Stage
     private val viewport: Viewport
@@ -131,6 +135,9 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             stage.addActor(actor)
         }
 
+        stage.addActor(_transitionActor)
+        _transitionActor.isVisible = false
+
         // Observers
         player.registerObserver(this)
         statusUI.addObserver(this)
@@ -188,6 +195,12 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         _questUI.initQuests(mapMgr)
 
         mapMgr.registerCurrentMapEntityObservers(this)
+    }
+
+    fun addTransitionToScreen() {
+        _transitionActor.isVisible = true
+        stage.addAction(Actions.sequence(
+                Actions.addAction(ScreenTransitionAction(ScreenTransitionAction.ScreenTransitionType.FADE_IN, 1f), _transitionActor)))
     }
 
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
@@ -324,6 +337,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             PLAYER_HAS_MOVED -> {
                 //System.out.println("Player has moved!!!");
                 if (_battleUI.isBattleReady()) {
+                    addTransitionToScreen()
                     MainGameScreen.gameState = MainGameScreen.GameState.SAVING
                     mapMgr.disableCurrentmapMusic()
                     notify(AudioCommand.MUSIC_PLAY_LOOP, AudioTypeEvent.MUSIC_BATTLE)
@@ -460,7 +474,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             StatusObserver.StatusEvent.UPDATED_XP -> {
                 ProfileManager.instance.setProperty("currentPlayerXP", statusUI.getXPValue())
             }
-            StatusObserver.StatusEvent.LEVELED_UP ->{
+            StatusObserver.StatusEvent.LEVELED_UP -> {
                 notify(AudioObserver.AudioCommand.MUSIC_PLAY_ONCE, AudioObserver.AudioTypeEvent.MUSIC_LEVEL_UP_FANFARE)
             }
 
@@ -481,12 +495,14 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 statusUI.addXPValue(xpReward)
                 notify(AudioCommand.MUSIC_STOP, AudioTypeEvent.MUSIC_BATTLE)
                 mapMgr.enableCurrentmapMusic()
+                addTransitionToScreen()
                 _battleUI.isVisible = false
             }
             PLAYER_RUNNING -> {
                 MainGameScreen.gameState = MainGameScreen.GameState.RUNNING
                 notify(AudioCommand.MUSIC_STOP, AudioTypeEvent.MUSIC_BATTLE)
                 mapMgr.enableCurrentmapMusic()
+                addTransitionToScreen()
                 _battleUI.isVisible = false
             }
             PLAYER_HIT_DAMAGE -> {
@@ -496,6 +512,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
                 if (hpVal <= 0) {
                     notify(AudioCommand.MUSIC_STOP, AudioTypeEvent.MUSIC_BATTLE)
+                    addTransitionToScreen()
                     _battleUI.isVisible = false
                     MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER
                 }

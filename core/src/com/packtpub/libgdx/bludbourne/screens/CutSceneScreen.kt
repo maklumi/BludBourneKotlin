@@ -1,11 +1,7 @@
 package com.packtpub.libgdx.bludbourne.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Action
@@ -14,9 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog
-import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.packtpub.libgdx.bludbourne.*
 import com.packtpub.libgdx.bludbourne.Map
@@ -24,6 +18,8 @@ import com.packtpub.libgdx.bludbourne.Map.Companion.UNIT_SCALE
 import com.packtpub.libgdx.bludbourne.UI.AnimatedImage
 import com.packtpub.libgdx.bludbourne.audio.AudioObserver
 import com.packtpub.libgdx.bludbourne.battle.MonsterFactory
+import com.packtpub.libgdx.bludbourne.sfx.ScreenTransitionAction
+import com.packtpub.libgdx.bludbourne.sfx.ScreenTransitionActor
 
 class CutSceneScreen(val _game: BludBourne) : MainGameScreen(_game) {
     private val _viewport = ScreenViewport(camera)
@@ -35,9 +31,9 @@ class CutSceneScreen(val _game: BludBourne) : MainGameScreen(_game) {
     private val _messageBoxUI = Dialog("", Utility.STATUSUI_SKIN, "solidbackground")
     private val _label = Label("Test", Utility.STATUSUI_SKIN).apply { setWrap(true) }
     private var _isCameraFixed = true
-    private val _transitionImage = Image()
-    private val _screenFadeOutAction: Action
-    private val _screenFadeInAction: Action
+
+    private val _transitionActor = ScreenTransitionActor()
+
     private lateinit var _introCutSceneAction: Action
     private val _switchScreenAction: Action
     private val _setupScene01: Action
@@ -55,12 +51,6 @@ class CutSceneScreen(val _game: BludBourne) : MainGameScreen(_game) {
     init {
 
         notify(AudioObserver.AudioCommand.MUSIC_LOAD, AudioObserver.AudioTypeEvent.MUSIC_INTRO_CUTSCENE)
-
-        val pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888).apply {
-            setColor(Color.BLACK)
-            fill()
-        }
-        val drawable = TextureRegionDrawable(TextureRegion(Texture(pixmap)))
 
         _messageBoxUI.apply {
             isVisible = false
@@ -157,32 +147,6 @@ class CutSceneScreen(val _game: BludBourne) : MainGameScreen(_game) {
             }
         }
 
-        _transitionImage.apply {
-            setFillParent(true)
-            setDrawable(drawable)
-            addAction(Actions.sequence(Actions.alpha(0f)))
-        }
-
-        _screenFadeOutAction = object : Action() {
-            override fun act(delta: Float): Boolean {
-                _transitionImage.addAction(Actions.sequence(
-                        Actions.alpha(0f),
-                        Actions.fadeIn(3f)
-                ))
-                return true
-            }
-        }
-
-        _screenFadeInAction = object : Action() {
-            override fun act(delta: Float): Boolean {
-                _transitionImage.addAction(Actions.sequence(
-                        Actions.alpha(1f),
-                        Actions.fadeOut(3f)
-                ))
-                return true
-            }
-        }
-
 
         //layout
         _stage.addActor(_animMage)
@@ -190,8 +154,6 @@ class CutSceneScreen(val _game: BludBourne) : MainGameScreen(_game) {
         _stage.addActor(_animInnKeeper)
         _stage.addActor(_animFire)
         _stage.addActor(_animDemon)
-        _stage.addActor(_transitionImage)
-        _transitionImage.toFront()
 
         _UIStage.addActor(_messageBoxUI)
 
@@ -203,12 +165,11 @@ class CutSceneScreen(val _game: BludBourne) : MainGameScreen(_game) {
         _setupScene03.reset()
         _setupScene04.reset()
         _setupScene05.reset()
-        _screenFadeInAction.reset()
         _switchScreenAction.reset()
 
         return Actions.sequence(
                 Actions.addAction(_setupScene01),
-                Actions.addAction(_screenFadeInAction),
+                Actions.addAction(ScreenTransitionAction(ScreenTransitionAction.ScreenTransitionType.FADE_IN, 3f), _transitionActor),
                 Actions.delay(3f),
                 Actions.run { showMessage("BLACKSMITH: We have planned this long enough. The time is now! I have had enough talk...") },
                 Actions.delay(7f),
@@ -216,10 +177,10 @@ class CutSceneScreen(val _game: BludBourne) : MainGameScreen(_game) {
                 Actions.delay(7f),
                 Actions.run { showMessage("INNKEEPER: Both of you need to keep it down. If we get caught using black magic, we will all be hanged!") },
                 Actions.delay(5f),
-                Actions.addAction(_screenFadeOutAction),
+                Actions.addAction(ScreenTransitionAction(ScreenTransitionAction.ScreenTransitionType.FADE_OUT, 3f), _transitionActor),
                 Actions.delay(3f),
                 Actions.addAction(_setupScene02),
-                Actions.addAction(_screenFadeInAction),
+                Actions.addAction(ScreenTransitionAction(ScreenTransitionAction.ScreenTransitionType.FADE_IN, 3f), _transitionActor),
                 Actions.delay(3f),
                 Actions.run { showMessage("BLACKSMITH: Now, let's get on with this. I don't like the cemeteries very much...") },
                 Actions.delay(7f),
@@ -250,21 +211,21 @@ class CutSceneScreen(val _game: BludBourne) : MainGameScreen(_game) {
                 Actions.delay(2f),
                 Actions.run { showMessage("BLACKSMITH: What...What have we done...") },
                 Actions.delay(3f),
-                Actions.addAction(_screenFadeOutAction),
+                Actions.addAction(ScreenTransitionAction(ScreenTransitionAction.ScreenTransitionType.FADE_OUT, 3f), _transitionActor),
                 Actions.delay(3f),
                 Actions.addAction(_setupScene04),
-                Actions.addAction(_screenFadeInAction),
+                Actions.addAction(ScreenTransitionAction(ScreenTransitionAction.ScreenTransitionType.FADE_IN, 3f), _transitionActor),
                 Actions.addAction(Actions.moveTo(54f, 65f, 13f, Interpolation.linear), _animDemon),
                 Actions.delay(10f),
-                Actions.addAction(_screenFadeOutAction),
+                Actions.addAction(ScreenTransitionAction(ScreenTransitionAction.ScreenTransitionType.FADE_OUT, 3f), _transitionActor),
                 Actions.delay(3f),
-                Actions.addAction(_screenFadeInAction),
+                Actions.addAction(ScreenTransitionAction(ScreenTransitionAction.ScreenTransitionType.FADE_IN, 3f), _transitionActor),
                 Actions.addAction(_setupScene05),
                 Actions.addAction(Actions.moveTo(15f, 76f, 15f, Interpolation.linear), _animDemon),
                 Actions.delay(15f),
                 Actions.run { showMessage("DEMON: I will now send my legions of demons to destroy these sacks of meat!") },
                 Actions.delay(5f),
-                Actions.addAction(_screenFadeOutAction),
+                Actions.addAction(ScreenTransitionAction(ScreenTransitionAction.ScreenTransitionType.FADE_OUT, 3f), _transitionActor),
                 Actions.delay(5f),
                 Actions.after(_switchScreenAction)
         )

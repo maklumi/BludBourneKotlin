@@ -142,6 +142,8 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
 
             mapMgr.hasMapChanged = false
 
+            playerHUD.addTransitionToScreen()
+
         }
 
         mapRenderer.render()
