@@ -387,9 +387,13 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
 
                 val questID = configReturnProperty.currentQuestID
                 if (_questUI.isQuestReadyForReturn(questID)) {
+                    notify(AudioObserver.AudioCommand.MUSIC_PLAY_ONCE, AudioObserver.AudioTypeEvent.MUSIC_LEVEL_UP_FANFARE)
+
                     val quest = _questUI.getQuestByID(questID)
                     statusUI.addXPValue(quest!!.xpReward)
                     statusUI.addGoldValue(quest.goldReward)
+                    notify(AudioObserver.AudioCommand.SOUND_PLAY_ONCE, AudioObserver.AudioTypeEvent.SOUND_COIN_RUSTLE)
+
                     inventoryUI.removeQuestItemFromInventory(questID)
 
                     configReturnProperty.conversationConfigPath = QuestUI.FINISHED_QUEST
@@ -448,7 +452,6 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 ProfileManager.instance.setProperty("currentPlayerHP", statusUI.getHPValue())
             }
             StatusObserver.StatusEvent.UPDATED_LEVEL -> {
-                notify(AudioCommand.MUSIC_PLAY_ONCE, MUSIC_LEVEL_UP_FANFARE)
                 ProfileManager.instance.setProperty("currentPlayerLevel", statusUI.getLevelValue())
             }
             StatusObserver.StatusEvent.UPDATED_MP -> {
@@ -457,6 +460,10 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
             StatusObserver.StatusEvent.UPDATED_XP -> {
                 ProfileManager.instance.setProperty("currentPlayerXP", statusUI.getXPValue())
             }
+            StatusObserver.StatusEvent.LEVELED_UP ->{
+                notify(AudioObserver.AudioCommand.MUSIC_PLAY_ONCE, AudioObserver.AudioTypeEvent.MUSIC_LEVEL_UP_FANFARE)
+            }
+
         }
     }
 

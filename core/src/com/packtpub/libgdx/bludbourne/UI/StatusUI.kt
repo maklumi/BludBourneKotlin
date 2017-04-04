@@ -221,6 +221,7 @@ class StatusUI : Window("stats", Utility.STATUSUI_SKIN), StatusSubject {
                 setMPValue(table.mpMax)
 
                 setLevelValue(Integer.parseInt(table.levelID))
+                notify(levelVal, StatusObserver.StatusEvent.LEVELED_UP)
                 return
             }
         }
