@@ -23,6 +23,9 @@ object AudioManager : AudioObserver {
                 val music = _queuedMusic[event.value]
                 music?.stop()
             }
+            MUSIC_STOP_ALL -> {
+                _queuedMusic.values.forEach(Music::stop)
+            }
             SOUND_LOAD -> Utility.loadSoundAsset(event.value)
             SOUND_PLAY_LOOP -> playSound(true, event.value)
             SOUND_PLAY_ONCE -> playSound(false, event.value)

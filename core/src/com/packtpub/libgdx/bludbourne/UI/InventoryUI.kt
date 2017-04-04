@@ -125,6 +125,7 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
                             if (item!!.isConsumable()) {
                                 val itemInfo = item.itemUseType.toString() + Component.MESSAGE_TOKEN + item.itemUseTypeValue
                                 this@InventoryUI.notify(itemInfo, InventoryObserver.InventoryEvent.ITEM_CONSUMED)
+                                slot.removeActor(item)
                                 slot.remove(item)
                             }
                         }
