@@ -12,7 +12,7 @@ class ClockActor(text: CharSequence, skin: Skin) : Label(text, skin) {
         NIGHT
     }
 
-    private var _totalTime = 0f
+    var totalTime = 0f
     var rateOfTime = 1f
     private var isAfternoon = false
     val time = String.format("%02d:%02d %s", 0, 0, if (isAfternoon) PM else AM)
@@ -23,13 +23,13 @@ class ClockActor(text: CharSequence, skin: Skin) : Label(text, skin) {
     }
 
     override fun act(delta: Float) {
-        _totalTime += delta * rateOfTime
+        totalTime += delta * rateOfTime
 
-        val seconds = MathUtils.floor(_totalTime % 60)
-        val minutes = MathUtils.floor(_totalTime / 60 % 60)
-//        val minutes = MathUtils.floor(_totalTime / 1 % 60)
-        var hours = MathUtils.floor(_totalTime / 3600 % 24)
-//        var hours = MathUtils.floor(_totalTime / 36 % 24)
+        val seconds = MathUtils.floor(totalTime % 60)
+        val minutes = MathUtils.floor(totalTime / 60 % 60)
+//        val minutes = MathUtils.floor(totalTime / 1 % 60)
+        var hours = MathUtils.floor(totalTime / 3600 % 24)
+//        var hours = MathUtils.floor(totalTime / 36 % 24)
 
         isAfternoon = !(hours == 0 || hours / 12 == 0)
 
@@ -45,8 +45,8 @@ class ClockActor(text: CharSequence, skin: Skin) : Label(text, skin) {
     }
 
     fun getCurrentTimeOfDay(): TimeOfDay {
-        val hours = MathUtils.floor(_totalTime / 3600 % 24)
-//        val hours = MathUtils.floor(_totalTime / 36 % 24)
+        val hours = MathUtils.floor(totalTime / 3600 % 24)
+//        val hours = MathUtils.floor(totalTime / 36 % 24)
         when (hours) {
             in 7..9 -> return TimeOfDay.DAWN
             in 10..16 -> return TimeOfDay.AFTERNOON

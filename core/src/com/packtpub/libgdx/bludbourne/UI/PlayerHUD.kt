@@ -254,6 +254,9 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
                     //start the player with some money
                     statusUI.setGoldValue(20)
                     statusUI.setStatusForLevel(1)
+
+                    _clock.totalTime = 60 * 60 * 12f // start at noon
+                    profileManager.setProperty("currentTime", _clock.totalTime)
                 } else {
                     var goldVal = profileManager.getProperty("currentPlayerGP", Int::class.java) as Int
 
@@ -295,6 +298,9 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
                     //then add in current values
                     statusUI.setGoldValue(goldVal)
                     statusUI.setLevelValue(levelVal)
+
+                    val totalTime = profileManager.getProperty("currentTime", Float::class.java)
+                    _clock.totalTime = totalTime as Float
                 }
             }
 
@@ -310,6 +316,7 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
                 profileManager.setProperty("currentPlayerHPMax", statusUI.getHPValueMax())
                 profileManager.setProperty("currentPlayerMP", statusUI.getMPValue())
                 profileManager.setProperty("currentPlayerMPMax", statusUI.getMPValueMax())
+                profileManager.setProperty("currentTime", _clock.totalTime)
             }
 
             ProfileObserver.ProfileEvent.CLEAR_CURRENT_PROFILE -> {
@@ -324,6 +331,7 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
                 profileManager.setProperty("currentPlayerHPMax", 0)
                 profileManager.setProperty("currentPlayerMP", 0)
                 profileManager.setProperty("currentPlayerMPMax", 0)
+                profileManager.setProperty("currentTime", 0f)
             }
 
         }

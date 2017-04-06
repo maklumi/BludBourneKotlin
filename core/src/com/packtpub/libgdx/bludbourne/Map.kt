@@ -39,6 +39,8 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected set
     var lightMapDawnLayer: MapLayer? = null
         protected set
+    var lightMapAfternoonLayer: MapLayer? = null
+        protected set
     var lightMapDuskLayer: MapLayer? = null
         protected set
     var lightMapNightLayer: MapLayer? = null
@@ -70,15 +72,19 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         }
         lightMapDawnLayer = currentMap.layers.get(LIGHTMAP_DAWN_LAYER)
         if (lightMapDawnLayer == null) {
+            Gdx.app.debug(TAG, "No dawn lightmap layer found!")
+        }
+        lightMapAfternoonLayer = currentMap.layers.get(LIGHTMAP_AFTERNOON_LAYER)
+        if (lightMapAfternoonLayer == null) {
             Gdx.app.debug(TAG, "No lightmap layer found!")
         }
         lightMapDuskLayer = currentMap.layers.get(LIGHTMAP_DUSK_LAYER)
         if (lightMapDuskLayer == null) {
-            Gdx.app.debug(TAG, "No lightmap layer found!")
+            Gdx.app.debug(TAG, "No dusk lightmap layer found!")
         }
         lightMapNightLayer = currentMap.layers.get(LIGHTMAP_NIGHT_LAYER)
         if (lightMapNightLayer == null) {
-            Gdx.app.debug(TAG, "No lightmap layer found!")
+            Gdx.app.debug(TAG, "No night lightmap layer found!")
         }
         npcStartPositions = getNPCStartPositions()
         specialNPCStartPositions = getExtraNPCStartPositions()
@@ -249,6 +255,7 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         val DECORATION_LAYER = "Decoration_Layer"
 
         val LIGHTMAP_DAWN_LAYER = "MAP_LIGHTMAP_LAYER_DAWN"
+        val LIGHTMAP_AFTERNOON_LAYER = "MAP_LIGHTMAP_LAYER_AFTERNOON"
         val LIGHTMAP_DUSK_LAYER = "MAP_LIGHTMAP_LAYER_DUSK"
         val LIGHTMAP_NIGHT_LAYER = "MAP_LIGHTMAP_LAYER_NIGHT"
 
