@@ -6,11 +6,11 @@ import com.badlogic.gdx.math.Vector2
 class ShakeCamera(cameraViewportX: Float, cameraViewportY: Float, private var _shakeRadius: Float) {
 
     var isCameraShaking = false
-    private val _originCameraCenter = Vector2(cameraViewportX / 2f, cameraViewportY / 2f)
+    private val _originPosition = Vector2(cameraViewportX / 2f, cameraViewportY / 2f)
     private var _origShakeRadius = _shakeRadius
     private var _randomAngle = 0.0f
-    private var _offsetCameraCenter = Vector2()
-    private var _currentCameraCenter = Vector2()
+    private var _offset = Vector2()
+    private var _currentPosition = Vector2()
 
     fun startShaking() {
         isCameraShaking = true
@@ -21,13 +21,13 @@ class ShakeCamera(cameraViewportX: Float, cameraViewportY: Float, private var _s
     }
 
     private fun computeCameraOffset() {
-        _offsetCameraCenter.x = MathUtils.sinDeg(_randomAngle) * _shakeRadius
-        _offsetCameraCenter.y = MathUtils.cosDeg(_randomAngle) * _shakeRadius
+        _offset.x = MathUtils.sinDeg(_randomAngle) * _shakeRadius
+        _offset.y = MathUtils.cosDeg(_randomAngle) * _shakeRadius
     }
 
     private fun computeCurrentCameraCenter() {
-        _currentCameraCenter.x = _originCameraCenter.x + _offsetCameraCenter.x
-        _currentCameraCenter.y = _originCameraCenter.y + _offsetCameraCenter.y
+        _currentPosition.x = _originPosition.x + _offset.x
+        _currentPosition.y = _originPosition.y + _offset.y
     }
 
     private fun diminishShake() {
@@ -37,7 +37,6 @@ class ShakeCamera(cameraViewportX: Float, cameraViewportY: Float, private var _s
         }
 
         isCameraShaking = true
-
         _shakeRadius *= .9f
         _randomAngle = ((150 + MathUtils.random(1, 60)) % 360).toFloat()
     }
@@ -46,15 +45,16 @@ class ShakeCamera(cameraViewportX: Float, cameraViewportY: Float, private var _s
         _shakeRadius = _origShakeRadius
         isCameraShaking = false
         seedRandomAngle()
-        computeCameraOffset()
+        _currentPosition.x = _originPosition.x
+        _currentPosition.y = _originPosition.y
     }
 
-    val shakeCameraCenter: Vector2
+    val newShakePosition: Vector2
         get() {
             computeCameraOffset()
             computeCurrentCameraCenter()
             diminishShake()
-            return _currentCameraCenter
+            return _currentPosition
         }
 
 }

@@ -1,5 +1,6 @@
 package com.packtpub.libgdx.bludbourne.UI
 
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -14,6 +15,7 @@ import com.packtpub.libgdx.bludbourne.Utility
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver.BattleEvent.*
 import com.packtpub.libgdx.bludbourne.battle.BattleState
+import com.packtpub.libgdx.bludbourne.sfx.ShakeCamera
 
 
 class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), BattleObserver {
@@ -31,6 +33,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
     private var _battleTimer = 0f
     private val _checkTimer = 1f
 
+    private var _battleShakeCam: ShakeCamera? = null
     private var _origDamageValLabelY = 0f
 
     init {
@@ -52,6 +55,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
         table.add(_runButton).pad(20f, 20f, 20f, 20f)
 
         //layout
+        this.setFillParent(true)
         this.add(_damageValLabel).align(Align.left).padLeft(_enemyWidth / 2f).row()
         this.add(_image).size(_enemyWidth, _enemyHeight).pad(10f, 10f, 10f, _enemyWidth / 2f)
         this.add(table)
@@ -100,6 +104,12 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
                 _image.setEntity(entity)
                 _image.setCurrentAnimation(Entity.AnimationType.IMMOBILE)
                 _image.setSize(_enemyWidth, _enemyHeight)
+
+                val vector = Vector2(_image.x, _image.y)
+                if (_battleShakeCam == null) {
+                    _battleShakeCam = ShakeCamera(vector.x, vector.y, 30f)
+                }
+
                 this.titleLabel.setText("Level " + battleState.getCurrentZoneLevel() + " " + entity.entityConfig.entityID)
             }
             OPPONENT_HIT_DAMAGE -> {
@@ -107,6 +117,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
                 _damageValLabel.apply {
                     setText(damage.toString())
                     y = _origDamageValLabelY
+                    _battleShakeCam?.startShaking()
                     isVisible = true
                 }
             }
@@ -132,6 +143,11 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
         _battleTimer = (_battleTimer + delta) % 60
         if (_damageValLabel.isVisible and (_damageValLabel.y < this.height)) {
             _damageValLabel.y = _damageValLabel.y + 5
+        }
+
+        if (_battleShakeCam != null && _battleShakeCam!!.isCameraShaking) {
+            val shakeCoords = _battleShakeCam!!.newShakePosition
+            _image.setPosition(shakeCoords.x, shakeCoords.y)
         }
 
         super.act(delta)

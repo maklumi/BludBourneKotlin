@@ -85,7 +85,7 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
 
         inventoryUI = InventoryUI().apply {
             setKeepWithinStage(false)
-            isMovable =  false
+            isMovable = false
             isVisible = false
             setPosition(statusUI.width, 0f)
         }
@@ -562,7 +562,7 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
 
     override fun render(delta: Float) {
         if (_shakeCam.isCameraShaking) {
-            val shakeCoords = _shakeCam.shakeCameraCenter
+            val shakeCoords = _shakeCam.newShakePosition
             camera.position.x = shakeCoords.x
             camera.position.y = shakeCoords.y
 
