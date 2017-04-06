@@ -43,4 +43,14 @@ class ScreenTransitionAction : Action {
         }
         return true
     }
+
+    companion object {
+        fun transition(type: ScreenTransitionType, duration: Float): ScreenTransitionAction {
+            val action = Actions.action(ScreenTransitionAction::class.java).apply {
+                transitionType = type
+                transitionDuration = duration
+            }
+            return action
+        }
+    }
 }

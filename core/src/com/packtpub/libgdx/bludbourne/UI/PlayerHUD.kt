@@ -206,7 +206,7 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
     fun addTransitionToScreen() {
         _transitionActor.isVisible = true
         stage.addAction(Actions.sequence(
-                Actions.addAction(ScreenTransitionAction(ScreenTransitionAction.ScreenTransitionType.FADE_IN, 1f), _transitionActor)))
+                Actions.addAction(ScreenTransitionAction.transition(ScreenTransitionAction.ScreenTransitionType.FADE_IN, 1f), _transitionActor)))
     }
 
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
