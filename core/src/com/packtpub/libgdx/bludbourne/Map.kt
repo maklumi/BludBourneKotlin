@@ -37,6 +37,8 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected set
     var enemySpawnLayer: MapLayer? = null
         protected set
+    var lightMapLayer: MapLayer? = null
+        protected set
     protected val npcStartPositions: Array<Vector2>
     protected val specialNPCStartPositions: Hashtable<String, Vector2>
     protected val json = Json()
@@ -61,6 +63,10 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         enemySpawnLayer = currentMap.layers.get(ENEMY_SPAWN_LAYER)
         if (enemySpawnLayer == null) {
             Gdx.app.debug(TAG, "No enemy layer found!")
+        }
+        lightMapLayer = currentMap.layers.get(LIGHTMAP_LAYER)
+        if (lightMapLayer == null) {
+            Gdx.app.debug(TAG, "No lightmap layer found!")
         }
         npcStartPositions = getNPCStartPositions()
         specialNPCStartPositions = getExtraNPCStartPositions()
@@ -225,6 +231,11 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected val QUEST_ITEM_SPAWN_LAYER = "MAP_QUEST_ITEM_SPAWN_LAYER"
         protected val QUEST_DISCOVER_LAYER = "MAP_QUEST_DISCOVER_LAYER"
         protected val ENEMY_SPAWN_LAYER = "MAP_ENEMY_SPAWN_LAYER"
+
+        val BACKGROUND_LAYER = "Background_Layer"
+        val GROUND_LAYER = "Ground_Layer"
+        val DECORATION_LAYER = "Decoration_Layer"
+        val LIGHTMAP_LAYER = "MAP_LIGHTMAP_LAYER"
 
         // starting locations
         protected val NPC_START = "NPC_START"

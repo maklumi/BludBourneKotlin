@@ -4,9 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.maps.tiled.TiledMapImageLayer
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.*
+import com.packtpub.libgdx.bludbourne.Map.Companion.BACKGROUND_LAYER
+import com.packtpub.libgdx.bludbourne.Map.Companion.DECORATION_LAYER
+import com.packtpub.libgdx.bludbourne.Map.Companion.GROUND_LAYER
 import com.packtpub.libgdx.bludbourne.Map.Companion.UNIT_SCALE
 import com.packtpub.libgdx.bludbourne.UI.PlayerHUD
 import com.packtpub.libgdx.bludbourne.audio.AudioManager
@@ -127,8 +132,8 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
 
         mapRenderer.setView(camera)
 
-//        mapRenderer.batch.enableBlending()
-//        mapRenderer.batch.setBlendFunction(GL20.GL_BLEND_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        mapRenderer.batch.enableBlending()
+        mapRenderer.batch.setBlendFunction(GL20.GL_BLEND_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         if (mapMgr.hasMapChanged) {
             mapRenderer.map = mapMgr.getCurrentTiledMap()
@@ -146,11 +151,34 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
 
         }
 
-        mapRenderer.render()
+        val lightMap = mapMgr.getCurrentLightMapLayer()
 
-        mapMgr.updateCurrentMapEntities(mapMgr, mapRenderer.batch, delta)
+        if (lightMap != null) {
+            lightMap as TiledMapImageLayer
+            val backgroundMapLayer = mapMgr.getCurrentTiledMap().layers.get(BACKGROUND_LAYER) as TiledMapTileLayer
+            val groundMapLayer = mapMgr.getCurrentTiledMap().layers.get(GROUND_LAYER) as TiledMapTileLayer
+            val decorationMapLayer = mapMgr.getCurrentTiledMap().layers.get(DECORATION_LAYER) as TiledMapTileLayer
 
-        player.update(mapMgr, mapRenderer.batch, delta)
+            mapRenderer.batch.begin()
+            mapRenderer.renderTileLayer(backgroundMapLayer)
+            mapRenderer.renderTileLayer(groundMapLayer)
+            mapRenderer.renderTileLayer(decorationMapLayer)
+            mapRenderer.batch.end()
+
+            mapMgr.updateCurrentMapEntities(mapMgr, mapRenderer.batch, delta)
+            player.update(mapMgr, mapRenderer.batch, delta)
+
+            mapRenderer.batch.begin()
+            mapRenderer.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
+            mapRenderer.renderImageLayer(lightMap)
+            mapRenderer.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+            mapRenderer.batch.end()
+        } else {
+            mapRenderer.render()
+            mapMgr.updateCurrentMapEntities(mapMgr, mapRenderer.batch, delta)
+            player.update(mapMgr, mapRenderer.batch, delta)
+        }
+
         playerHUD.render(delta)
     }
 

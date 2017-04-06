@@ -189,6 +189,10 @@ class MapManager : ProfileObserver {
         return currentMap!!.currentMap
     }
 
+    fun getCurrentLightMapLayer(): MapLayer? {
+        return currentMap!!.lightMapLayer
+    }
+
     fun setMapChanged(hasMapChanged: Boolean) {
         this.hasMapChanged = hasMapChanged
     }
