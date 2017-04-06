@@ -27,6 +27,7 @@ import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
 import com.packtpub.libgdx.bludbourne.quest.QuestGraph
 import com.packtpub.libgdx.bludbourne.screens.MainGameScreen
+import com.packtpub.libgdx.bludbourne.sfx.ClockActor
 import com.packtpub.libgdx.bludbourne.sfx.ScreenTransitionAction
 import com.packtpub.libgdx.bludbourne.sfx.ScreenTransitionActor
 import com.packtpub.libgdx.bludbourne.sfx.ShakeCamera
@@ -53,7 +54,7 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
     private val _messageBoxUI: Dialog
     private val INVENTORY_FULL = "Your inventory is full!"
     private val _shakeCam = ShakeCamera(camera.viewportWidth, camera.viewportHeight, 30.0f)
-
+    private val _clock = ClockActor("0", Utility.STATUSUI_SKIN)
 
     init {
         viewport = ScreenViewport(camera)
@@ -75,6 +76,12 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
         _messageBoxUI.setVisible(false)
         _messageBoxUI.pack()
         _messageBoxUI.setPosition(stage.width / 2 - _messageBoxUI.getWidth() / 2, stage.height / 2 - _messageBoxUI.getHeight() / 2)
+
+        _clock.apply {
+            rateOfTime = 60f
+            isVisible = true
+        }
+        _clock.setPosition(stage.width - _clock.width, 0f)
 
         statusUI = StatusUI().apply {
             isVisible = true
@@ -128,7 +135,17 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
         stage.addActor(_messageBoxUI)
         stage.addActor(statusUI)
         stage.addActor(inventoryUI)
-        statusUI.toFront()
+//        statusUI.toFront()
+        stage.addActor(_clock)
+
+        _battleUI.validate()
+        _questUI.validate()
+        storeInventoryUI.validate()
+        conversationUI.validate()
+        _messageBoxUI.validate()
+        statusUI.validate()
+        inventoryUI.validate()
+        _clock.validate()
 
         //add tooltips to the stage
         val actors = inventoryUI.inventoryActors
