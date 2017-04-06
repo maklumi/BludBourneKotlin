@@ -29,9 +29,10 @@ import com.packtpub.libgdx.bludbourne.quest.QuestGraph
 import com.packtpub.libgdx.bludbourne.screens.MainGameScreen
 import com.packtpub.libgdx.bludbourne.sfx.ScreenTransitionAction
 import com.packtpub.libgdx.bludbourne.sfx.ScreenTransitionActor
+import com.packtpub.libgdx.bludbourne.sfx.ShakeCamera
 
 
-class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
+class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) :
         Screen, ProfileObserver, ComponentObserver, ConversationGraphObserver,
         StoreInventoryObserver, BattleObserver, InventoryObserver,
         StatusObserver,
@@ -51,6 +52,8 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
     private val json = Json()
     private val _messageBoxUI: Dialog
     private val INVENTORY_FULL = "Your inventory is full!"
+    private val _shakeCam = ShakeCamera(camera.viewportWidth, camera.viewportHeight, 30.0f)
+
 
     init {
         viewport = ScreenViewport(camera)
@@ -73,17 +76,19 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         _messageBoxUI.pack()
         _messageBoxUI.setPosition(stage.width / 2 - _messageBoxUI.getWidth() / 2, stage.height / 2 - _messageBoxUI.getHeight() / 2)
 
-        statusUI = StatusUI()
-        statusUI.isVisible = true
-        statusUI.setPosition(0f, 0f)
+        statusUI = StatusUI().apply {
+            isVisible = true
+            setPosition(0f, 0f)
+            setKeepWithinStage(false)
+            isMovable = false
+        }
 
-        inventoryUI = InventoryUI()
-        inventoryUI.isVisible = false
-        inventoryUI.isMovable = false
-
-
-        inventoryUI.setPosition(stage.width / 2f, 0f)
-
+        inventoryUI = InventoryUI().apply {
+            setKeepWithinStage(false)
+            isMovable =  false
+            isVisible = false
+            setPosition(statusUI.width, 0f)
+        }
 
         conversationUI = ConversationUI()
         conversationUI.apply {
@@ -103,6 +108,7 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         _questUI = QuestUI()
         _questUI.isMovable = false
         _questUI.isVisible = false
+        _questUI.setKeepWithinStage(false)
         _questUI.setPosition(0f, stage.height / 2)
         _questUI.width = stage.width
         _questUI.height = stage.height / 2
@@ -509,8 +515,10 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
                 notify(AudioCommand.SOUND_PLAY_ONCE, AudioTypeEvent.SOUND_PLAYER_PAIN)
                 val hpVal = ProfileManager.instance.getProperty("currentPlayerHP", Int::class.java) as Int
                 statusUI.setHPValue(hpVal)
+                _shakeCam.startShaking()
 
                 if (hpVal <= 0) {
+                    _shakeCam.reset()
                     notify(AudioCommand.MUSIC_STOP, AudioTypeEvent.MUSIC_BATTLE)
                     addTransitionToScreen()
                     _battleUI.isVisible = false
@@ -548,9 +556,17 @@ class PlayerHUD(camera: Camera, val player: Entity, val mapMgr: MapManager) :
         }
     }
 
-    override fun show() {}
+    override fun show() {
+        _shakeCam.reset()
+    }
 
     override fun render(delta: Float) {
+        if (_shakeCam.isCameraShaking) {
+            val shakeCoords = _shakeCam.shakeCameraCenter
+            camera.position.x = shakeCoords.x
+            camera.position.y = shakeCoords.y
+
+        }
         stage.act(delta)
         stage.draw()
     }
