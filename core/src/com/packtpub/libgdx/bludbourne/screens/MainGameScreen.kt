@@ -155,14 +155,20 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
 
         if (lightMap != null) {
             lightMap as TiledMapImageLayer
-            val backgroundMapLayer = mapMgr.getCurrentTiledMap().layers.get(BACKGROUND_LAYER) as TiledMapTileLayer
-            val groundMapLayer = mapMgr.getCurrentTiledMap().layers.get(GROUND_LAYER) as TiledMapTileLayer
-            val decorationMapLayer = mapMgr.getCurrentTiledMap().layers.get(DECORATION_LAYER) as TiledMapTileLayer
+            val backgroundMapLayer = mapMgr.getCurrentTiledMap().layers.get(BACKGROUND_LAYER)
+            val groundMapLayer = mapMgr.getCurrentTiledMap().layers.get(GROUND_LAYER)
+            val decorationMapLayer = mapMgr.getCurrentTiledMap().layers.get(DECORATION_LAYER)
 
             mapRenderer.batch.begin()
-            mapRenderer.renderTileLayer(backgroundMapLayer)
-            mapRenderer.renderTileLayer(groundMapLayer)
-            mapRenderer.renderTileLayer(decorationMapLayer)
+            backgroundMapLayer?.let {
+                mapRenderer.renderTileLayer(backgroundMapLayer as TiledMapTileLayer)
+            }
+            groundMapLayer?.let {
+                mapRenderer.renderTileLayer(groundMapLayer as TiledMapTileLayer)
+            }
+            decorationMapLayer?.let {
+                mapRenderer.renderTileLayer(decorationMapLayer as TiledMapTileLayer)
+            }
             mapRenderer.batch.end()
 
             mapMgr.updateCurrentMapEntities(mapMgr, mapRenderer.batch, delta)
