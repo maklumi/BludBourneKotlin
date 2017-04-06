@@ -212,6 +212,10 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
         notify(AudioCommand.SOUND_LOAD, AudioTypeEvent.SOUND_DRINKING)
     }
 
+    fun getCurrentTimeOfDay(): ClockActor.TimeOfDay {
+        return _clock.getCurrentTimeOfDay()
+    }
+
     fun updateEntityObservers() {
         mapMgr.unregisterCurrentMapEntityObservers()
 

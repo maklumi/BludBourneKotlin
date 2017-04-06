@@ -37,7 +37,11 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected set
     var enemySpawnLayer: MapLayer? = null
         protected set
-    var lightMapLayer: MapLayer? = null
+    var lightMapDawnLayer: MapLayer? = null
+        protected set
+    var lightMapDuskLayer: MapLayer? = null
+        protected set
+    var lightMapNightLayer: MapLayer? = null
         protected set
     protected val npcStartPositions: Array<Vector2>
     protected val specialNPCStartPositions: Hashtable<String, Vector2>
@@ -64,8 +68,16 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         if (enemySpawnLayer == null) {
             Gdx.app.debug(TAG, "No enemy layer found!")
         }
-        lightMapLayer = currentMap.layers.get(LIGHTMAP_LAYER)
-        if (lightMapLayer == null) {
+        lightMapDawnLayer = currentMap.layers.get(LIGHTMAP_DAWN_LAYER)
+        if (lightMapDawnLayer == null) {
+            Gdx.app.debug(TAG, "No lightmap layer found!")
+        }
+        lightMapDuskLayer = currentMap.layers.get(LIGHTMAP_DUSK_LAYER)
+        if (lightMapDuskLayer == null) {
+            Gdx.app.debug(TAG, "No lightmap layer found!")
+        }
+        lightMapNightLayer = currentMap.layers.get(LIGHTMAP_NIGHT_LAYER)
+        if (lightMapNightLayer == null) {
             Gdx.app.debug(TAG, "No lightmap layer found!")
         }
         npcStartPositions = getNPCStartPositions()
@@ -235,7 +247,10 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         val BACKGROUND_LAYER = "Background_Layer"
         val GROUND_LAYER = "Ground_Layer"
         val DECORATION_LAYER = "Decoration_Layer"
-        val LIGHTMAP_LAYER = "MAP_LIGHTMAP_LAYER"
+
+        val LIGHTMAP_DAWN_LAYER = "MAP_LIGHTMAP_LAYER_DAWN"
+        val LIGHTMAP_DUSK_LAYER = "MAP_LIGHTMAP_LAYER_DUSK"
+        val LIGHTMAP_NIGHT_LAYER = "MAP_LIGHTMAP_LAYER_NIGHT"
 
         // starting locations
         protected val NPC_START = "NPC_START"

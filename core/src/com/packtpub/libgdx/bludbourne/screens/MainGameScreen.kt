@@ -151,7 +151,7 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
 
         }
 
-        val lightMap = mapMgr.getCurrentLightMapLayer()
+        val lightMap = mapMgr.getCurrentLightMapLayer(playerHUD.getCurrentTimeOfDay())
 
         if (lightMap != null) {
             lightMap as TiledMapImageLayer

@@ -5,6 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 
 class ClockActor(text: CharSequence, skin: Skin) : Label(text, skin) {
+    enum class TimeOfDay {
+        DAWN,
+        AFTERNOON,
+        DUSK,
+        NIGHT
+    }
+
     private var _totalTime = 0f
     var rateOfTime = 1f
     private var isAfternoon = false
@@ -20,7 +27,9 @@ class ClockActor(text: CharSequence, skin: Skin) : Label(text, skin) {
 
         val seconds = MathUtils.floor(_totalTime % 60)
         val minutes = MathUtils.floor(_totalTime / 60 % 60)
+//        val minutes = MathUtils.floor(_totalTime / 1 % 60)
         var hours = MathUtils.floor(_totalTime / 3600 % 24)
+//        var hours = MathUtils.floor(_totalTime / 36 % 24)
 
         isAfternoon = !(hours == 0 || hours / 12 == 0)
 
@@ -33,6 +42,17 @@ class ClockActor(text: CharSequence, skin: Skin) : Label(text, skin) {
         val time = String.format("%02d:%02d %s", hours, minutes, if (isAfternoon) PM else AM)
 
         this.setText(time)
+    }
+
+    fun getCurrentTimeOfDay(): TimeOfDay {
+        val hours = MathUtils.floor(_totalTime / 3600 % 24)
+//        val hours = MathUtils.floor(_totalTime / 36 % 24)
+        when (hours) {
+            in 7..9 -> return TimeOfDay.DAWN
+            in 10..16 -> return TimeOfDay.AFTERNOON
+            in 17..19 -> return TimeOfDay.DUSK
+            else -> return TimeOfDay.NIGHT
+        }
     }
 
     companion object {

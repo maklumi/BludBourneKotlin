@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 import com.packtpub.libgdx.bludbourne.profile.ProfileObserver
+import com.packtpub.libgdx.bludbourne.sfx.ClockActor
 
 class MapManager : ProfileObserver {
 
@@ -189,8 +190,13 @@ class MapManager : ProfileObserver {
         return currentMap!!.currentMap
     }
 
-    fun getCurrentLightMapLayer(): MapLayer? {
-        return currentMap!!.lightMapLayer
+    fun getCurrentLightMapLayer(timeOfDay: ClockActor.TimeOfDay): MapLayer? {
+        when (timeOfDay) {
+            ClockActor.TimeOfDay.DAWN -> return currentMap!!.lightMapDawnLayer
+            ClockActor.TimeOfDay.AFTERNOON -> return null
+            ClockActor.TimeOfDay.DUSK -> return currentMap!!.lightMapDuskLayer
+            ClockActor.TimeOfDay.NIGHT -> return currentMap!!.lightMapNightLayer
+        }
     }
 
     fun setMapChanged(hasMapChanged: Boolean) {
