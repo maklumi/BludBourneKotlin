@@ -220,6 +220,7 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
         player.dispose()
         mapRenderer.dispose()
         AudioManager.dispose()
+        MapFactory.clearCache()
     }
 
     private fun setupViewport(width: Int, height: Int) {

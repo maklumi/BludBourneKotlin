@@ -11,16 +11,16 @@ object ParticleEffectFactory {
         CANDLE_FIRE("sfx/candle.p"),
         LANTERN_FIRE("sfx/candle.p"),
         LAVA_SMOKE("sfx/smoke.p"),
-        WAND_ATTACK(""),
+        WAND_ATTACK("sfx/magic_attack.p"),
         NONE("")
     }
 
     private val SFX_ROOT_DIR = "sfx"
 
-    fun getParticleEffect(particleEffectType: ParticleEffectType, position: Vector2): ParticleEffect? {
+    fun getParticleEffect(particleEffectType: ParticleEffectType, positionX: Float, positionY: Float): ParticleEffect? {
         val effect = ParticleEffect()
         effect.load(Gdx.files.internal(particleEffectType.fullFilePath), Gdx.files.internal(SFX_ROOT_DIR))
-        effect.setPosition(position.x, position.y)
+        effect.setPosition(positionX, positionY)
         when (particleEffectType) {
             CANDLE_FIRE -> {
                 effect.scaleEffect(.04f)
@@ -32,6 +32,7 @@ object ParticleEffectFactory {
                 effect.scaleEffect(.04f)
             }
             WAND_ATTACK -> {
+                effect.scaleEffect(1.0f)
             }
             else -> {
             }
@@ -40,4 +41,7 @@ object ParticleEffectFactory {
         return effect
     }
 
+    fun getParticleEffect(particleEffectType: ParticleEffectType, position: Vector2): ParticleEffect? {
+        return getParticleEffect(particleEffectType, position.x, position.y)
+    }
 }

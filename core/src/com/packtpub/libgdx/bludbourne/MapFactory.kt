@@ -33,6 +33,9 @@ object MapFactory {
     }
 
     fun clearCache() {
+        for (map in mapTable.values) {
+            map.dispose()
+        }
         mapTable.clear()
     }
 }

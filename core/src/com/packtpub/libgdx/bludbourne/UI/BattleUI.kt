@@ -1,5 +1,7 @@
 package com.packtpub.libgdx.bludbourne.UI
 
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.ParticleEffect
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
@@ -9,14 +11,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.Window
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.Entity
 import com.packtpub.libgdx.bludbourne.EntityConfig
 import com.packtpub.libgdx.bludbourne.Utility
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver
 import com.packtpub.libgdx.bludbourne.battle.BattleObserver.BattleEvent.*
 import com.packtpub.libgdx.bludbourne.battle.BattleState
+import com.packtpub.libgdx.bludbourne.sfx.ParticleEffectFactory
 import com.packtpub.libgdx.bludbourne.sfx.ShakeCamera
-
 
 class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), BattleObserver {
     private val _image: AnimatedImage
@@ -34,7 +37,9 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
     private val _checkTimer = 1f
 
     private var _battleShakeCam: ShakeCamera? = null
+    private val _effects = Array<ParticleEffect>()
     private var _origDamageValLabelY = 0f
+    private var _currentImagePosition = Vector2(0f, 0f)
 
     init {
 
@@ -80,7 +85,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
     }
 
     fun battleZoneTriggered(battleZoneValue: Int) {
-        battleState.setCurrentZoneLevel(battleZoneValue);
+        battleState.setCurrentZoneLevel(battleZoneValue)
     }
 
     fun isBattleReady(): Boolean {
@@ -92,7 +97,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
         }
     }
 
-    override fun onNotify(entity: Entity, event: BattleObserver.BattleEvent) {
+    override fun onNotify(enemyEntity: Entity, event: BattleObserver.BattleEvent) {
         when (event) {
             PLAYER_TURN_START -> {
                 _runButton.isDisabled = true
@@ -101,19 +106,19 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
                 _attackButton.touchable = Touchable.disabled
             }
             OPPONENT_ADDED -> {
-                _image.setEntity(entity)
+                _image.setEntity(enemyEntity)
                 _image.setCurrentAnimation(Entity.AnimationType.IMMOBILE)
                 _image.setSize(_enemyWidth, _enemyHeight)
 
-                val vector = Vector2(_image.x, _image.y)
+                _currentImagePosition.set(_image.x, _image.y)
                 if (_battleShakeCam == null) {
-                    _battleShakeCam = ShakeCamera(vector.x, vector.y, 30f)
+                    _battleShakeCam = ShakeCamera(_currentImagePosition.x, _currentImagePosition.y, 30f)
                 }
 
-                this.titleLabel.setText("Level " + battleState.getCurrentZoneLevel() + " " + entity.entityConfig.entityID)
+                this.titleLabel.setText("Level " + battleState.getCurrentZoneLevel() + " " + enemyEntity.entityConfig.entityID)
             }
             OPPONENT_HIT_DAMAGE -> {
-                val damage = entity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_HIT_DAMAGE_TOTAL.toString()).toInt()
+                val damage = enemyEntity.entityConfig.getPropertyValue(EntityConfig.EntityProperties.ENTITY_HIT_DAMAGE_TOTAL.toString()).toInt()
                 _damageValLabel.apply {
                     setText(damage.toString())
                     y = _origDamageValLabelY
@@ -134,8 +139,23 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
             PLAYER_TURN_DONE -> {
                 battleState.opponentAttacks()
             }
+            PLAYER_USED_MAGIC -> {
+                val x = _currentImagePosition.x + (_enemyWidth / 2)
+                val y = _currentImagePosition.y + (_enemyHeight / 2)
+                _effects.add(ParticleEffectFactory.getParticleEffect(ParticleEffectFactory.ParticleEffectType.WAND_ATTACK, x, y))
+            }
             else -> {
             }
+        }
+    }
+
+    override fun draw(batch: Batch, parentAlpha: Float) {
+        super.draw(batch, parentAlpha)
+
+        //Draw the particles last
+        for (i in 0.._effects.size - 1) {
+            val effect = _effects.get(i) ?: continue
+            effect.draw(batch)
         }
     }
 
@@ -148,6 +168,16 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
         if (_battleShakeCam != null && _battleShakeCam!!.isCameraShaking) {
             val shakeCoords = _battleShakeCam!!.newShakePosition
             _image.setPosition(shakeCoords.x, shakeCoords.y)
+        }
+
+        for (i in 0.._effects.size - 1) {
+            val effect = _effects.get(i) ?: continue
+            if (effect.isComplete) {
+                _effects.removeIndex(i)
+                effect.dispose()
+            } else {
+                effect.update(delta)
+            }
         }
 
         super.act(delta)

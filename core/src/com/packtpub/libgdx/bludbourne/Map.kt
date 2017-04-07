@@ -219,6 +219,18 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         }
     }
 
+    internal fun dispose() {
+        for (i in 0..mapEntities.size - 1) {
+            mapEntities.get(i).dispose()
+        }
+        for (i in 0..mapQuestEntities.size - 1) {
+            mapQuestEntities.get(i).dispose()
+        }
+        for (i in 0..mapParticleEffects.size - 1) {
+            mapParticleEffects.get(i).dispose()
+        }
+    }
+
     fun getNPCStartPositions(): Array<Vector2> {
         val positions = Array<Vector2>()
 

@@ -314,9 +314,9 @@ class InventoryUI : Window("Inventory", Utility.STATUSUI_SKIN, "solidbackground"
 
             val cells: Array<Cell<Actor>> = targetTable.cells
 
-            (0..cells.size - 1).forEach { i ->
-                val inventorySlot = cells[i].actor as InventorySlot
-                inventorySlot.clearAllInventoryItems(true)
+            for (i in 0..cells.size - 1) {
+                val inventorySlot = cells[i].actor ?: continue
+                (inventorySlot as InventorySlot).clearAllInventoryItems(true)
             }
 
             for (i in 0..inventoryItems.size - 1) {
