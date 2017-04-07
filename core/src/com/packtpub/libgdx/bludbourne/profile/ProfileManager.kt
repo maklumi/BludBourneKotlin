@@ -3,6 +3,7 @@ package com.packtpub.libgdx.bludbourne.profile
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Base64Coder
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.ObjectMap
 import java.util.*
@@ -69,7 +70,8 @@ class ProfileManager private constructor() : ProfileSubject() {
 
         if (Gdx.files.isLocalStorageAvailable) {
             file = Gdx.files.local(fullFilename)
-            file!!.writeString(fileData, !overwrite)
+            val encodedString = Base64Coder.encodeString(fileData)
+            file!!.writeString(encodedString, !overwrite)
         }
 
         _profiles.put(profileName, file!!)
@@ -109,7 +111,12 @@ class ProfileManager private constructor() : ProfileSubject() {
             return
         }
 
-        _profileProperties = _json.fromJson(ObjectMap::class.java, _profiles!![_profileName]) as ObjectMap<String, Any>
+        val encodedFile = _profiles[_profileName] as FileHandle
+        val s = encodedFile.readString()
+        val decodedFile = Base64Coder.decodeString(s)
+
+        _profileProperties = _json.fromJson(ObjectMap::class.java, decodedFile) as ObjectMap<String, Any>
+
         notify(this, ProfileObserver.ProfileEvent.PROFILE_LOADED)
         isNewProfile = false
     }
