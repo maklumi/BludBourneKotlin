@@ -8,7 +8,7 @@ class ShakeCamera(cameraViewportX: Float, cameraViewportY: Float, private var _s
     var isCameraShaking = false
     private val _originPosition = Vector2(cameraViewportX / 2f, cameraViewportY / 2f)
     private var _origShakeRadius = _shakeRadius
-    private var _randomAngle = 0.0f
+    private var _randomAngle = MathUtils.random(1, 360).toFloat()
     private var _offset = Vector2()
     private var _currentPosition = Vector2()
 
@@ -21,8 +21,10 @@ class ShakeCamera(cameraViewportX: Float, cameraViewportY: Float, private var _s
     }
 
     private fun computeCameraOffset() {
-        _offset.x = MathUtils.sinDeg(_randomAngle) * _shakeRadius
-        _offset.y = MathUtils.cosDeg(_randomAngle) * _shakeRadius
+        val sine = MathUtils.sinDeg(_randomAngle)
+        val cosine = MathUtils.cosDeg(_randomAngle)
+        _offset.x = cosine * _shakeRadius
+        _offset.y = sine * _shakeRadius
     }
 
     private fun computeCurrentCameraCenter() {
@@ -38,7 +40,7 @@ class ShakeCamera(cameraViewportX: Float, cameraViewportY: Float, private var _s
 
         isCameraShaking = true
         _shakeRadius *= .9f
-        _randomAngle = ((150 + MathUtils.random(1, 60)) % 360).toFloat()
+        _randomAngle = MathUtils.random(1, 360).toFloat()
     }
 
     fun reset() {
