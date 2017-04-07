@@ -149,6 +149,11 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
         }
     }
 
+    fun resetDefaults() {
+        _battleTimer = 0f
+        battleState.resetDefaults()
+    }
+
     override fun draw(batch: Batch, parentAlpha: Float) {
         super.draw(batch, parentAlpha)
 

@@ -341,7 +341,16 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
 
         when (event) {
             LOAD_CONVERSATION -> {
-                val config = json.fromJson(EntityConfig::class.java, value)
+                var config = json.fromJson(EntityConfig::class.java, value)
+
+                //Check to see if there is a version loading into properties
+                if (config.itemTypeID == InventoryItem.ItemTypeID.NONE.toString()) {
+                    val configReturnProperty = ProfileManager.instance.getProperty(config.entityID, EntityConfig::class.java)
+                    if (configReturnProperty != null) {
+                        config = configReturnProperty
+                    }
+                }
+
                 conversationUI.loadConversation(config)
                 conversationUI.getCurrentConversationGraph().addObserver(this)
             }
@@ -605,7 +614,7 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
     }
 
     override fun pause() {
-
+        _battleUI.resetDefaults()
     }
 
     override fun resume() {

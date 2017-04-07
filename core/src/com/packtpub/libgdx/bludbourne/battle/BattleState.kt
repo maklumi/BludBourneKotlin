@@ -1,5 +1,6 @@
 package com.packtpub.libgdx.bludbourne.battle
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Timer
 import com.packtpub.libgdx.bludbourne.Entity
@@ -26,6 +27,17 @@ class BattleState : BattleSubject(), InventoryObserver {
     private val _playerAttackCalculations: Timer.Task = getPlayerAttackCalculationTimer()
     private val _opponentAttackCalculations: Timer.Task = getOpponentAttackCalculationTimer()
     private val _checkPlayerMagicUse: Timer.Task = getPlayerMagicUseCheckTimer()
+
+    fun resetDefaults() {
+        Gdx.app.debug(TAG, "Resetting defaults...")
+        _currentZoneLevel = 0
+        _currentPlayerAP = 0
+        _currentPlayerDP = 0
+        _currentPlayerWandAPPoints = 0
+        _playerAttackCalculations.cancel()
+        _opponentAttackCalculations.cancel()
+        _checkPlayerMagicUse.cancel()
+    }
 
     fun setCurrentZoneLevel(zoneLevel: Int) {
         _currentZoneLevel = zoneLevel
@@ -184,10 +196,12 @@ class BattleState : BattleSubject(), InventoryObserver {
             ADD_WAND_AP -> {
                 val wandAP = value.toInt()
                 _currentPlayerWandAPPoints += wandAP
+                Gdx.app.debug(TAG, "WandAP: " + _currentPlayerWandAPPoints)
             }
             REMOVE_WAND_AP -> {
                 val removeWandAP = value.toInt()
                 _currentPlayerWandAPPoints -= removeWandAP
+                Gdx.app.debug(TAG, "WandAP: " + _currentPlayerWandAPPoints)
             }
             else -> {
             }

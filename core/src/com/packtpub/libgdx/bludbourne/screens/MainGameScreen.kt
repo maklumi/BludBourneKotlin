@@ -208,11 +208,12 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
 
     override fun pause() {
         gameState = GameState.PAUSED
-        ProfileManager.instance.saveProfile()
+        playerHUD.pause()
     }
 
     override fun resume() {
         gameState = GameState.LOADING
+        playerHUD.resume()
     }
 
     override fun dispose() {
