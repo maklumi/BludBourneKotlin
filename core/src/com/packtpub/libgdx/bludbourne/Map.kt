@@ -2,6 +2,7 @@ package com.packtpub.libgdx.bludbourne
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.ParticleEffect
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
@@ -12,6 +13,7 @@ import com.badlogic.gdx.utils.Json
 import com.packtpub.libgdx.bludbourne.audio.AudioManager
 import com.packtpub.libgdx.bludbourne.audio.AudioObserver
 import com.packtpub.libgdx.bludbourne.audio.AudioSubject
+import com.packtpub.libgdx.bludbourne.sfx.ParticleEffectFactory
 import java.util.*
 
 abstract class Map(var currentMapType: MapFactory.MapType,
@@ -37,6 +39,8 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected set
     var enemySpawnLayer: MapLayer? = null
         protected set
+    var _particleEffectSpawnLayer: MapLayer? = null
+        protected set
     var lightMapDawnLayer: MapLayer? = null
         protected set
     var lightMapAfternoonLayer: MapLayer? = null
@@ -50,6 +54,7 @@ abstract class Map(var currentMapType: MapFactory.MapType,
     protected val json = Json()
     var mapEntities: Array<Entity> = Array(10)
     var mapQuestEntities: Array<Entity> = Array()
+    var mapParticleEffects = Array<ParticleEffect>()
 
     init {
         Utility.loadMapAsset(fullMapPath)
@@ -86,11 +91,41 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         if (lightMapNightLayer == null) {
             Gdx.app.debug(TAG, "No night lightmap layer found!")
         }
+        _particleEffectSpawnLayer = currentMap.layers.get(PARTICLE_EFFECT_SPAWN_LAYER)
+        if (_particleEffectSpawnLayer == null) {
+            Gdx.app.debug(TAG, "No particle effect spawn layer")
+        }
         npcStartPositions = getNPCStartPositions()
         specialNPCStartPositions = getExtraNPCStartPositions()
 
         // Observers
         this.addObserver(AudioManager)
+    }
+
+    fun getParticleEffectSpawnPositions(particleEffectType: ParticleEffectFactory.ParticleEffectType): Array<Vector2> {
+        val objects = Array<MapObject>()
+        val positions = Array<Vector2>()
+
+        for (mapObject in _particleEffectSpawnLayer!!.objects) {
+            val name = mapObject.name
+
+            if (name == null || name.isEmpty() ||
+                    name != particleEffectType.toString()) {
+                continue
+            }
+
+            val rect = (mapObject as RectangleMapObject).rectangle
+            //Get center of rectangle
+            var x = rect.getX() + (rect.getWidth() / 2)
+            var y = rect.getY() + (rect.getHeight() / 2)
+
+            //scale by the unit to convert from map coordinates
+            x *= UNIT_SCALE
+            y *= UNIT_SCALE
+
+            positions.add(Vector2(x, y))
+        }
+        return positions
     }
 
     fun getQuestItemSpawnPositions(objectName: String, objectTaskID: String): Array<Vector2> {
@@ -249,6 +284,7 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         protected val QUEST_ITEM_SPAWN_LAYER = "MAP_QUEST_ITEM_SPAWN_LAYER"
         protected val QUEST_DISCOVER_LAYER = "MAP_QUEST_DISCOVER_LAYER"
         protected val ENEMY_SPAWN_LAYER = "MAP_ENEMY_SPAWN_LAYER"
+        protected val PARTICLE_EFFECT_SPAWN_LAYER = "PARTICLE_EFFECT_SPAWN_LAYER"
 
         val BACKGROUND_LAYER = "Background_Layer"
         val GROUND_LAYER = "Ground_Layer"

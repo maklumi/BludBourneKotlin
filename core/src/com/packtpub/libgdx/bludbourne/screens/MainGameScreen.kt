@@ -176,14 +176,14 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
             player.update(mapMgr, mapRenderer.batch, delta)
 
             mapRenderer.batch.begin()
-            mapRenderer.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
+            mapRenderer.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_COLOR)
             mapRenderer.renderImageLayer(lightMap as TiledMapImageLayer)
             mapRenderer.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
             mapRenderer.batch.end()
 
             previousLightMap?.let {
                 mapRenderer.batch.begin()
-                mapRenderer.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                mapRenderer.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_COLOR)
                 mapRenderer.renderImageLayer(previousLightMap as TiledMapImageLayer)
                 mapRenderer.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
                 mapRenderer.batch.end()

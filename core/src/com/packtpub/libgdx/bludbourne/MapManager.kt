@@ -93,6 +93,7 @@ class MapManager : ProfileObserver {
         hasMapChanged = true
         clearCurrentSelectedMapEntity()
         previousLightMap = null
+        currentLightMap = null
         Gdx.app.debug(TAG, "Player Start: (" + currentMap?.playerStart?.x + "," + currentMap?.playerStart?.y + ")")
     }
 

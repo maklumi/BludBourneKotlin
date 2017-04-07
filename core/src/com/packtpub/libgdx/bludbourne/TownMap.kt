@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector2
 import com.packtpub.libgdx.bludbourne.audio.AudioObserver
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
+import com.packtpub.libgdx.bludbourne.sfx.ParticleEffectFactory
 
 
 class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
@@ -89,6 +90,17 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
         initSpecialEntityPosition(townFolk15)
         mapEntities.add(townFolk15)
 
+        val effectPositions = getParticleEffectSpawnPositions(ParticleEffectFactory.ParticleEffectType.CANDLE_FIRE)
+        for (position in effectPositions) {
+            val effect = ParticleEffectFactory.getParticleEffect(ParticleEffectFactory.ParticleEffectType.CANDLE_FIRE)
+            if (effect != null) {
+                effect.scaleEffect(.04f)
+                effect.setPosition(position.x, position.y)
+                effect.start()
+                mapParticleEffects.add(effect)
+            }
+        }
+
     }
 
     override fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
@@ -97,6 +109,11 @@ class TownMap : Map(MapFactory.MapType.TOWN, TownMap.mapPath) {
         }
         for (i in 0..mapQuestEntities.size - 1) {
             mapQuestEntities[i].update(mapMgr, batch, delta)
+        }
+        for (particleEffect in mapParticleEffects) {
+            batch.begin()
+            particleEffect.draw(batch, delta)
+            batch.end()
         }
     }
 
