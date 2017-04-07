@@ -29,7 +29,7 @@ class ConversationGraph(private val conversations: Hashtable<String, Conversatio
         if (currentConversationID.equals(id, true) || isReachable(currentConversationID, id)) {
             currentConversationID = id
         } else {
-            println("New conversation node $id is not reachable from current node [$currentConversationID]!")
+            //Gdx.app.debug(TAG, "New conversation node $id is not reachable from current node [$currentConversationID]!")
         }
     }
 
@@ -50,7 +50,7 @@ class ConversationGraph(private val conversations: Hashtable<String, Conversatio
 
     fun getConversationByID(id: String): Conversation? {
         if (!isValid(id)) {
-            println("Id $id is not valid!")
+            //Gdx.app.debug(TAG, "Id $id is not valid!")
             return null
         }
         return conversations[id]!!

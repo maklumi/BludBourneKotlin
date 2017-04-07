@@ -105,7 +105,7 @@ class ProfileManager private constructor() : ProfileSubject() {
         val doesProfileFileExist = Gdx.files.local(fullProfileFileName).exists()
 
         if (!doesProfileFileExist) {
-            println("File doesn't exist!")
+            //Gdx.app.debug(TAG, "File doesn't exist!")
             return
         }
 

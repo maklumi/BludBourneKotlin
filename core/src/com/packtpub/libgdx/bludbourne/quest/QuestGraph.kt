@@ -71,7 +71,7 @@ class QuestGraph {
 
     fun getQuestTaskByID(id: String): QuestTask? {
         if (!isValid(id)) {
-            println("Id $id is not valid!")
+//            println("Id $id is not valid!")
             return null
         }
         return questTasks[id]
@@ -82,7 +82,7 @@ class QuestGraph {
 
         //Will not add if creates cycles
         if (doesCycleExist(questTaskDependency)) {
-            println("Cycle exists! Not adding")
+//            println("Cycle exists! Not adding")
             return
         }
 
@@ -93,7 +93,7 @@ class QuestGraph {
         val keys = questTasks.keys
         for (id in keys) {
             if (doesQuestTaskHaveDependencies(id) && questTaskDep.destinationId.equals(id, ignoreCase = true)) {
-                println("ID: " + id + " destID: " + questTaskDep.destinationId)
+//                println("ID: " + id + " destID: " + questTaskDep.destinationId)
                 return true
             }
         }

@@ -12,6 +12,7 @@ import com.packtpub.libgdx.bludbourne.profile.ProfileManager
 
 
 class BattleState : BattleSubject(), InventoryObserver {
+    private val TAG = BattleState::class.java.simpleName
     private var _currentOpponent: Entity? = null
     private var _currentPlayerAP: Int = 0
     private var _currentPlayerDP: Int = 0
@@ -38,7 +39,7 @@ class BattleState : BattleSubject(), InventoryObserver {
         if (_currentZoneLevel == 0) return false
         val randomVal = MathUtils.random(1, 100)
 
-        //System.out.println("CHANGE OF ATTACK: " + _chanceOfAttack + " randomval: " + randomVal);
+        //Gdx.app.debug(TAG, "CHANGE OF ATTACK: " + _chanceOfAttack + " randomval: " + randomVal);
 
         if (_chanceOfAttack > randomVal) {
             setCurrentOpponent()
@@ -49,7 +50,7 @@ class BattleState : BattleSubject(), InventoryObserver {
     }
 
     fun setCurrentOpponent() {
-        System.out.print("Entered BATTLE ZONE: " + _currentZoneLevel)
+        //Gdx.app.debug(TAG, "Entered BATTLE ZONE: " + _currentZoneLevel)
         val entity = MonsterFactory.getRandomMonster(_currentZoneLevel) ?: return
         this._currentOpponent = entity
         notify(entity, BattleEvent.OPPONENT_ADDED)
@@ -96,12 +97,12 @@ class BattleState : BattleSubject(), InventoryObserver {
 
                 val damage = MathUtils.clamp(_currentPlayerAP - currentOpponentDP, 0, _currentPlayerAP)
 
-                println("ENEMY HAS $currentOpponentHP hit with damage: $damage")
+                //Gdx.app.debug(TAG, "ENEMY HAS $currentOpponentHP hit with damage: $damage")
 
                 currentOpponentHP = MathUtils.clamp(currentOpponentHP - damage, 0, currentOpponentHP)
                 _currentOpponent!!.entityConfig.setPropertyValue(EntityConfig.EntityProperties.ENTITY_HEALTH_POINTS.toString(), currentOpponentHP.toString())
 
-                println("Player attacks " + _currentOpponent!!.entityConfig.entityID + " leaving it with HP: " + currentOpponentHP)
+                //Gdx.app.debug(TAG, "Player attacks " + _currentOpponent!!.entityConfig.entityID + " leaving it with HP: " + currentOpponentHP)
 
                 _currentOpponent!!.entityConfig.setPropertyValue(EntityConfig.EntityProperties.ENTITY_HIT_DAMAGE_TOTAL.toString(), damage.toString())
 
@@ -150,7 +151,7 @@ class BattleState : BattleSubject(), InventoryObserver {
                     this@BattleState.notify(_currentOpponent as Entity, BattleEvent.PLAYER_HIT_DAMAGE)
                 }
 
-                println("Player HIT for " + damage + " BY " + _currentOpponent!!.entityConfig.entityID + " leaving player with HP: " + hpVal)
+                //Gdx.app.debug(TAG, "Player HIT for " + damage + " BY " + _currentOpponent!!.entityConfig.entityID + " leaving player with HP: " + hpVal)
 
                 this@BattleState.notify(_currentOpponent as Entity, BattleEvent.OPPONENT_TURN_DONE)
             }
@@ -173,12 +174,12 @@ class BattleState : BattleSubject(), InventoryObserver {
             UPDATED_AP -> {
                 val apVal = value.toInt()
                 _currentPlayerAP = apVal
-                System.out.println("APVAL: " + _currentPlayerAP)
+                //Gdx.app.debug(TAG, "APVAL: " + _currentPlayerAP)
             }
             UPDATED_DP -> {
                 val dpVal = value.toInt()
                 _currentPlayerDP = dpVal
-                System.out.println("DPVAL: " + _currentPlayerDP)
+                //Gdx.app.debug(TAG, "DPVAL: " + _currentPlayerDP)
             }
             ADD_WAND_AP -> {
                 val wandAP = value.toInt()

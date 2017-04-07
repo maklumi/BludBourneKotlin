@@ -18,7 +18,6 @@ class PlayerInputComponent : InputComponent() {
     override fun update(entity: Entity, delta: Float) {
         //Keyboard input
         if (keys[InputComponent.Keys.PAUSE]!!) {
-            println("INPUT PAUSED")
             MainGameScreen.gameState = MainGameScreen.GameState.PAUSED
             pauseReleased()
         } else if (keys[Keys.LEFT]!!) {
