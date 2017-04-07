@@ -109,6 +109,7 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
                 _image.setEntity(enemyEntity)
                 _image.setCurrentAnimation(Entity.AnimationType.IMMOBILE)
                 _image.setSize(_enemyWidth, _enemyHeight)
+                _image.setPosition(this.getCell(_image).actorX, this.getCell(_image).actorY)
 
                 _currentImagePosition.set(_image.x, _image.y)
                 if (_battleShakeCam == null) {
@@ -146,6 +147,17 @@ class BattleUI : Window("BATTLE", Utility.STATUSUI_SKIN, "solidbackground"), Bat
             }
             else -> {
             }
+        }
+    }
+
+    fun resize() {
+        _image.setPosition(this.getCell(_image).actorX, this.getCell(_image).actorY)
+        _currentImagePosition.set(_image.x, _image.y)
+
+        if (_battleShakeCam != null) {
+            val position = Vector2(_currentImagePosition.x, _currentImagePosition.y)
+            _battleShakeCam!!.originPosition = position
+            _battleShakeCam!!.reset()
         }
     }
 

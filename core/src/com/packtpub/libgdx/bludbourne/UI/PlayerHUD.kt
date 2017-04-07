@@ -611,6 +611,8 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
 
     override fun resize(width: Int, height: Int) {
         stage.viewport.update(width, height, true)
+        _battleUI.validate()
+        _battleUI.resize()
     }
 
     override fun pause() {

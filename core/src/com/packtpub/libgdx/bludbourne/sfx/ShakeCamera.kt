@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2
 class ShakeCamera(cameraViewportX: Float, cameraViewportY: Float, private var _shakeRadius: Float) {
 
     var isCameraShaking = false
-    private val _originPosition = Vector2(cameraViewportX / 2f, cameraViewportY / 2f)
+    var originPosition = Vector2(cameraViewportX / 2f, cameraViewportY / 2f)
     private var _origShakeRadius = _shakeRadius
     private var _randomAngle = MathUtils.random(1, 360).toFloat()
     private var _offset = Vector2()
@@ -28,8 +28,8 @@ class ShakeCamera(cameraViewportX: Float, cameraViewportY: Float, private var _s
     }
 
     private fun computeCurrentCameraCenter() {
-        _currentPosition.x = _originPosition.x + _offset.x
-        _currentPosition.y = _originPosition.y + _offset.y
+        _currentPosition.x = originPosition.x + _offset.x
+        _currentPosition.y = originPosition.y + _offset.y
     }
 
     private fun diminishShake() {
@@ -47,8 +47,8 @@ class ShakeCamera(cameraViewportX: Float, cameraViewportY: Float, private var _s
         _shakeRadius = _origShakeRadius
         isCameraShaking = false
         seedRandomAngle()
-        _currentPosition.x = _originPosition.x
-        _currentPosition.y = _originPosition.y
+        _currentPosition.x = originPosition.x
+        _currentPosition.y = originPosition.y
     }
 
     val newShakePosition: Vector2
