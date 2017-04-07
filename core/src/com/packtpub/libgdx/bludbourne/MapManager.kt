@@ -174,6 +174,10 @@ class MapManager : ProfileObserver {
         currentMap!!.updateMapEntities(mapMgr, batch, delta)
     }
 
+    fun updateCurrentMapEffects(mapMgr: MapManager, batch: Batch, delta: Float) {
+        currentMap!!.updateMapEffects(mapMgr, batch, delta)
+    }
+
     fun getCurrentMapEntities(): Array<Entity> = currentMap!!.mapEntities
 
     fun clearCurrentSelectedMapEntity() {

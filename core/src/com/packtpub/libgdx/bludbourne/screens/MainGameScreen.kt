@@ -174,6 +174,7 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
 
             mapMgr.updateCurrentMapEntities(mapMgr, mapRenderer.batch, delta)
             player.update(mapMgr, mapRenderer.batch, delta)
+            mapMgr.updateCurrentMapEffects(mapMgr, mapRenderer.batch, delta)
 
             mapRenderer.batch.begin()
             mapRenderer.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_COLOR)
@@ -193,6 +194,7 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
             mapRenderer.render()
             mapMgr.updateCurrentMapEntities(mapMgr, mapRenderer.batch, delta)
             player.update(mapMgr, mapRenderer.batch, delta)
+            mapMgr.updateCurrentMapEffects(mapMgr, mapRenderer.batch, delta)
         }
 
         playerHUD.render(delta)

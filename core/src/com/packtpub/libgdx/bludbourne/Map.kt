@@ -208,6 +208,9 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         for (i in 0..mapQuestEntities.size - 1) {
             mapQuestEntities[i].update(mapMgr, batch, delta)
         }
+    }
+
+    fun updateMapEffects(mapMgr: MapManager, batch: Batch, delta: Float) {
         // style 3
         for (particleEffect in mapParticleEffects) {
             batch.begin()

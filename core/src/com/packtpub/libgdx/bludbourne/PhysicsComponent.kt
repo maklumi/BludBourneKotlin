@@ -93,6 +93,8 @@ abstract class PhysicsComponent : ComponentSubject(), Component {
     }
 
     fun calculateNextPosition(deltaTime: Float) {
+        if( deltaTime > .7) return
+
         var testX = currentEntityPosition.x
         var testY = currentEntityPosition.y
 

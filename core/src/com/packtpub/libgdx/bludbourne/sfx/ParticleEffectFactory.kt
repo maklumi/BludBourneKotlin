@@ -10,7 +10,7 @@ object ParticleEffectFactory {
     enum class ParticleEffectType(val fullFilePath: String) {
         CANDLE_FIRE("sfx/candle.p"),
         LANTERN_FIRE("sfx/candle.p"),
-        LAVA_SMOKE(""),
+        LAVA_SMOKE("sfx/smoke.p"),
         WAND_ATTACK(""),
         NONE("")
     }
@@ -29,6 +29,7 @@ object ParticleEffectFactory {
                 effect.scaleEffect(.02f)
             }
             LAVA_SMOKE -> {
+                effect.scaleEffect(.04f)
             }
             WAND_ATTACK -> {
             }
