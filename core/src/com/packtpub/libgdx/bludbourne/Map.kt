@@ -201,7 +201,20 @@ abstract class Map(var currentMapType: MapFactory.MapType,
         setClosestStartPosition(convertedUnits)
     }
 
-    abstract fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float)
+    fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
+        // style 1
+        mapEntities.forEach { it.update(mapMgr, batch, delta) }
+        // style 2
+        for (i in 0..mapQuestEntities.size - 1) {
+            mapQuestEntities[i].update(mapMgr, batch, delta)
+        }
+        // style 3
+        for (particleEffect in mapParticleEffects) {
+            batch.begin()
+            particleEffect.draw(batch, delta)
+            batch.end()
+        }
+    }
 
     fun getNPCStartPositions(): Array<Vector2> {
         val positions = Array<Vector2>()

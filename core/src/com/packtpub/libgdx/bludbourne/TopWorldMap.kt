@@ -1,14 +1,17 @@
 package com.packtpub.libgdx.bludbourne
 
-import com.badlogic.gdx.graphics.g2d.Batch
 import com.packtpub.libgdx.bludbourne.audio.AudioObserver
+import com.packtpub.libgdx.bludbourne.sfx.ParticleEffectFactory
 
 
 class TopWorldMap : Map(MapFactory.MapType.TOP_WORLD, TopWorldMap._mapPath) {
 
-    override fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
-        mapEntities.forEach { it.update(mapMgr, batch, delta) }
-        mapQuestEntities.forEach { it.update(mapMgr, batch, delta) }
+    val lanternEffectPositions = getParticleEffectSpawnPositions(ParticleEffectFactory.ParticleEffectType.LANTERN_FIRE)
+
+    init {
+        for (position in lanternEffectPositions) {
+            mapParticleEffects.add(ParticleEffectFactory.getParticleEffect(ParticleEffectFactory.ParticleEffectType.LANTERN_FIRE, position))
+        }
     }
 
     override fun unloadMusic() {

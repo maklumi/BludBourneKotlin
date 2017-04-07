@@ -233,6 +233,12 @@ class MapManager : ProfileObserver {
                 _currentLightMapOpacity = MathUtils.clamp(_currentLightMapOpacity, 0f, 1f)
             }
         } else {
+            if (previousLightMap != null) {
+                previousLightMap!!.setOpacity(0f)
+            }
+            if (currentLightMap != null) {
+                currentLightMap!!.setOpacity(1f)
+            }
             _timeOfDayChanged = false
         }
     }

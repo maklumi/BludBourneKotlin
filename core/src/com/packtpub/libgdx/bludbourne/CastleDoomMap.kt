@@ -1,13 +1,16 @@
 package com.packtpub.libgdx.bludbourne
 
-import com.badlogic.gdx.graphics.g2d.Batch
 import com.packtpub.libgdx.bludbourne.audio.AudioObserver
+import com.packtpub.libgdx.bludbourne.sfx.ParticleEffectFactory
 
 class CastleDoomMap : Map(MapFactory.MapType.CASTLE_OF_DOOM, CastleDoomMap.mapPath) {
 
-    override fun updateMapEntities(mapMgr: MapManager, batch: Batch, delta: Float) {
-        mapEntities.forEach { it.update(mapMgr, batch, delta) }
-        mapQuestEntities.forEach { it.update(mapMgr, batch, delta) }
+    val candleEffectPositions = getParticleEffectSpawnPositions(ParticleEffectFactory.ParticleEffectType.CANDLE_FIRE)
+
+    init {
+        for (position in candleEffectPositions) {
+            mapParticleEffects.add(ParticleEffectFactory.getParticleEffect(ParticleEffectFactory.ParticleEffectType.CANDLE_FIRE, position))
+        }
     }
 
     override fun unloadMusic() {

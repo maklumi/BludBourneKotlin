@@ -2,26 +2,41 @@ package com.packtpub.libgdx.bludbourne.sfx
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.ParticleEffect
+import com.badlogic.gdx.math.Vector2
 import com.packtpub.libgdx.bludbourne.sfx.ParticleEffectFactory.ParticleEffectType.*
 
 object ParticleEffectFactory {
 
-    enum class ParticleEffectType {
-        CANDLE_FIRE, LAVA_SMOKE, WAND_ATTACK,
-        NONE
+    enum class ParticleEffectType(val fullFilePath: String) {
+        CANDLE_FIRE("sfx/candle.p"),
+        LANTERN_FIRE("sfx/candle.p"),
+        LAVA_SMOKE(""),
+        WAND_ATTACK(""),
+        NONE("")
     }
 
-    fun getParticleEffect(particleEffectType: ParticleEffectType): ParticleEffect? {
+    private val SFX_ROOT_DIR = "sfx"
+
+    fun getParticleEffect(particleEffectType: ParticleEffectType, position: Vector2): ParticleEffect? {
         val effect = ParticleEffect()
+        effect.load(Gdx.files.internal(particleEffectType.fullFilePath), Gdx.files.internal(SFX_ROOT_DIR))
+        effect.setPosition(position.x, position.y)
         when (particleEffectType) {
             CANDLE_FIRE -> {
-                effect.load(Gdx.files.internal("sfx/candle.p"), Gdx.files.internal("sfx"))
-                return effect
+                effect.scaleEffect(.04f)
             }
-            LAVA_SMOKE -> return null
-            WAND_ATTACK -> return null
-            else -> return null
+            LANTERN_FIRE -> {
+                effect.scaleEffect(.02f)
+            }
+            LAVA_SMOKE -> {
+            }
+            WAND_ATTACK -> {
+            }
+            else -> {
+            }
         }
+        effect.start()
+        return effect
     }
 
 }
