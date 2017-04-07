@@ -84,12 +84,12 @@ abstract class GraphicsComponent : ComponentSubject(), Component {
         val texture1Frames = TextureRegion.split(texture1, Entity.FRAME_WIDTH, Entity.FRAME_HEIGHT)
         val texture2Frames = TextureRegion.split(texture2, Entity.FRAME_WIDTH, Entity.FRAME_HEIGHT)
 
-        val animationKeyFrames = Array<TextureRegion>(2)
+        val point = points.first()
 
-        animationKeyFrames.add(texture1Frames[points.first().x][points.first().y])
-        animationKeyFrames.add(texture2Frames[points.first().x][points.first().y])
+        val animation = Animation(frameDuration, texture1Frames[point.x][point.y], texture2Frames[point.x][point.y])
+        animation.playMode = Animation.PlayMode.LOOP
 
-        return Animation(frameDuration, animationKeyFrames, Animation.PlayMode.LOOP)
+        return animation
     }
 
     internal fun loadAnimation(textureName: String, points: Array<GridPoint2>, frameDuration: Float): Animation<TextureRegion> {
@@ -102,6 +102,16 @@ abstract class GraphicsComponent : ComponentSubject(), Component {
         points.forEach { point -> animationKeyFrames.add(textureFrames[point.x][point.y]) }
 
         return Animation(frameDuration, animationKeyFrames, Animation.PlayMode.LOOP)
+//        val animationKeyFrames = Array<TextureRegion>(points.size)
+//
+//        for (i in 0..points.size - 1) {
+//            animationKeyFrames[i] = textureFrames[points.get(i).x][points.get(i).y]
+//        }
+//
+//        val animation = Animation(frameDuration, animationKeyFrames )
+//        animation.playMode = Animation.PlayMode.LOOP
+//
+//        return animation
     }
 
 }
