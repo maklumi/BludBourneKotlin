@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.packtpub.libgdx.bludbourne.profile.ProfileManager
@@ -19,6 +20,12 @@ class MapManager : ProfileObserver {
     //    private var currentMap: Map = MapFactory.getMap(MapFactory.MapType.TOWN)
     private var currentMap: Map? = null
     var currentSelectedEntity: Entity? = null
+    var currentLightMap: MapLayer? = null
+    var previousLightMap: MapLayer? = null
+    private var _timeOfDay: ClockActor.TimeOfDay? = null
+    private var _currentLightMapOpacity = 0f
+    private var _previousLightMapOpacity = 1f
+    private var _timeOfDayChanged = false
 
     override fun onNotify(profileManager: ProfileManager, event: ProfileObserver.ProfileEvent) {
         when (event) {
@@ -85,6 +92,7 @@ class MapManager : ProfileObserver {
         currentMap = map
         hasMapChanged = true
         clearCurrentSelectedMapEntity()
+        previousLightMap = null
         Gdx.app.debug(TAG, "Player Start: (" + currentMap?.playerStart?.x + "," + currentMap?.playerStart?.y + ")")
     }
 
@@ -190,12 +198,41 @@ class MapManager : ProfileObserver {
         return currentMap!!.currentMap
     }
 
-    fun getCurrentLightMapLayer(timeOfDay: ClockActor.TimeOfDay): MapLayer? {
+    fun updateLightMaps(timeOfDay: ClockActor.TimeOfDay) {
+        if (_timeOfDay != timeOfDay) {
+            _currentLightMapOpacity = 0f
+            _previousLightMapOpacity = 1f
+            _timeOfDay = timeOfDay
+            _timeOfDayChanged = true
+            previousLightMap = currentLightMap
+
+            Gdx.app.debug(TAG, "Time of Day CHANGED")
+        }
         when (timeOfDay) {
-            ClockActor.TimeOfDay.DAWN -> return currentMap!!.lightMapDawnLayer
-            ClockActor.TimeOfDay.AFTERNOON -> return null
-            ClockActor.TimeOfDay.DUSK -> return currentMap!!.lightMapDuskLayer
-            ClockActor.TimeOfDay.NIGHT -> return currentMap!!.lightMapNightLayer
+            ClockActor.TimeOfDay.DAWN -> currentLightMap = currentMap!!.lightMapDawnLayer
+            ClockActor.TimeOfDay.AFTERNOON -> currentLightMap = currentMap!!.lightMapAfternoonLayer
+            ClockActor.TimeOfDay.DUSK -> currentLightMap = currentMap!!.lightMapDuskLayer
+            ClockActor.TimeOfDay.NIGHT -> currentLightMap = currentMap!!.lightMapNightLayer
+            else -> currentLightMap = currentMap!!.lightMapAfternoonLayer
+        }
+        if (_timeOfDayChanged) {
+            if (previousLightMap != null && _previousLightMapOpacity != 0f) {
+                previousLightMap!!.opacity = _previousLightMapOpacity
+                _previousLightMapOpacity -= 0.5f
+                _previousLightMapOpacity = MathUtils.clamp(_previousLightMapOpacity, 0f, 1f)
+
+                if (_previousLightMapOpacity == 0f) {
+                    previousLightMap = null
+                }
+            }
+
+            if (currentLightMap != null && _currentLightMapOpacity != 1f) {
+                currentLightMap!!.opacity = _currentLightMapOpacity
+                _currentLightMapOpacity += 0.01f
+                _currentLightMapOpacity = MathUtils.clamp(_currentLightMapOpacity, 0f, 1f)
+            }
+        } else {
+            _timeOfDayChanged = false
         }
     }
 

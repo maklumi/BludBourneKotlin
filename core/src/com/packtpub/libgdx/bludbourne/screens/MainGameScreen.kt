@@ -151,10 +151,11 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
 
         }
 
-        val lightMap = mapMgr.getCurrentLightMapLayer(playerHUD.getCurrentTimeOfDay())
+        mapMgr.updateLightMaps(playerHUD.getCurrentTimeOfDay())
+        val lightMap = mapMgr.currentLightMap
+        val previousLightMap = mapMgr.previousLightMap
 
         if (lightMap != null) {
-            lightMap as TiledMapImageLayer
             val backgroundMapLayer = mapMgr.getCurrentTiledMap().layers.get(BACKGROUND_LAYER)
             val groundMapLayer = mapMgr.getCurrentTiledMap().layers.get(GROUND_LAYER)
             val decorationMapLayer = mapMgr.getCurrentTiledMap().layers.get(DECORATION_LAYER)
@@ -176,9 +177,18 @@ open class MainGameScreen(val game: BludBourne) : GameScreen() {
 
             mapRenderer.batch.begin()
             mapRenderer.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
-            mapRenderer.renderImageLayer(lightMap)
+            mapRenderer.renderImageLayer(lightMap as TiledMapImageLayer)
             mapRenderer.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
             mapRenderer.batch.end()
+
+            previousLightMap?.let {
+                mapRenderer.batch.begin()
+                mapRenderer.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                mapRenderer.renderImageLayer(previousLightMap as TiledMapImageLayer)
+                mapRenderer.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+                mapRenderer.batch.end()
+            }
+
         } else {
             mapRenderer.render()
             mapMgr.updateCurrentMapEntities(mapMgr, mapRenderer.batch, delta)

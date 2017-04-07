@@ -213,7 +213,7 @@ class PlayerHUD(val camera: Camera, val player: Entity, val mapMgr: MapManager) 
     }
 
     fun getCurrentTimeOfDay(): ClockActor.TimeOfDay {
-        return _clock.getCurrentTimeOfDay()
+        return _clock.currentTimeOfDay
     }
 
     fun updateEntityObservers() {
